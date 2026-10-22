@@ -106,6 +106,22 @@ directly in a compatible browser. A local web server is not required.
 
 Run the local test suite with `node --test tests/*.test.js`.
 
+### Browser smoke test
+
+`tools/smoke.js` drives the Memories and Radio settings panels in headless
+Chrome against a fake radio that speaks the real serial protocol (handshake,
+EEPROM read/write, reboot, and a locked-radio case). No radio or npm packages
+are needed, only Node.js and a Chrome or Chromium binary:
+
+```
+CHROME=/path/to/chrome node tools/smoke.js index.html /tmp/uvstudio-smoke
+```
+
+It prints what was read, edited, and written to the fake radio, and saves
+`memories.png` and `settings.png` in the output folder. Without `CHROME` it
+looks for Playwright's headless shell in `~/.cache/ms-playwright`. It uses the
+DevTools port 9333 and is not part of `node --test`.
+
 ## Origin and attribution
 
 UV Studio incorporates K5Viewer and UVTools2. Their original attribution notices
