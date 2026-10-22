@@ -149,6 +149,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   console.log('after add', await state(), await evaluate(`document.activeElement?.dataset.field`));
   await evaluate(`(() => { const c = document.getElementById('memShowEmpty'); c.checked = false; c.dispatchEvent(new Event('change')); })()`);
 
+  // Widest values must fit their cells without scrolling (DCS tone, 10-char name, 4-digit MHz).
+  console.log('clipped inputs', await evaluate(`(() => {
+    const set = (sel, v) => { const el = document.querySelector(sel); el.value = v; };
+    set('tr[data-index="0"] [data-field="txTone"]', 'D023N');
+    set('tr[data-index="0"] [data-field="rxTone"]', '100.0');
+    set('tr[data-index="0"] [data-field="name"]', 'WWWWWWWWWW');
+    set('tr[data-index="0"] [data-field="freq"]', '1234.56789');
+    const clipped = [...document.querySelectorAll('#memTableBody tr[data-index="0"] input:not([type])')]
+      .filter(el => el.scrollWidth > el.clientWidth).map(el => el.dataset.field);
+    document.getElementById('memShowEmpty').dispatchEvent(new Event('change'));   // re-render from the image
+    return clipped;
+  })()`));
+
   const shot = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync(path.join(outDir, 'memories.png'), Buffer.from(shot.result.data, 'base64'));
 

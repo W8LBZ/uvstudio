@@ -1504,10 +1504,10 @@
   box-shadow: none;
 }
 #pane-tools .mem-table select { padding-right: 24px; }
-#pane-tools .mem-table input[data-field="name"] { width: 12ch; }
+#pane-tools .mem-table input[data-field="name"] { width: calc(10ch + 18px); font-family: var(--font-mono); }
 #pane-tools .mem-table input[data-field="freq"],
-#pane-tools .mem-table input[data-field="offset"] { width: 11ch; font-family: var(--font-mono); }
-#pane-tools .mem-table input[list] { width: 8ch; }
+#pane-tools .mem-table input[data-field="offset"] { width: calc(10ch + 16px); font-family: var(--font-mono); }
+#pane-tools .mem-table input[list] { width: calc(6ch + 40px); font-family: var(--font-mono); }   /* "D023N" + padding + datalist arrow */
 #pane-tools .mem-table input[aria-invalid="true"] { border-color: var(--error); }
 #pane-tools .mem-table tr.mem-dirty td {
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
