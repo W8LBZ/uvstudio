@@ -192,7 +192,7 @@
       const units = text === '' ? 0xFFFF : Math.round(Number(text) * 10);
       const [lo, hi] = fmBand(img);
       if (units !== 0xFFFF && !(units >= lo && units < hi)) {
-        throw new Error(`${text} MHz outside the FM band ${lo / 10}-${hi / 10} MHz`);
+        throw new Error(`${text} MHz outside the FM band (${lo / 10} to ${(hi - 1) / 10} MHz)`);
       }
       img[at] = units & 0xFF;
       img[at + 1] = units >> 8;
@@ -385,5 +385,8 @@
     updateState();
   });
   window.addEventListener('uvstudio:languagechange', render);
+  window.addEventListener('beforeunload', event => {
+    if (image && dirtyIds().length) event.preventDefault();
+  });
   updateState();
 })();
