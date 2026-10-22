@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=57" rel="stylesheet">
+<link href="css/tools.css?v=58" rel="stylesheet">
 <link href="css/studio.css?v=26" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -136,6 +136,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg>
                 <span class="nav-item-label" data-i18n="studio_nav_factory_reset">Factory reset</span>
                 <span class="tag" data-i18n="studio_nav_labs_only">Labs only</span>
+            </button>
+            <button class="nav-item" data-route="memories" data-app="tools" data-tool-view="memories" data-name="Memories" data-section-i18n="studio_nav_memories">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                <span class="nav-item-label" data-i18n="studio_nav_memories">Memories</span>
             </button>
             <button class="nav-item" data-route="calibration" data-app="tools" data-tool-view="calibration" data-default-action="dump" data-name="Calibration" data-section-i18n="studio_nav_calibration">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
@@ -356,6 +360,47 @@
                 </section>
                 <button id="restoreBtn" disabled aria-live="polite">Restore calibration data</button>
               </div>
+            </div>
+
+            <div class="tool-view" id="memories-content" role="region" hidden>
+                <section class="section">
+                    <p class="tab-description" data-i18n="memDescription">Read the 1024 memory channels from your radio, edit them, then write the changes back. Import and export use the CHIRP CSV format.</p>
+                    <div class="mem-toolbar">
+                        <button type="button" id="memReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
+                        <button type="button" id="memWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
+                        <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Import CSV</button>
+                        <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
+                        <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
+                        <button type="button" id="memSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
+                        <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
+                        <span class="mem-summary" id="memSummary" role="status" aria-live="polite"></span>
+                    </div>
+                    <input type="file" id="memCsvFile" accept=".csv,text/csv" hidden>
+                    <input type="file" id="memBinFile" accept=".bin" hidden>
+                    <datalist id="memToneList"></datalist>
+                    <div class="slots-table-wrap mem-table-wrap">
+                        <table class="slots-table mem-table">
+                            <thead>
+                                <tr>
+                                    <th class="slot-col-idx">#</th>
+                                    <th data-i18n="memColName">Name</th>
+                                    <th data-i18n="memColFreq">Frequency (MHz)</th>
+                                    <th data-i18n="memColDuplex">Duplex</th>
+                                    <th data-i18n="memColOffset">Offset (MHz)</th>
+                                    <th data-i18n="memColMode">Mode</th>
+                                    <th data-i18n="memColTxTone">TX tone</th>
+                                    <th data-i18n="memColRxTone">RX tone</th>
+                                    <th data-i18n="memColPower">Power</th>
+                                    <th data-i18n="memColStep">Step (kHz)</th>
+                                    <th data-i18n="memColScanList">Scan list</th>
+                                    <th data-i18n="memColSkip">Skip</th>
+                                    <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="memTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
 
             <div class="tool-view" id="rf-log-content" role="region" hidden>
@@ -859,26 +904,27 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=63"></script>
-<script src="locales/fr.js?v=63"></script>
-<script src="locales/it.js?v=63"></script>
-<script src="locales/es.js?v=63"></script>
-<script src="locales/de.js?v=63"></script>
-<script src="locales/pt.js?v=63"></script>
-<script src="locales/ru.js?v=63"></script>
-<script src="locales/pl.js?v=63"></script>
-<script src="locales/zh.js?v=63"></script>
-<script src="locales/nl.js?v=63"></script>
+<script src="locales/en.js?v=64"></script>
+<script src="locales/fr.js?v=64"></script>
+<script src="locales/it.js?v=64"></script>
+<script src="locales/es.js?v=64"></script>
+<script src="locales/de.js?v=64"></script>
+<script src="locales/pt.js?v=64"></script>
+<script src="locales/ru.js?v=64"></script>
+<script src="locales/pl.js?v=64"></script>
+<script src="locales/zh.js?v=64"></script>
+<script src="locales/nl.js?v=64"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=2"></script>
 <script src="js/rf-log.js?v=4"></script>
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
-<script src="js/flash.js?v=84"></script>
+<script src="js/flash.js?v=85"></script>
+<script src="js/memories.js?v=1"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
-<script src="js/studio.js?v=19"></script>
+<script src="js/studio.js?v=20"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 </body>
 </html>

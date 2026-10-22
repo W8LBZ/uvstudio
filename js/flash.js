@@ -602,7 +602,9 @@ window.UVStudioFlash = Object.freeze({
   updateAppFromURL,
   deleteAppSlot,
   clearAppFromCatalog: () => beginAppImageLoad('catalog'),
-  hasFirmware: () => Boolean(firmwareData)
+  hasFirmware: () => Boolean(firmwareData),
+  runMemoryOperation,
+  log
 });
 
 function updateFlashButton() {
@@ -829,7 +831,9 @@ async function readLoop() {
         readBuffer.push(...value);
         const isBulkFlashTransfer = activeOperationName === 'dump-flash' ||
           activeOperationName === 'restore-flash' ||
-          activeOperationName === 'factory-reset';
+          activeOperationName === 'factory-reset' ||
+          activeOperationName === 'read-memories' ||
+          activeOperationName === 'write-memories';
         if (activeToolsView !== 'slots' && !isBulkFlashTransfer) {
           log(t('rxData', value.length, readBuffer.length), 'info');
         }
@@ -2037,10 +2041,113 @@ async function requestDeviceInfo() {
       // Log raw device info data (and keep the firmware string to name it later)
       const name = logDeviceInfo(resp.data);
       log(t('deviceDetected'), 'success');
-      return { timestamp: ts, name };
+      // REPLY_0514_t: Version[16] then bHasCustomAesKey. F4HWN builds have no
+      // unlock command, so a radio with a custom key refuses EEPROM access.
+      return { timestamp: ts, name, hasAesKey: resp.data.length > 16 && resp.data[16] !== 0 };
     }
   }
   throw new Error(t('timeoutNoDevice'));
+}
+
+// ========== EEPROM RANGE READ/WRITE (128-byte chunks, used by Memories) ==========
+const EEPROM_RANGE_CHUNK = 128; // REPLY_051B_t holds at most 128 data bytes
+
+async function exchangeEepromMessage(msg, responseType, offset) {
+  const session = toolsSerialSession;
+  for (let attempt = 0; attempt <= FLASH_COMMAND_RETRIES; attempt++) {
+    readBuffer = [];
+    await sendMessage(msg);
+    let revision = serialReadRevision;
+    const deadline = performance.now() + FLASH_COMMAND_TIMEOUT_MS;
+    for (;;) {
+      if (session !== toolsSerialSession) throw new Error(t('tools_disconnected'));
+      const buffered = readBuffer.length;
+      const resp = fetchMessage(readBuffer);
+      if (resp) {
+        if (resp.msgType === responseType && resp.data.length >= 2 &&
+            (resp.data[0] | (resp.data[1] << 8)) === offset) return resp;
+        continue;
+      }
+      if (readBuffer.length !== buffered) continue; // garbage dropped, retry parse
+      const remaining = deadline - performance.now();
+      if (remaining <= 0 || !(await waitForSerialRead(revision, remaining))) break;
+      revision = serialReadRevision;
+    }
+  }
+  throw new Error(t('eepromError', offset.toString(16)));
+}
+
+async function readEepromRange(offset, size, timestamp, onProgress) {
+  const out = new Uint8Array(size);
+  for (let i = 0; i < size; i += EEPROM_RANGE_CHUNK) {
+    const len = Math.min(EEPROM_RANGE_CHUNK, size - i);
+    const msg = createMessage(MSG_READ_EEPROM, 8);
+    const view = new DataView(msg.buffer);
+    view.setUint16(4, offset + i, true);
+    msg[6] = len;
+    view.setUint32(8, timestamp, true);
+    const resp = await exchangeEepromMessage(msg, MSG_READ_EEPROM_RESP, offset + i);
+    if (resp.data[2] !== len || resp.data.length < 4 + len) {
+      throw new Error(t('eepromError', (offset + i).toString(16)));
+    }
+    out.set(resp.data.subarray(4, 4 + len), i);
+    onProgress?.(i + len);
+  }
+  return out;
+}
+
+// data.length must be a multiple of 8: the firmware silently drops a partial tail.
+async function writeEepromRange(offset, data, timestamp) {
+  for (let i = 0; i < data.length; i += EEPROM_RANGE_CHUNK) {
+    const chunk = data.subarray(i, i + EEPROM_RANGE_CHUNK);
+    const msg = createMessage(MSG_WRITE_EEPROM, 8 + chunk.length);
+    const view = new DataView(msg.buffer);
+    view.setUint16(4, offset + i, true);
+    msg[6] = chunk.length;
+    msg[7] = 1; // bAllowPassword
+    view.setUint32(8, timestamp, true);
+    msg.set(chunk, 12);
+    await exchangeEepromMessage(msg, MSG_WRITE_EEPROM_RESP, offset + i);
+  }
+}
+
+// Runs task(radio) as one tools operation on a connected radio, for the Memories
+// panel. Returns false when the operation could not start or failed (already logged).
+async function runMemoryOperation(name, critical, task) {
+  const operation = beginToolsOperation(name, critical);
+  if (!operation) return false;
+  if (progressContainer) progressContainer.style.display = 'block';
+  updateProgress(0);
+  try {
+    if (!port) await connect();
+    readBuffer = [];
+    await sleep(1000);
+    const devInfo = await requestDeviceInfo();
+    if (devInfo.hasAesKey) throw new Error(t('memLocked'));
+    const ts = devInfo.timestamp;
+    await task({
+      read: (offset, size, onProgress) => readEepromRange(offset, size, ts, onProgress),
+      write: (offset, data) => writeEepromRange(offset, data, ts),
+      progress: updateProgress,
+      reboot: async () => {
+        log(t('rebooting'), 'info');
+        await sendMessage(createMessage(MSG_REBOOT, 0));
+        await sleep(500);
+        log(t('rebootComplete'), 'success');
+      }
+    });
+    setTimeout(() => {
+      if (progressContainer) progressContainer.style.display = 'none';
+      updateProgress(0);
+    }, 800);
+    return true;
+  } catch (e) {
+    log(t('error', e?.message ?? String(e)), 'error');
+    return false;
+  } finally {
+    if (port) await disconnect();
+    endToolsOperation(operation);
+  }
 }
 
 // Helper to display device info response

@@ -1446,3 +1446,60 @@
   #pane-tools .apps-table-wrap .slots-table tbody tr.app-slot-pending,
   #pane-tools .apps-table-wrap .slots-table tbody tr.app-slot-empty { display: none; }
 }
+
+/* ---------- Memories ---------- */
+#pane-tools .container:has(#memories-content.active) {
+  max-width: none;
+}
+#pane-tools .mem-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+#pane-tools .mem-show-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+#pane-tools .mem-summary {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+#pane-tools .mem-table-wrap {
+  max-height: 60vh;
+  overflow: auto;
+}
+#pane-tools .mem-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+#pane-tools .mem-table td {
+  padding: 4px 6px;
+}
+#pane-tools .mem-table input:not([type="checkbox"]),
+#pane-tools .mem-table select {
+  height: 28px;
+  margin: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: none;
+}
+#pane-tools .mem-table select { padding-right: 24px; }
+#pane-tools .mem-table input[data-field="name"] { width: 12ch; }
+#pane-tools .mem-table input[data-field="freq"],
+#pane-tools .mem-table input[data-field="offset"] { width: 11ch; font-family: var(--font-mono); }
+#pane-tools .mem-table input[list] { width: 8ch; }
+#pane-tools .mem-table input[aria-invalid="true"] { border-color: var(--error); }
+#pane-tools .mem-table tr.mem-dirty td {
+  background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+}

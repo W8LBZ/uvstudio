@@ -17,6 +17,7 @@ No installation, server, dependency, or build step is required.
 - Back up and restore radio calibration data
 - Upload and download custom 128 × 64 boot logos
 - Export the latest RF Log activities as CSV
+- View, edit, back up, and restore the 1024 memory channels, with CHIRP CSV import and export
 - Light and dark themes
 - Global serial connection and operation status
 - Interface translations for ten languages
@@ -55,6 +56,15 @@ Follow the instructions
 shown for the selected operation. Keep the radio in normal mode for maintenance
 operations and use DFU mode only when flashing firmware.
 
+### Memories
+
+Open Memories, select Read from radio, edit the table, then select Write
+changes to radio. Only the changed bytes are written; they are read back to
+verify them, then the radio reboots. Import CSV merges a CHIRP CSV export into
+the channels at their Location (1–1024). Save backup and Open backup use a raw
+34 KiB image of the channel, name, and attribute areas. A radio locked with a
+custom AES key cannot be read or written over USB and is reported as such.
+
 ## Run locally
 
 UV Studio is a static HTML, CSS, and JavaScript application. Open index.html
@@ -74,6 +84,7 @@ directly in a compatible browser. A local web server is not required.
 - js/k5viewer.js — serial display protocol, keypad, RF Log, and analytics
 - js/flash.js — firmware, calibration, and boot logo operations
 - js/rf-log.js — RF Log packet parsing and CSV generation
+- js/memories.js — memory channel codec, CHIRP CSV, and the Memories panel
 - js/studio-i18n.js — shared translation engine and language preference
 - locales/ — unified dictionaries for Studio, K5Viewer, and UVTools2
 - tests/ — Node.js protocol, controller, locale, and static integration tests
@@ -84,6 +95,9 @@ Run the local test suite with `node --test tests/*.test.js`.
 
 UV Studio incorporates K5Viewer and UVTools2. Their original attribution notices
 are retained in [NOTICE](NOTICE).
+
+This fork adds the Memories panel (js/memories.js, with supporting changes to
+index.html, js/flash.js, js/studio.js, css/tools.css, locales/, and tests/).
 
 ## License
 

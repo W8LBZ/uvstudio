@@ -34,7 +34,9 @@
         "dump-flash": "studio_operation_dump_flash",
         "restore-flash": "studio_operation_restore_flash",
         "factory-reset": "studio_operation_factory_reset",
-        "export-rf-log": "studio_operation_export_rf_log"
+        "export-rf-log": "studio_operation_export_rf_log",
+        "read-memories": "studio_operation_read_memories",
+        "write-memories": "studio_operation_write_memories"
     };
 
     const routeAliases = {
