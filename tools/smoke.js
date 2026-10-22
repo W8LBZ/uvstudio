@@ -137,6 +137,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     set('tr[data-index="1"] [data-field="rxTone"]', '88.5');
     set('tr[data-index="1"] [data-field="name"]', 'RPT TSQL');
     set('tr[data-index="1"] [data-field="txTone"]', '88.6');   // invalid -> logged, untouched
+    set('tr[data-index="1"] [data-field="busy"]', '');
+    document.querySelector('tr[data-index="1"] [data-field="busy"]').checked = true;
+    document.querySelector('tr[data-index="1"] [data-field="busy"]').dispatchEvent(new Event('change', { bubbles: true }));
+    set('tr[data-index="1"] [data-field="pttId"]', '1');
+    set('[data-list="2"]', 'RPT');
   })()`);
   console.log('after edit', await state());
   await evaluate(`(() => { const c = document.getElementById('memShowEmpty'); c.checked = true; c.dispatchEvent(new Event('change')); })()`);
@@ -151,6 +156,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await waitIdle();
   console.log('after write', await state(), await evaluate("JSON.stringify(radioLog.reduce((m, k) => (m[k] = (m[k] || 0) + 1, m), {}))"));
   console.log('radio ch2', await evaluate('JSON.stringify(UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, 1))'));
+  console.log('list 2 name', await evaluate("UVSTUDIO_MEMORIES.getListName(fakeRadio, 2)"),
+    await evaluate("document.querySelector('tr[data-index=\"0\"] [data-field=\"scanlist\"]').options[2].textContent"));
   console.log('radio ch5', await evaluate('JSON.stringify(UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, 4))'));
   console.log('csv', JSON.stringify(await evaluate('UVSTUDIO_MEMORIES.exportChirpCsv(fakeRadio)')));
   console.log('log tail', await evaluate(`Array.from(document.querySelectorAll('#log *')).slice(-6).map(e => e.textContent).join(' | ')`));

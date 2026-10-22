@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.en = {
   "memWriteComplete": "{0} bytes written and verified.",
   "memNoChanges": "No changes to write.",
   "memVerifyError": "Verification failed at offset 0x{0}.",
-  "memInvalidValue": "Invalid value on channel {0}",
+  "memInvalidValue": "Invalid value ({0})",
   "memImportRowError": "CSV line {0} skipped: {1}",
   "memImportComplete": "{0} channels imported, {1} rows skipped. Review them, then write to the radio.",
   "memBackupSize": "A memories backup must be exactly {0} bytes.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.en = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} changed",
   "setReadComplete": "Settings read.",
-  "setBackupSize": "A settings backup must be exactly {0} bytes."
+  "setBackupSize": "A settings backup must be exactly {0} bytes.",
+  "memColBusy": "Busy lock",
+  "memColReverse": "Reverse",
+  "memColCompander": "Compander",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "Scan list names",
+  "memListName": "Scan list {0} name"
 };

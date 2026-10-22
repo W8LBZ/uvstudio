@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.de = {
   "memWriteComplete": "{0} Bytes geschrieben und geprüft.",
   "memNoChanges": "Keine Änderungen zu schreiben.",
   "memVerifyError": "Prüfung bei Offset 0x{0} fehlgeschlagen.",
-  "memInvalidValue": "Ungültiger Wert in Kanal {0}",
+  "memInvalidValue": "Ungültiger Wert ({0})",
   "memImportRowError": "CSV-Zeile {0} übersprungen: {1}",
   "memImportComplete": "{0} Kanäle importiert, {1} Zeilen übersprungen. Prüfen und dann ins Funkgerät schreiben.",
   "memBackupSize": "Eine Speichersicherung muss genau {0} Bytes groß sein.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.de = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} geändert",
   "setReadComplete": "Einstellungen gelesen.",
-  "setBackupSize": "Eine Einstellungssicherung muss genau {0} Bytes groß sein."
+  "setBackupSize": "Eine Einstellungssicherung muss genau {0} Bytes groß sein.",
+  "memColBusy": "Belegtsperre",
+  "memColReverse": "Umkehr",
+  "memColCompander": "Kompander",
+  "memColPttId": "PTT-ID",
+  "memScanListNames": "Namen der Scanlisten",
+  "memListName": "Name der Scanliste {0}"
 };

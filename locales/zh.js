@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "memWriteComplete": "已写入并校验 {0} 字节。",
   "memNoChanges": "没有需要写入的更改。",
   "memVerifyError": "偏移 0x{0} 处校验失败。",
-  "memInvalidValue": "信道 {0} 的值无效",
+  "memInvalidValue": "无效的值（{0}）",
   "memImportRowError": "已跳过 CSV 第 {0} 行：{1}",
   "memImportComplete": "已导入 {0} 个信道，跳过 {1} 行。请检查后写入电台。",
   "memBackupSize": "存储信道备份必须正好为 {0} 字节。",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.zh = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} 项已修改",
   "setReadComplete": "设置已读取。",
-  "setBackupSize": "设置备份必须正好为 {0} 字节。"
+  "setBackupSize": "设置备份必须正好为 {0} 字节。",
+  "memColBusy": "遇忙禁发",
+  "memColReverse": "反向",
+  "memColCompander": "压扩",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "扫描列表名称",
+  "memListName": "扫描列表 {0} 名称"
 };

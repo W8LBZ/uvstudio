@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "memWriteComplete": "Zapisano i zweryfikowano bajtów: {0}.",
   "memNoChanges": "Brak zmian do zapisania.",
   "memVerifyError": "Weryfikacja nie powiodła się pod adresem 0x{0}.",
-  "memInvalidValue": "Nieprawidłowa wartość w kanale {0}",
+  "memInvalidValue": "Nieprawidłowa wartość ({0})",
   "memImportRowError": "Wiersz CSV {0} pominięty: {1}",
   "memImportComplete": "Zaimportowano kanałów: {0}, pominięto wierszy: {1}. Sprawdź je, a następnie zapisz w radiu.",
   "memBackupSize": "Kopia pamięci musi mieć dokładnie {0} bajtów.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.pl = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "Zmienione: {0}",
   "setReadComplete": "Ustawienia odczytane.",
-  "setBackupSize": "Kopia ustawień musi mieć dokładnie {0} bajtów."
+  "setBackupSize": "Kopia ustawień musi mieć dokładnie {0} bajtów.",
+  "memColBusy": "Blokada zajętości",
+  "memColReverse": "Odwrócenie",
+  "memColCompander": "Kompander",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "Nazwy list skanowania",
+  "memListName": "Nazwa listy skanowania {0}"
 };

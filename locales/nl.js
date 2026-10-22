@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.nl = {
   "memWriteComplete": "{0} bytes geschreven en gecontroleerd.",
   "memNoChanges": "Geen wijzigingen om te schrijven.",
   "memVerifyError": "Controle mislukt op offset 0x{0}.",
-  "memInvalidValue": "Ongeldige waarde in kanaal {0}",
+  "memInvalidValue": "Ongeldige waarde ({0})",
   "memImportRowError": "CSV-regel {0} overgeslagen: {1}",
   "memImportComplete": "{0} kanalen geïmporteerd, {1} regels overgeslagen. Controleer ze en schrijf ze naar de radio.",
   "memBackupSize": "Een geheugenback-up moet precies {0} bytes zijn.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.nl = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} gewijzigd",
   "setReadComplete": "Instellingen gelezen.",
-  "setBackupSize": "Een instellingenback-up moet precies {0} bytes zijn."
+  "setBackupSize": "Een instellingenback-up moet precies {0} bytes zijn.",
+  "memColBusy": "Bezet-slot",
+  "memColReverse": "Omkeren",
+  "memColCompander": "Compander",
+  "memColPttId": "PTT-ID",
+  "memScanListNames": "Namen van scanlijsten",
+  "memListName": "Naam van scanlijst {0}"
 };

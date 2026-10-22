@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.ru = {
   "memWriteComplete": "Записано и проверено байт: {0}.",
   "memNoChanges": "Нет изменений для записи.",
   "memVerifyError": "Ошибка проверки по смещению 0x{0}.",
-  "memInvalidValue": "Недопустимое значение в канале {0}",
+  "memInvalidValue": "Недопустимое значение ({0})",
   "memImportRowError": "Строка CSV {0} пропущена: {1}",
   "memImportComplete": "Импортировано каналов: {0}, пропущено строк: {1}. Проверьте их и запишите в рацию.",
   "memBackupSize": "Копия памяти должна быть ровно {0} байт.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.ru = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "Изменено: {0}",
   "setReadComplete": "Настройки прочитаны.",
-  "setBackupSize": "Копия настроек должна быть ровно {0} байт."
+  "setBackupSize": "Копия настроек должна быть ровно {0} байт.",
+  "memColBusy": "Блок. занятости",
+  "memColReverse": "Реверс",
+  "memColCompander": "Компандер",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "Названия списков сканирования",
+  "memListName": "Название списка сканирования {0}"
 };

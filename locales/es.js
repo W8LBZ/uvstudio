@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.es = {
   "memWriteComplete": "{0} bytes escritos y verificados.",
   "memNoChanges": "No hay cambios que escribir.",
   "memVerifyError": "Verificación fallida en el offset 0x{0}.",
-  "memInvalidValue": "Valor no válido en el canal {0}",
+  "memInvalidValue": "Valor no válido ({0})",
   "memImportRowError": "Línea CSV {0} omitida: {1}",
   "memImportComplete": "{0} canales importados, {1} filas omitidas. Revíselos y luego escriba en la radio.",
   "memBackupSize": "Una copia de memorias debe tener exactamente {0} bytes.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.es = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} modificados",
   "setReadComplete": "Ajustes leídos.",
-  "setBackupSize": "Una copia de ajustes debe tener exactamente {0} bytes."
+  "setBackupSize": "Una copia de ajustes debe tener exactamente {0} bytes.",
+  "memColBusy": "Bloqueo ocupado",
+  "memColReverse": "Inverso",
+  "memColCompander": "Compansor",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "Nombres de listas de escaneo",
+  "memListName": "Nombre de la lista de escaneo {0}"
 };

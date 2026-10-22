@@ -69,7 +69,9 @@ the channels at their Location (1–1024). Save backup and Open backup use a raw
 custom AES key cannot be read or written over USB and is reported as such.
 
 The TX lock column keeps a channel within the F Lock band plan (the firmware
-default). Clearing it lets that channel transmit outside the band plan.
+default). Clearing it lets that channel transmit outside the band plan. Busy
+lock, reverse, compander, and PTT ID are also editable per channel. Scan list
+names (3 characters, as shown on the radio) are edited above the table.
 
 ### Radio settings
 

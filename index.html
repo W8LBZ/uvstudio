@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.0.0-w8lbz.1"></script>
+    <script src="js/studio-version.js?v=2.0.0-w8lbz.2"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=59" rel="stylesheet">
+<link href="css/tools.css?v=60" rel="stylesheet">
 <link href="css/studio.css?v=26" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -382,6 +382,10 @@
                     <input type="file" id="memCsvFile" accept=".csv,text/csv" hidden>
                     <input type="file" id="memBinFile" accept=".bin" hidden>
                     <datalist id="memToneList"></datalist>
+                    <details class="mem-list-names-box" id="memListNamesBox" hidden>
+                        <summary data-i18n="memScanListNames">Scan list names</summary>
+                        <div class="mem-list-names" id="memListNames"></div>
+                    </details>
                     <div class="slots-table-wrap mem-table-wrap">
                         <table class="slots-table mem-table">
                             <thead>
@@ -399,6 +403,10 @@
                                     <th data-i18n="memColScanList">Scan list</th>
                                     <th data-i18n="memColSkip">Skip</th>
                                     <th data-i18n="memColTxLock" data-i18n-title="memTxLockHint" title="Apply the F Lock band plan to this channel">TX lock</th>
+                                    <th data-i18n="memColBusy">Busy lock</th>
+                                    <th data-i18n="memColReverse">Reverse</th>
+                                    <th data-i18n="memColCompander">Compander</th>
+                                    <th data-i18n="memColPttId">PTT ID</th>
                                     <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
                                 </tr>
                             </thead>
@@ -924,16 +932,16 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=66"></script>
-<script src="locales/fr.js?v=66"></script>
-<script src="locales/it.js?v=66"></script>
-<script src="locales/es.js?v=66"></script>
-<script src="locales/de.js?v=66"></script>
-<script src="locales/pt.js?v=66"></script>
-<script src="locales/ru.js?v=66"></script>
-<script src="locales/pl.js?v=66"></script>
-<script src="locales/zh.js?v=66"></script>
-<script src="locales/nl.js?v=66"></script>
+<script src="locales/en.js?v=67"></script>
+<script src="locales/fr.js?v=67"></script>
+<script src="locales/it.js?v=67"></script>
+<script src="locales/es.js?v=67"></script>
+<script src="locales/de.js?v=67"></script>
+<script src="locales/pt.js?v=67"></script>
+<script src="locales/ru.js?v=67"></script>
+<script src="locales/pl.js?v=67"></script>
+<script src="locales/zh.js?v=67"></script>
+<script src="locales/nl.js?v=67"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=2"></script>
@@ -941,7 +949,7 @@
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/flash.js?v=86"></script>
-<script src="js/memories.js?v=2"></script>
+<script src="js/memories.js?v=3"></script>
 <script src="js/settings.js?v=1"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>

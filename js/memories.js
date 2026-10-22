@@ -2,7 +2,8 @@
 // the EEPROM compatibility map (firmware App/driver/eeprom_compat.c):
 //   0x0000 1024 x 16-byte channel records
 //   0x4000 1024 x 16-byte names (10 chars used)
-//   0x8000 1024 x 2-byte attributes (band, compander, exclude, scan list)
+//   0x8000 1024 x 2-byte attributes (band, compander, exclude, scan list), then 7 VFO attributes
+//   0x880E 24 x 4-byte scan list names (the radio shows 3 characters)
 // Codec and CHIRP CSV helpers are shared by the panel below and the tests.
 (function (root, factory) {
   const api = factory();
@@ -14,7 +15,10 @@
   const CHANNEL_COUNT = 1024;
   const NAME_BASE = 0x4000;
   const ATTR_BASE = 0x8000;
-  const IMAGE_SIZE = 0x8800;
+  const IMAGE_SIZE = 0x8870;       // through the scan list names, 8-byte aligned
+  const LEGACY_IMAGE_SIZE = 0x8800; // backups made before scan list names were included
+  const LIST_NAME_BASE = 0x880E;
+  const LIST_NAME_LENGTH = 3;
   const NAME_LENGTH = 10;
   const EMPTY_BAND = 7;
   const SCANLIST_ALL = 25;      // SCAN_LIST_MODE_ALL: member of every list
@@ -26,6 +30,8 @@
   const MODES = ['FM', 'NFM', 'AM', 'NAM', 'USB'];   // index = modulation * 2 + narrow
   const DUPLEXES = ['', '+', '-'];
   const POWERS = ['USER', 'LOW1', 'LOW2', 'LOW3', 'LOW4', 'LOW5', 'MID', 'HIGH'];
+  const COMPANDERS = ['OFF', 'TX', 'RX', 'TX/RX'];
+  const PTT_IDS = ['OFF', 'UP', 'DOWN', 'UP+DOWN', 'APOLLO'];
   const CHIRP_POWERS = [
     'USER = < 20mW to 5W', 'LOW 1 = < 20mW', 'LOW 2 = 125mW', 'LOW 3 = 250mW',
     'LOW 4 = 500mW', 'LOW 5 = 1W', 'MID = 2W', 'HIGH = 5W'
@@ -136,14 +142,20 @@
       skip: Boolean(attrAt(image, index) & 0x80),
       // TX_LOCK: apply the F Lock band plan to this channel (firmware default on).
       // Clear = this channel may transmit outside the band plan.
-      txLock: Boolean(image[r + 12] & 0x40)
+      txLock: Boolean(image[r + 12] & 0x40),
+      busy: Boolean(image[r + 12] & 0x20),
+      reverse: Boolean(image[r + 12] & 0x01),
+      compander: (attrAt(image, index) >> 3) & 3,
+      // Erased (0xFF) or out-of-range PTT ID reads as OFF, like the firmware.
+      pttId: image[r + 13] === 0xFF || ((image[r + 13] >> 1) & 7) >= PTT_IDS.length ? 0 : (image[r + 13] >> 1) & 7
     };
   }
 
   function defaultChannel() {
     return {
       name: '', freq: 0, offset: 0, duplex: '', mode: 'FM', txTone: '', rxTone: '',
-      power: 7, step: DEFAULT_STEP, scanlist: SCANLIST_ALL, skip: false, txLock: true
+      power: 7, step: DEFAULT_STEP, scanlist: SCANLIST_ALL, skip: false, txLock: true,
+      busy: false, reverse: false, compander: 0, pttId: 0
     };
   }
 
@@ -174,6 +186,8 @@
     if (!(ch.power >= 0 && ch.power < POWERS.length)) throw new Error('invalid power');
     if (!(ch.step >= 0 && ch.step < STEPS.length)) throw new Error('invalid step');
     if (!(ch.scanlist >= 0 && ch.scanlist <= SCANLIST_ALL)) throw new Error('invalid scan list');
+    if (!(ch.compander >= 0 && ch.compander < COMPANDERS.length)) throw new Error('invalid compander');
+    if (!(ch.pttId >= 0 && ch.pttId < PTT_IDS.length)) throw new Error('invalid PTT ID');
     const modeIndex = MODES.indexOf(ch.mode);
     const name = String(ch.name ?? '').replace(/[^\x20-\x7E]/g, '').trim().slice(0, NAME_LENGTH);
 
@@ -195,15 +209,36 @@
       narrow = modeIndex & 1;
     }
     image[r + 11] = (modulation << 4) | DUPLEXES.indexOf(ch.duplex);
-    image[r + 12] = (image[r + 12] & 0xA1) | (ch.txLock === false ? 0 : 0x40) |
-      (ch.power << 2) | (narrow << 1);
+    image[r + 12] = (image[r + 12] & 0x80) | (ch.txLock === false ? 0 : 0x40) |
+      (ch.busy ? 0x20 : 0) | (ch.power << 2) | (narrow << 1) | (ch.reverse ? 1 : 0);
+    if (image[r + 13] === 0xFF) image[r + 13] = 0;
+    image[r + 13] = (image[r + 13] & 0xF1) | (ch.pttId << 1);   // bit 0 (DTMF decode) kept
     image[r + 14] = ch.step;
 
-    image[a] = (image[a] & 0x78) | bandOf(ch.freq) | (ch.skip ? 0x80 : 0);
+    image[a] = (image[a] & 0x60) | (ch.compander << 3) | bandOf(ch.freq) | (ch.skip ? 0x80 : 0);
     image[a + 1] = ch.scanlist;
 
     image.fill(0, NAME_BASE + r, NAME_BASE + r + 16);
     for (let i = 0; i < name.length; i++) image[NAME_BASE + r + i] = name.charCodeAt(i);
+  }
+
+  function getListName(image, list) {   // list 1..24
+    let name = '';
+    for (let i = 0; i < LIST_NAME_LENGTH; i++) {
+      const c = image[LIST_NAME_BASE + (list - 1) * 4 + i];
+      if (c === 0x00 || c === 0xFF) break;
+      name += String.fromCharCode(c);
+    }
+    return name.trimEnd();
+  }
+
+  function setListName(image, list, text) {
+    const name = String(text ?? '').trim();
+    if (!(list >= 1 && list <= SCANLIST_COUNT)) throw new Error(`invalid scan list ${list}`);
+    if (name.length > LIST_NAME_LENGTH || !/^[\x20-\x7E]*$/.test(name)) throw new Error(`invalid list name "${text}"`);
+    const at = LIST_NAME_BASE + (list - 1) * 4;
+    image.fill(0, at, at + 4);
+    for (let i = 0; i < name.length; i++) image[at + i] = name.charCodeAt(i);
   }
 
   function channelDirty(before, after, index) {
@@ -393,6 +428,10 @@
       scanlist: base.scanlist,
       skip: String(rec.Skip ?? '').trim().toUpperCase() === 'S',
       txLock: warning ? true : base.txLock,
+      busy: base.busy,
+      reverse: base.reverse,
+      compander: base.compander,
+      pttId: base.pttId,
       warning
     };
   }
@@ -429,6 +468,10 @@
   return {
     CHANNEL_COUNT,
     IMAGE_SIZE,
+    LEGACY_IMAGE_SIZE,
+    LIST_NAME_LENGTH,
+    COMPANDERS,
+    PTT_IDS,
     SCANLIST_ALL,
     SCANLIST_COUNT,
     MODES,
@@ -442,6 +485,8 @@
     toneText,
     parseTone,
     isEmpty,
+    getListName,
+    setListName,
     decodeChannel,
     defaultChannel,
     encodeChannel,
@@ -475,6 +520,8 @@
   const showEmpty = $('memShowEmpty');
   const summary = $('memSummary');
   const toneList = $('memToneList');
+  const listNames = $('memListNames');
+  const listNamesBox = $('memListNamesBox');
 
   let radioImage = null;   // last state read from / written to the radio
   let image = null;        // working copy edited by the table
@@ -490,7 +537,7 @@
 
   function scanPairs() {
     const pairs = [[0, '—']];
-    for (let i = 1; i <= M.SCANLIST_COUNT; i++) pairs.push([i, String(i)]);
+    for (let i = 1; i <= M.SCANLIST_COUNT; i++) pairs.push([i, `${i} ${M.getListName(image, i)}`.trim()]);
     pairs.push([M.SCANLIST_ALL, t('memScanAll')]);
     return pairs;
   }
@@ -502,7 +549,7 @@
     const head = `<tr data-index="${i}"${dirty ? ' class="mem-dirty"' : ''}><td class="slot-idx">${i + 1}</td>`;
     if (!ch) {
       return `${head}<td></td><td><input data-field="freq" inputmode="decimal" ${label('memColFreq')}></td>` +
-        '<td colspan="11"></td></tr>';
+        '<td colspan="15"></td></tr>';
     }
     const modes = M.MODES.includes(ch.mode) ? M.MODES : M.MODES.concat(ch.mode);
     const steps = ch.step < M.STEPS.length ? stepPairs : stepPairs.concat([[ch.step, `#${ch.step}`]]);
@@ -519,6 +566,10 @@
       `<td><select data-field="scanlist" ${label('memColScanList')}>${options(scanPairs(), ch.scanlist)}</select></td>` +
       `<td><input type="checkbox" data-field="skip"${ch.skip ? ' checked' : ''} ${label('memColSkip')}></td>` +
       `<td><input type="checkbox" data-field="txLock"${ch.txLock ? ' checked' : ''} ${label('memColTxLock')}></td>` +
+      `<td><input type="checkbox" data-field="busy"${ch.busy ? ' checked' : ''} ${label('memColBusy')}></td>` +
+      `<td><input type="checkbox" data-field="reverse"${ch.reverse ? ' checked' : ''} ${label('memColReverse')}></td>` +
+      `<td><select data-field="compander" ${label('memColCompander')}>${options(M.COMPANDERS.map((c, n) => [n, c]), ch.compander)}</select></td>` +
+      `<td><select data-field="pttId" ${label('memColPttId')}>${options(M.PTT_IDS.map((p, n) => [n, p]), ch.pttId)}</select></td>` +
       `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" ${label('memDelete')}>✕</button></td></tr>`;
   }
 
@@ -536,13 +587,26 @@
     const { used, dirty } = image ? counts() : { used: 0, dirty: 0 };
     summary.textContent = image ? t('memSummary', used, dirty) : '';
     const serial = 'serial' in navigator;
+    const changed = Boolean(radioImage && image && M.dirtyRuns(radioImage, image).length);
     readBtn.disabled = busy || !serial;
-    writeBtn.disabled = busy || !serial || !radioImage || dirty === 0;
+    writeBtn.disabled = busy || !serial || !changed;
     importBtn.disabled = openBtn.disabled = busy || !image;
     exportBtn.disabled = saveBtn.disabled = !image;
   }
 
+  function renderListNames() {
+    listNames.innerHTML = image ? Array.from({ length: M.SCANLIST_COUNT }, (_, n) => {
+      const list = n + 1;
+      const dirty = radioImage && M.getListName(radioImage, list) !== M.getListName(image, list);
+      return `<label class="mem-list-name${dirty ? ' mem-dirty' : ''}"><span>${list}</span>` +
+        `<input data-list="${list}" maxlength="${M.LIST_NAME_LENGTH}" value="${escapeHtml(M.getListName(image, list))}" ` +
+        `aria-label="${escapeHtml(t('memListName', list))}"></label>`;
+    }).join('') : '';
+    listNamesBox.hidden = !image;
+  }
+
   function render() {
+    renderListNames();
     const rows = [];
     if (image) {
       for (let i = 0; i < M.CHANNEL_COUNT; i++) {
@@ -584,8 +648,8 @@
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
       if (field === 'freq' || field === 'offset') ch[field] = M.parseMHz(input.value);
-      else if (field === 'skip' || field === 'txLock') ch[field] = input.checked;
-      else if (field === 'power' || field === 'step' || field === 'scanlist') ch[field] = Number(input.value);
+      else if (input.type === 'checkbox') ch[field] = input.checked;
+      else if (['power', 'step', 'scanlist', 'compander', 'pttId'].includes(field)) ch[field] = Number(input.value);
       else ch[field] = input.value;
       M.encodeChannel(image, i, ch);
       input.removeAttribute('aria-invalid');
@@ -603,6 +667,26 @@
     if (field === 'freq' || field === 'offset') input.value = M.formatMHz(ch[field]);
     else if (field === 'name' || field === 'txTone' || field === 'rxTone') input.value = ch[field];
     tr.classList.toggle('mem-dirty', Boolean(radioImage && M.channelDirty(radioImage, image, i)));
+    updateState();
+  });
+
+  listNames.addEventListener('change', event => {
+    const input = event.target;
+    const list = Number(input.dataset.list);
+    try {
+      M.setListName(image, list, input.value);
+      input.removeAttribute('aria-invalid');
+    } catch (error) {
+      log(t('memInvalidValue', `${t('memListName', list)}: ${error.message}`), 'error');
+      input.setAttribute('aria-invalid', 'true');
+      return;
+    }
+    input.value = M.getListName(image, list);
+    input.closest('label').classList.toggle('mem-dirty', M.getListName(radioImage, list) !== M.getListName(image, list));
+    // Refresh the scan list labels in the table without moving focus.
+    body.querySelectorAll('select[data-field="scanlist"]').forEach(select => {
+      select.options[list].textContent = `${list} ${M.getListName(image, list)}`.trim();
+    });
     updateState();
   });
 
@@ -682,11 +766,14 @@
     binInput.value = '';
     if (!file) return;
     const data = new Uint8Array(await file.arrayBuffer());
-    if (data.length !== M.IMAGE_SIZE) {
+    if (data.length !== M.IMAGE_SIZE && data.length !== M.LEGACY_IMAGE_SIZE) {
       log(t('memBackupSize', M.IMAGE_SIZE), 'error');
       return;
     }
-    image = data;
+    // Older backups stop before the scan list names: keep the current ones.
+    const next = image.slice();
+    next.set(data);
+    image = next;
     render();
     log(t('memBackupLoaded', file.name), 'success');
   });

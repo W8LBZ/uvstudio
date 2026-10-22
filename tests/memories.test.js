@@ -35,13 +35,42 @@ test('round-trips channels and keeps bits the panel does not edit', () => {
   const image = blank();
   const ch = channel({ name: 'PMR 1', freq: 446006250, mode: 'NAM', txTone: 'D754N', rxTone: '67.0', power: 1, step: 2, scanlist: 25 });
   mem.encodeChannel(image, 0, ch);
-  image[12] |= 0x20;            // busy channel lockout
-  image[0x8000] |= 0x08;        // compander
+  image[12] |= 0x80;            // unused bit
+  image[13] |= 0x01;            // DTMF decode (not exposed)
+  image[0x8000] |= 0x60;        // unused attribute bits
   mem.encodeChannel(image, 0, Object.assign(mem.decodeChannel(image, 0), { power: 7 }));
   assert.deepEqual(mem.decodeChannel(image, 0), Object.assign({}, ch, { power: 7 }));
-  assert.equal(image[12] & 0x20, 0x20);
-  assert.equal(image[0x8000] & 0x18, 0x08);
+  assert.equal(image[12] & 0x80, 0x80);
+  assert.equal(image[13] & 0x01, 0x01);
+  assert.equal(image[0x8000] & 0x60, 0x60);
   assert.equal(image[0x8000] & 7, 5);                         // BAND6_400MHz (enum 5)
+});
+
+test('encodes busy lockout, reverse, compander and PTT ID where the firmware reads them', () => {
+  const image = blank();
+  mem.encodeChannel(image, 2, channel({ busy: true, reverse: true, compander: 3, pttId: 4, txLock: false }));
+  const r = 2 * 16;
+  assert.equal(image[r + 12] & 0x61, 0x21);                   // busy bit5, reverse bit0, TX lock off
+  assert.equal(image[r + 13], 4 << 1);
+  assert.equal((image[0x8000 + 4] >> 3) & 3, 3);
+  const ch = mem.decodeChannel(image, 2);
+  assert.deepEqual([ch.busy, ch.reverse, ch.compander, ch.pttId], [true, true, 3, 4]);
+  image[r + 13] = 0xFF;                                       // erased byte reads as PTT ID off
+  assert.equal(mem.decodeChannel(image, 2).pttId, 0);
+  assert.throws(() => mem.encodeChannel(image, 2, channel({ pttId: 5 })), /PTT/);
+});
+
+test('stores 3-character scan list names in 4-byte slots', () => {
+  const image = blank();
+  assert.equal(mem.getListName(image, 1), '');
+  mem.setListName(image, 3, 'RPT');
+  assert.deepEqual(Array.from(image.subarray(0x880E + 8, 0x880E + 12)), [0x52, 0x50, 0x54, 0]);
+  assert.equal(mem.getListName(image, 3), 'RPT');
+  assert.equal(mem.getListName(image, 2), '');
+  assert.throws(() => mem.setListName(image, 3, 'FOUR'), /list name/);
+  assert.throws(() => mem.setListName(image, 25, 'X'), /scan list/);
+  assert.equal(mem.IMAGE_SIZE % 8, 0);
+  assert.ok(mem.IMAGE_SIZE >= 0x880E + 24 * 4);
 });
 
 test('rejects invalid values without touching the image', () => {

@@ -549,7 +549,7 @@ window.UVSTUDIO_LOCALES.pt = {
   "memWriteComplete": "{0} bytes escritos e verificados.",
   "memNoChanges": "Nenhuma alteração a escrever.",
   "memVerifyError": "Falha na verificação no offset 0x{0}.",
-  "memInvalidValue": "Valor inválido no canal {0}",
+  "memInvalidValue": "Valor inválido ({0})",
   "memImportRowError": "Linha CSV {0} ignorada: {1}",
   "memImportComplete": "{0} canais importados, {1} linhas ignoradas. Reveja-os e depois escreva no rádio.",
   "memBackupSize": "Uma cópia de memórias deve ter exatamente {0} bytes.",
@@ -569,5 +569,11 @@ window.UVSTUDIO_LOCALES.pt = {
   "setGroup_dtmf": "DTMF",
   "setSummary": "{0} alterados",
   "setReadComplete": "Definições lidas.",
-  "setBackupSize": "Uma cópia de definições deve ter exatamente {0} bytes."
+  "setBackupSize": "Uma cópia de definições deve ter exatamente {0} bytes.",
+  "memColBusy": "Bloqueio ocupado",
+  "memColReverse": "Inverso",
+  "memColCompander": "Compansor",
+  "memColPttId": "PTT ID",
+  "memScanListNames": "Nomes das listas de varrimento",
+  "memListName": "Nome da lista de varrimento {0}"
 };
