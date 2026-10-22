@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.ru = {
   "memColCompander": "Компандер",
   "memColPttId": "PTT ID",
   "memScanListNames": "Названия списков сканирования",
-  "memListName": "Название списка сканирования {0}"
+  "memListName": "Название списка сканирования {0}",
+  "memSelectRow": "Выбрать канал {0}",
+  "memSelectAll": "Выбрать все показанные",
+  "memSelected": "Выбрано: {0}",
+  "memMoveUp": "Вверх",
+  "memMoveDown": "Вниз",
+  "memInsert": "Вставить пустой выше",
+  "memRemoveShift": "Удалить со сдвигом",
+  "memCopy": "Копировать",
+  "memPaste": "Вставить",
+  "memBulkField": "Задать для выбранных:",
+  "memBulkValue": "Значение",
+  "memBulkApply": "Применить",
+  "memBulkDone": "Изменено каналов: {0}.",
+  "memCopied": "Скопировано каналов: {0}.",
+  "memLastInUse": "Канал {0} занят: освободите его перед вставкой.",
+  "memPasteOverflow": "После {0} недостаточно каналов, чтобы вставить {1}."
 };

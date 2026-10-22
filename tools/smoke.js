@@ -176,6 +176,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await evaluate(`(() => {
     const set = (id, v) => { const el = document.querySelector('[data-id="' + id + '"]'); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
     set('Sql', '6'); set('RxMode', '1'); set('Message 2', 'HELLO'); set('UPCode', '12E');
+    const mix = document.querySelector('[data-id="ScMix"] [data-bit="2"]'); mix.checked = false;
+    mix.dispatchEvent(new Event('change', { bubbles: true }));
   })()`);
   console.log('settings edited', await evaluate(`({ summary: document.getElementById('setSummary').textContent,
     dirty: document.querySelectorAll('.set-dirty').length, invalid: document.querySelectorAll('[aria-invalid="true"]').length })`));
@@ -185,7 +187,30 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await waitIdle();
   console.log('settings written', await evaluate(`JSON.stringify({ sql: fakeRadio[0xA001], dual: fakeRadio[0xA00C], cross: fakeRadio[0xA00A],
     msg2: new TextDecoder().decode(fakeRadio.subarray(0xA0D8, 0xA0DD)), up: fakeRadio[0xA110],
+    mix: Array.from(fakeRadio.subarray(0xA170, 0xA177)),
     cmds: radioLog.reduce((m, k) => (m[k] = (m[k] || 0) + 1, m), {}) })`));
+  // ---- Table editing: select channels 1-2, move down, bulk power, copy/paste
+  await evaluate("location.hash = 'memories'");
+  await sleep(500);
+  await evaluate("document.getElementById('memReadBtn').click()");
+  await waitIdle();
+  await evaluate(`(() => {
+    const click = (sel, opts = {}) => document.querySelector(sel).dispatchEvent(new MouseEvent('click', Object.assign({ bubbles: true }, opts)));
+    click('tr[data-index="0"] [data-select]');
+    click('tr[data-index="1"] [data-select]', { shiftKey: true });
+    document.querySelector('[data-edit="down"]').click();
+    const field = document.getElementById('memBulkField'); field.value = 'power'; field.dispatchEvent(new Event('change'));
+    document.querySelector('#memBulkValue select').value = '1';
+    document.getElementById('memBulkApply').click();
+    document.querySelector('[data-edit="copy"]').click();
+  })()`);
+  console.log('edited table', await evaluate(`({ selected: document.getElementById('memSelectionCount').textContent,
+    rows: Array.from(document.querySelectorAll('#memTableBody tr')).map(tr => tr.dataset.index + ':' + (tr.querySelector('[data-field="name"]')?.value ?? '-')).join(' ') })`));
+  const shot3 = await send('Page.captureScreenshot', { format: 'png' });
+  fs.writeFileSync(path.join(outDir, 'table-edit.png'), Buffer.from(shot3.result.data, 'base64'));
+  await evaluate("document.getElementById('memWriteBtn').click()");
+  await waitIdle();
+  console.log('table written', await evaluate(`JSON.stringify([0, 1, 2].map(i => { const c = UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, i); return c && (c.name + '/' + c.power); }))`));
   console.log('page errors', errors);
   ws.close();
   proc.kill();

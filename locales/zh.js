@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.zh = {
   "memColCompander": "压扩",
   "memColPttId": "PTT ID",
   "memScanListNames": "扫描列表名称",
-  "memListName": "扫描列表 {0} 名称"
+  "memListName": "扫描列表 {0} 名称",
+  "memSelectRow": "选择信道 {0}",
+  "memSelectAll": "全选显示的信道",
+  "memSelected": "已选择 {0} 个",
+  "memMoveUp": "上移",
+  "memMoveDown": "下移",
+  "memInsert": "在上方插入空信道",
+  "memRemoveShift": "删除并上移",
+  "memCopy": "复制",
+  "memPaste": "粘贴",
+  "memBulkField": "为所选设置：",
+  "memBulkValue": "值",
+  "memBulkApply": "应用",
+  "memBulkDone": "已修改 {0} 个信道。",
+  "memCopied": "已复制 {0} 个信道。",
+  "memLastInUse": "信道 {0} 已被占用：请先清空再插入。",
+  "memPasteOverflow": "{0} 之后的信道不足以粘贴 {1} 个。"
 };

@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.en = {
   "memColCompander": "Compander",
   "memColPttId": "PTT ID",
   "memScanListNames": "Scan list names",
-  "memListName": "Scan list {0} name"
+  "memListName": "Scan list {0} name",
+  "memSelectRow": "Select channel {0}",
+  "memSelectAll": "Select all shown",
+  "memSelected": "{0} selected",
+  "memMoveUp": "Move up",
+  "memMoveDown": "Move down",
+  "memInsert": "Insert empty above",
+  "memRemoveShift": "Delete and shift up",
+  "memCopy": "Copy",
+  "memPaste": "Paste",
+  "memBulkField": "Set for selected:",
+  "memBulkValue": "Value",
+  "memBulkApply": "Apply",
+  "memBulkDone": "{0} channels changed.",
+  "memCopied": "{0} channels copied.",
+  "memLastInUse": "Channel {0} is in use: free it before inserting.",
+  "memPasteOverflow": "Not enough channels after {0} to paste {1}."
 };

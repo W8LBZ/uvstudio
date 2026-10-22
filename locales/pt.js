@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.pt = {
   "memColCompander": "Compansor",
   "memColPttId": "PTT ID",
   "memScanListNames": "Nomes das listas de varrimento",
-  "memListName": "Nome da lista de varrimento {0}"
+  "memListName": "Nome da lista de varrimento {0}",
+  "memSelectRow": "Selecionar canal {0}",
+  "memSelectAll": "Selecionar todos os visíveis",
+  "memSelected": "{0} selecionados",
+  "memMoveUp": "Mover para cima",
+  "memMoveDown": "Mover para baixo",
+  "memInsert": "Inserir vazio acima",
+  "memRemoveShift": "Eliminar e subir",
+  "memCopy": "Copiar",
+  "memPaste": "Colar",
+  "memBulkField": "Definir nos selecionados:",
+  "memBulkValue": "Valor",
+  "memBulkApply": "Aplicar",
+  "memBulkDone": "{0} canais alterados.",
+  "memCopied": "{0} canais copiados.",
+  "memLastInUse": "O canal {0} está em uso: liberte-o antes de inserir.",
+  "memPasteOverflow": "Canais insuficientes após {0} para colar {1}."
 };

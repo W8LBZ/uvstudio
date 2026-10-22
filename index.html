@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=60" rel="stylesheet">
+<link href="css/tools.css?v=61" rel="stylesheet">
 <link href="css/studio.css?v=26" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -386,10 +386,26 @@
                         <summary data-i18n="memScanListNames">Scan list names</summary>
                         <div class="mem-list-names" id="memListNames"></div>
                     </details>
+                    <div class="mem-selection-bar" id="memSelectionBar" hidden>
+                        <span class="mem-summary" id="memSelectionCount" aria-live="polite"></span>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="up" data-i18n="memMoveUp">Move up</button>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="down" data-i18n="memMoveDown">Move down</button>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="insert" data-i18n="memInsert">Insert empty above</button>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="removeShift" data-i18n="memRemoveShift">Delete and shift up</button>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="copy" data-i18n="memCopy">Copy</button>
+                        <button type="button" class="btn compact-toolbar-action" data-edit="paste" data-i18n="memPaste">Paste</button>
+                        <span class="mem-bulk">
+                            <label for="memBulkField" data-i18n="memBulkField">Set for selected:</label>
+                            <select id="memBulkField"></select>
+                            <span id="memBulkValue" class="mem-bulk-value"></span>
+                            <button type="button" class="btn compact-toolbar-action" id="memBulkApply" data-i18n="memBulkApply">Apply</button>
+                        </span>
+                    </div>
                     <div class="slots-table-wrap mem-table-wrap">
                         <table class="slots-table mem-table">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="memSelectAll" aria-label="Select all shown" data-i18n-aria-label="memSelectAll"></th>
                                     <th class="slot-col-idx">#</th>
                                     <th data-i18n="memColName">Name</th>
                                     <th data-i18n="memColFreq">Frequency (MHz)</th>
@@ -932,16 +948,16 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=67"></script>
-<script src="locales/fr.js?v=67"></script>
-<script src="locales/it.js?v=67"></script>
-<script src="locales/es.js?v=67"></script>
-<script src="locales/de.js?v=67"></script>
-<script src="locales/pt.js?v=67"></script>
-<script src="locales/ru.js?v=67"></script>
-<script src="locales/pl.js?v=67"></script>
-<script src="locales/zh.js?v=67"></script>
-<script src="locales/nl.js?v=67"></script>
+<script src="locales/en.js?v=68"></script>
+<script src="locales/fr.js?v=68"></script>
+<script src="locales/it.js?v=68"></script>
+<script src="locales/es.js?v=68"></script>
+<script src="locales/de.js?v=68"></script>
+<script src="locales/pt.js?v=68"></script>
+<script src="locales/ru.js?v=68"></script>
+<script src="locales/pl.js?v=68"></script>
+<script src="locales/zh.js?v=68"></script>
+<script src="locales/nl.js?v=68"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=2"></script>
@@ -949,8 +965,8 @@
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/flash.js?v=86"></script>
-<script src="js/memories.js?v=3"></script>
-<script src="js/settings.js?v=1"></script>
+<script src="js/memories.js?v=4"></script>
+<script src="js/settings.js?v=2"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
 <script src="js/studio.js?v=21"></script>

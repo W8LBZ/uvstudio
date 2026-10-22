@@ -45,6 +45,18 @@
     img[0x00A] = (mode >= 4 ? mode === 5 : (mode & 2) !== 0) ? selected : 0;
   }
 
+  // SCAN_LIST_MIX_MASK at 0xA170: 24-bit list mask (bit n-1 = list n), valid only with the
+  // "MIX",1 marker in bytes 3..6; otherwise (or mask 0) the firmware mixes all lists.
+  const MIX_ALL = 0xFFFFFF;
+  function mixGet(img) {
+    const valid = img[0x173] === 0x4D && img[0x174] === 0x49 && img[0x175] === 0x58 && img[0x176] === 1;
+    const mask = img[0x170] | (img[0x171] << 8) | (img[0x172] << 16);
+    return valid && mask ? mask : MIX_ALL;
+  }
+  function mixSet(img, mask) {
+    img.set([mask & 0xFF, (mask >> 8) & 0xFF, mask >> 16, 0x4D, 0x49, 0x58, 1], 0x170);
+  }
+
   const FIELDS = [
     // Radio
     field('Sql', 'radio', 0xA001, range(0, 9)),
@@ -108,6 +120,7 @@
       : v < 81 ? `CARRIER ${two(Math.floor(v / 4))}s:${String((v % 4) * 250).padStart(3, '0')}ms`
         : `TIMEOUT ${mmss((v - 80) * 5)}`))),
     field('SetScn', 'scan', 0xA15F, [[1, 'NORMAL'], [0, 'FAST']], 1, 1),   // stored inverted
+    { id: 'ScMix', group: 'scan', values: 'mask', get: mixGet, set: mixSet },
 
     // Transmit
     field('SetPwr', 'tx', 0xA15F, list(['< 20mW', '125mW', '250mW', '500mW', '1W', '2W', '5W']), 4, 4),
@@ -164,9 +177,9 @@
       return;
     }
     const v = Number(value);
-    const valid = f.values === 'channel'
-      ? Number.isInteger(v) && v >= 0 && v <= CHANNEL_NONE
-      : f.values.some(([candidate]) => candidate === v);
+    const valid = f.values === 'channel' ? Number.isInteger(v) && v >= 0 && v <= CHANNEL_NONE
+      : f.values === 'mask' ? Number.isInteger(v) && v > 0 && v <= MIX_ALL
+        : f.values.some(([candidate]) => candidate === v);
     if (!valid) throw new Error(`invalid ${id} value ${value}`);
     if (f.set) {
       f.set(img, v);
@@ -179,7 +192,7 @@
     }
   }
 
-  return { BASE, SIZE, CHANNEL_NONE, FIELDS, GROUPS, TEXT_LENGTH, PROTECTED, getValue, setValue };
+  return { BASE, SIZE, CHANNEL_NONE, MIX_ALL, FIELDS, GROUPS, TEXT_LENGTH, PROTECTED, getValue, setValue };
 });
 
 // ---------- Settings panel (browser only; serial sessions run through flash.js) ----------
@@ -216,6 +229,11 @@
     if (f.values === 'text' || f.values === 'dtmf') {
       return `<input ${attrs} maxlength="${S.TEXT_LENGTH}" value="${escapeHtml(value)}">`;
     }
+    if (f.values === 'mask') {
+      return `<div class="set-mask" role="group" aria-label="${escapeHtml(f.id)}" ${attrs}>` +
+        Array.from({ length: 24 }, (_, bit) => `<label><input type="checkbox" data-bit="${bit}"` +
+          `${value & (1 << bit) ? ' checked' : ''}>${bit + 1}</label>`).join('') + '</div>';
+    }
     if (f.values === 'channel') {
       const shown = value >= S.CHANNEL_NONE ? '' : value + 1;
       return `<input ${attrs} type="number" min="1" max="${S.CHANNEL_NONE}" placeholder="—" value="${shown}">`;
@@ -232,7 +250,8 @@
       const dirty = new Set(dirtyIds());
       form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend>${escapeHtml(t(groupKey(group)))}</legend>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
-          `<div class="set-row${dirty.has(f.id) ? ' set-dirty' : ''}"><label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}">${escapeHtml(f.id)}</label>${control(f)}</div>`
+          `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
+          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}">${escapeHtml(f.id)}</label>${control(f)}</div>`
         ).join('') + '</fieldset>').join('');
     }
     updateState();
@@ -249,14 +268,16 @@
   }
 
   form.addEventListener('change', event => {
-    const input = event.target;
-    const id = input.dataset.id;
+    const input = event.target.closest('[data-id]');
+    const id = input?.dataset.id;
     if (!id) return;
     const f = S.FIELDS.find(candidate => candidate.id === id);
     try {
       const value = f.values === 'channel'
         ? (input.value.trim() === '' ? S.CHANNEL_NONE : Number(input.value) - 1)
-        : input.value;
+        : f.values === 'mask'
+          ? Array.from(input.querySelectorAll('[data-bit]')).reduce((m, box) => (box.checked ? m | (1 << box.dataset.bit) : m), 0)
+          : input.value;
       S.setValue(image, id, value);
       input.removeAttribute('aria-invalid');
     } catch (error) {

@@ -16,7 +16,8 @@ function noise() {
 
 test('round-trips every option of every field without touching other bits', () => {
   for (const f of set.FIELDS) {
-    const values = f.values === 'channel' ? [0, 511, set.CHANNEL_NONE]
+    const values = f.values === 'mask' ? [1, 0x800001, set.MIX_ALL]
+      : f.values === 'channel' ? [0, 511, set.CHANNEL_NONE]
       : f.values === 'text' ? ['', 'F4HWN', 'W8LBZ 16 CHARS!!']
         : f.values === 'dtmf' ? ['', '12345', 'ABCD*#0123456789']
           : f.values.map(([v]) => v);
@@ -87,6 +88,15 @@ test('keeps the VOX level when VOX is switched off', () => {
   assert.deepEqual([img[0x005], img[0x006]], [1, 5]);
   set.setValue(img, 'VOX', 0);
   assert.deepEqual([img[0x005], img[0x006]], [0, 5]);
+});
+
+test('stores the MIX list mask with the firmware marker', () => {
+  const img = new Uint8Array(set.SIZE).fill(0xFF);
+  assert.equal(set.getValue(img, 'ScMix'), set.MIX_ALL);        // no marker: all lists
+  set.setValue(img, 'ScMix', 0b101);                            // lists 1 and 3
+  assert.deepEqual(Array.from(img.subarray(0x170, 0x178)), [5, 0, 0, 0x4D, 0x49, 0x58, 1, 0xFF]);
+  assert.equal(set.getValue(img, 'ScMix'), 5);
+  assert.throws(() => set.setValue(img, 'ScMix', 0), /ScMix/);
 });
 
 test('rejects invalid values', () => {

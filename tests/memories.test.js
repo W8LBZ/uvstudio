@@ -156,3 +156,39 @@ test('groups changed bytes into aligned write runs', () => {
     { offset: 400, length: 64 }, { offset: 464, length: 48 }
   ]);
 });
+
+function named(names) {
+  const image = blank();
+  names.forEach((name, i) => { if (name) mem.encodeChannel(image, i, channel({ name, freq: 145000000 + i * 12500 })); });
+  return image;
+}
+const namesOf = (image, n) => Array.from({ length: n }, (_, i) => mem.decodeChannel(image, i)?.name ?? null);
+
+test('moves selected channels as a block, keeping every byte', () => {
+  const image = named(['A', 'B', 'C', 'D', 'E']);
+  image[3 * 16 + 13] |= 1;                                     // hidden DTMF bit travels with D
+  assert.deepEqual(mem.moveChannels(image, [2, 3], -1), [1, 2]);
+  assert.deepEqual(namesOf(image, 5), ['A', 'C', 'D', 'B', 'E']);
+  assert.equal(image[2 * 16 + 13] & 1, 1);
+  assert.deepEqual(mem.moveChannels(image, [1, 2], 1), [2, 3]);
+  assert.deepEqual(namesOf(image, 5), ['A', 'B', 'C', 'D', 'E']);
+  assert.throws(() => mem.moveChannels(image, [0], -1), /ends/);
+});
+
+test('inserts and removes with shifting, like CHIRP', () => {
+  const image = named(['A', 'B', 'C']);
+  mem.insertChannel(image, 1);
+  assert.deepEqual(namesOf(image, 4), ['A', null, 'B', 'C']);
+  mem.removeChannel(image, 0);
+  assert.deepEqual(namesOf(image, 4), [null, 'B', 'C', null]);
+  mem.encodeChannel(image, mem.CHANNEL_COUNT - 1, channel({ name: 'LAST' }));
+  assert.throws(() => mem.insertChannel(image, 0), /last channel/);
+});
+
+test('copies and pastes channels, including empty ones', () => {
+  const image = named(['A', null, 'C']);
+  const clip = [0, 1, 2].map(i => mem.copyChannel(image, i));
+  mem.pasteChannels(image, 10, clip);
+  assert.deepEqual(namesOf(image, 13).slice(10), ['A', null, 'C']);
+  assert.throws(() => mem.pasteChannels(image, mem.CHANNEL_COUNT - 1, clip), /fit/);
+});

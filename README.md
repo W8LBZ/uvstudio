@@ -73,10 +73,15 @@ default). Clearing it lets that channel transmit outside the band plan. Busy
 lock, reverse, compander, and PTT ID are also editable per channel. Scan list
 names (3 characters, as shown on the radio) are edited above the table.
 
+Tick rows (shift-click selects a range) to move them up or down, insert an
+empty channel above, delete and shift the rest up, copy and paste, or set one
+field on every selected channel. Moving channels does not update priority or
+call channel numbers in Radio settings.
+
 ### Radio settings
 
 Open Radio settings, select Read from radio, change settings, then select Write
-changes to radio. Settings use the radio's own menu names and values. Hidden
+changes to radio. ScMix picks which scan lists the MIX scan list setting combines. Settings use the radio's own menu names and values. Hidden
 menu items (F Lock, 350 En, battery calibration) and the volume gain stored in
 the calibration area are not shown. Opening a settings backup never restores
 its AES key or firmware version bytes.

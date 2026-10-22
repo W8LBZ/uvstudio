@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.pl = {
   "memColCompander": "Kompander",
   "memColPttId": "PTT ID",
   "memScanListNames": "Nazwy list skanowania",
-  "memListName": "Nazwa listy skanowania {0}"
+  "memListName": "Nazwa listy skanowania {0}",
+  "memSelectRow": "Zaznacz kanał {0}",
+  "memSelectAll": "Zaznacz wszystkie widoczne",
+  "memSelected": "Zaznaczone: {0}",
+  "memMoveUp": "W górę",
+  "memMoveDown": "W dół",
+  "memInsert": "Wstaw pusty powyżej",
+  "memRemoveShift": "Usuń i przesuń w górę",
+  "memCopy": "Kopiuj",
+  "memPaste": "Wklej",
+  "memBulkField": "Ustaw dla zaznaczonych:",
+  "memBulkValue": "Wartość",
+  "memBulkApply": "Zastosuj",
+  "memBulkDone": "Zmieniono kanałów: {0}.",
+  "memCopied": "Skopiowano kanałów: {0}.",
+  "memLastInUse": "Kanał {0} jest zajęty: zwolnij go przed wstawieniem.",
+  "memPasteOverflow": "Za mało kanałów po {0}, aby wkleić {1}."
 };

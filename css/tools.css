@@ -1505,6 +1505,39 @@
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
 }
 
+#pane-tools .mem-selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+#pane-tools .mem-selection-bar .mem-summary { margin-left: 0; margin-right: 6px; }
+#pane-tools .mem-bulk {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+#pane-tools .mem-bulk select,
+#pane-tools .mem-bulk input:not([type="checkbox"]) {
+  height: 28px;
+  margin: 0;
+  padding: 2px 24px 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: none;
+}
+#pane-tools .mem-bulk input:not([type="checkbox"]) { width: 10ch; padding-right: 6px; }
+#pane-tools .mem-table tr.mem-selected td {
+  background: color-mix(in oklab, var(--accent) 18%, var(--surface));
+}
 #pane-tools .mem-list-names-box {
   margin-bottom: 12px;
 }
@@ -1592,6 +1625,20 @@
 }
 #pane-tools .set-row select { padding-right: 24px; }
 #pane-tools .set-row [aria-invalid="true"] { border-color: var(--error); }
+#pane-tools .set-row-mask { flex-wrap: wrap; }
+#pane-tools .set-mask {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px 6px;
+  width: 100%;
+  font-size: 12px;
+}
+#pane-tools .set-mask label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+}
 #pane-tools .set-row.set-dirty {
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
 }

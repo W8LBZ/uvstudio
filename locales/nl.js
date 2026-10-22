@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.nl = {
   "memColCompander": "Compander",
   "memColPttId": "PTT-ID",
   "memScanListNames": "Namen van scanlijsten",
-  "memListName": "Naam van scanlijst {0}"
+  "memListName": "Naam van scanlijst {0}",
+  "memSelectRow": "Kanaal {0} selecteren",
+  "memSelectAll": "Alle getoonde selecteren",
+  "memSelected": "{0} geselecteerd",
+  "memMoveUp": "Omhoog",
+  "memMoveDown": "Omlaag",
+  "memInsert": "Leeg erboven invoegen",
+  "memRemoveShift": "Verwijderen en opschuiven",
+  "memCopy": "Kopiëren",
+  "memPaste": "Plakken",
+  "memBulkField": "Instellen voor selectie:",
+  "memBulkValue": "Waarde",
+  "memBulkApply": "Toepassen",
+  "memBulkDone": "{0} kanalen gewijzigd.",
+  "memCopied": "{0} kanalen gekopieerd.",
+  "memLastInUse": "Kanaal {0} is in gebruik: maak het vrij voor het invoegen.",
+  "memPasteOverflow": "Na {0} zijn er niet genoeg kanalen om {1} te plakken."
 };

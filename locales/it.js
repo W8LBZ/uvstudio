@@ -575,5 +575,21 @@ window.UVSTUDIO_LOCALES.it = {
   "memColCompander": "Compander",
   "memColPttId": "PTT ID",
   "memScanListNames": "Nomi delle liste di scansione",
-  "memListName": "Nome della lista di scansione {0}"
+  "memListName": "Nome della lista di scansione {0}",
+  "memSelectRow": "Seleziona canale {0}",
+  "memSelectAll": "Seleziona tutti i visibili",
+  "memSelected": "{0} selezionati",
+  "memMoveUp": "Sposta su",
+  "memMoveDown": "Sposta giù",
+  "memInsert": "Inserisci vuoto sopra",
+  "memRemoveShift": "Elimina e sposta su",
+  "memCopy": "Copia",
+  "memPaste": "Incolla",
+  "memBulkField": "Imposta per i selezionati:",
+  "memBulkValue": "Valore",
+  "memBulkApply": "Applica",
+  "memBulkDone": "{0} canali modificati.",
+  "memCopied": "{0} canali copiati.",
+  "memLastInUse": "Il canale {0} è in uso: liberalo prima di inserire.",
+  "memPasteOverflow": "Canali insufficienti dopo {0} per incollarne {1}."
 };

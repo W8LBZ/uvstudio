@@ -250,6 +250,48 @@
     });
   }
 
+  // ---------- Whole-channel operations (raw bytes, so nothing is lost) ----------
+  const slotRanges = index => [[index * 16, 16], [NAME_BASE + index * 16, 16], [ATTR_BASE + index * 2, 2]];
+
+  function copyChannel(image, index) {
+    return isEmpty(image, index) ? null : slotRanges(index).map(([start, len]) => image.slice(start, start + len));
+  }
+
+  function pasteChannel(image, index, slot) {
+    if (slot === null) encodeChannel(image, index, null);
+    else slotRanges(index).forEach(([start], k) => image.set(slot[k], start));
+  }
+
+  function pasteChannels(image, at, slots) {
+    if (at < 0 || at + slots.length > CHANNEL_COUNT) throw new Error('paste does not fit');
+    slots.forEach((slot, k) => pasteChannel(image, at + k, slot));
+  }
+
+  // Shift channels at..1022 down one place and clear `at` (CHIRP "insert row above").
+  function insertChannel(image, at) {
+    if (!isEmpty(image, CHANNEL_COUNT - 1)) throw new Error('last channel is in use');
+    for (let i = CHANNEL_COUNT - 1; i > at; i--) pasteChannel(image, i, copyChannel(image, i - 1));
+    encodeChannel(image, at, null);
+  }
+
+  // Delete `at` and shift the channels after it up one place.
+  function removeChannel(image, at) {
+    for (let i = at; i < CHANNEL_COUNT - 1; i++) pasteChannel(image, i, copyChannel(image, i + 1));
+    encodeChannel(image, CHANNEL_COUNT - 1, null);
+  }
+
+  // Move the selected channels one place up (delta -1) or down (+1); returns their new indices.
+  function moveChannels(image, indices, delta) {
+    const sorted = [...indices].sort((a, b) => (a - b) * -delta);
+    if (sorted.some(i => i + delta < 0 || i + delta >= CHANNEL_COUNT)) throw new Error('cannot move past the ends');
+    for (const i of sorted) {
+      const here = copyChannel(image, i);
+      pasteChannel(image, i, copyChannel(image, i + delta));
+      pasteChannel(image, i + delta, here);
+    }
+    return indices.map(i => i + delta);
+  }
+
   // Changed 8-byte blocks (the firmware's write granularity), merged into runs.
   function dirtyRuns(before, after, maxLength = 128) {
     const runs = [];
@@ -491,6 +533,11 @@
     defaultChannel,
     encodeChannel,
     channelDirty,
+    copyChannel,
+    pasteChannels,
+    insertChannel,
+    removeChannel,
+    moveChannels,
     dirtyRuns,
     parseCsv,
     exportChirpCsv,
@@ -523,9 +570,18 @@
   const listNames = $('memListNames');
   const listNamesBox = $('memListNamesBox');
 
+  const selectionBar = $('memSelectionBar');
+  const selectionCount = $('memSelectionCount');
+  const selectAll = $('memSelectAll');
+  const bulkField = $('memBulkField');
+  const bulkValue = $('memBulkValue');
+
   let radioImage = null;   // last state read from / written to the radio
   let image = null;        // working copy edited by the table
   let busy = false;
+  const selected = new Set();
+  let lastClicked = null;
+  let clipboard = null;    // copied channel slots
 
   toneList.innerHTML = M.CTCSS.map((_, i) => `<option value="${M.toneText(1, i)}">`).join('') +
     M.DCS.map((_, i) => `<option value="${M.toneText(2, i)}"><option value="${M.toneText(3, i)}">`).join('');
@@ -542,35 +598,58 @@
     return pairs;
   }
 
+  const BULK_FIELDS = ['duplex', 'offset', 'mode', 'txTone', 'rxTone', 'power', 'step', 'scanlist',
+    'skip', 'txLock', 'busy', 'reverse', 'compander', 'pttId'];
+  const FIELD_LABELS = {
+    name: 'memColName', freq: 'memColFreq', duplex: 'memColDuplex', offset: 'memColOffset', mode: 'memColMode',
+    txTone: 'memColTxTone', rxTone: 'memColRxTone', power: 'memColPower', step: 'memColStep',
+    scanlist: 'memColScanList', skip: 'memColSkip', txLock: 'memColTxLock', busy: 'memColBusy',
+    reverse: 'memColReverse', compander: 'memColCompander', pttId: 'memColPttId'
+  };
+  const CELL_FIELDS = Object.keys(FIELD_LABELS);
+
+  function cellHtml(field, ch, labelText) {
+    const attrs = `data-field="${field}" aria-label="${escapeHtml(labelText)}"`;
+    const select = pairs => `<select ${attrs}>${options(pairs, ch[field])}</select>`;
+    const check = () => `<input type="checkbox" ${attrs}${ch[field] ? ' checked' : ''}>`;
+    switch (field) {
+      case 'name': return `<input ${attrs} maxlength="10" value="${escapeHtml(ch.name)}">`;
+      case 'freq': case 'offset': return `<input ${attrs} inputmode="decimal" value="${M.formatMHz(ch[field])}">`;
+      case 'txTone': case 'rxTone': return `<input ${attrs} list="memToneList" value="${ch[field]}">`;
+      case 'duplex': return select(M.DUPLEXES.map(d => [d, d]));
+      case 'mode': return select((M.MODES.includes(ch.mode) ? M.MODES : M.MODES.concat(ch.mode)).map(m => [m, m]));
+      case 'power': return select(M.POWERS.map((p, n) => [n, p]));
+      case 'step': return select(ch.step < M.STEPS.length ? stepPairs : stepPairs.concat([[ch.step, `#${ch.step}`]]));
+      case 'scanlist': return select(scanPairs());
+      case 'compander': return select(M.COMPANDERS.map((c, n) => [n, c]));
+      case 'pttId': return select(M.PTT_IDS.map((p, n) => [n, p]));
+      default: return check();   // skip, txLock, busy, reverse
+    }
+  }
+
+  // Reads a cell control back into a channel value (throws on bad input).
+  function fieldValue(input) {
+    const field = input.dataset.field;
+    if (field === 'freq' || field === 'offset') return M.parseMHz(input.value);
+    if (input.type === 'checkbox') return input.checked;
+    if (['power', 'step', 'scanlist', 'compander', 'pttId'].includes(field)) return Number(input.value);
+    return input.value;
+  }
+
   function rowHtml(i) {
     const ch = M.decodeChannel(image, i);
     const dirty = radioImage && M.channelDirty(radioImage, image, i);
-    const label = key => `aria-label="${escapeHtml(`${t(key)} ${i + 1}`)}"`;
-    const head = `<tr data-index="${i}"${dirty ? ' class="mem-dirty"' : ''}><td class="slot-idx">${i + 1}</td>`;
+    const classes = [dirty && 'mem-dirty', selected.has(i) && 'mem-selected'].filter(Boolean).join(' ');
+    const head = `<tr data-index="${i}"${classes ? ` class="${classes}"` : ''}>` +
+      `<td><input type="checkbox" data-select${selected.has(i) ? ' checked' : ''} aria-label="${escapeHtml(t('memSelectRow', i + 1))}"></td>` +
+      `<td class="slot-idx">${i + 1}</td>`;
+    const label = field => `${t(FIELD_LABELS[field])} ${i + 1}`;
     if (!ch) {
-      return `${head}<td></td><td><input data-field="freq" inputmode="decimal" ${label('memColFreq')}></td>` +
-        '<td colspan="15"></td></tr>';
+      return `${head}<td></td><td>${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td>` +
+        `<td colspan="${CELL_FIELDS.length - 1}"></td></tr>`;
     }
-    const modes = M.MODES.includes(ch.mode) ? M.MODES : M.MODES.concat(ch.mode);
-    const steps = ch.step < M.STEPS.length ? stepPairs : stepPairs.concat([[ch.step, `#${ch.step}`]]);
-    return head +
-      `<td><input data-field="name" maxlength="10" value="${escapeHtml(ch.name)}" ${label('memColName')}></td>` +
-      `<td><input data-field="freq" inputmode="decimal" value="${M.formatMHz(ch.freq)}" ${label('memColFreq')}></td>` +
-      `<td><select data-field="duplex" ${label('memColDuplex')}>${options(M.DUPLEXES.map(d => [d, d]), ch.duplex)}</select></td>` +
-      `<td><input data-field="offset" inputmode="decimal" value="${M.formatMHz(ch.offset)}" ${label('memColOffset')}></td>` +
-      `<td><select data-field="mode" ${label('memColMode')}>${options(modes.map(m => [m, m]), ch.mode)}</select></td>` +
-      `<td><input data-field="txTone" list="memToneList" value="${ch.txTone}" ${label('memColTxTone')}></td>` +
-      `<td><input data-field="rxTone" list="memToneList" value="${ch.rxTone}" ${label('memColRxTone')}></td>` +
-      `<td><select data-field="power" ${label('memColPower')}>${options(M.POWERS.map((p, n) => [n, p]), ch.power)}</select></td>` +
-      `<td><select data-field="step" ${label('memColStep')}>${options(steps, ch.step)}</select></td>` +
-      `<td><select data-field="scanlist" ${label('memColScanList')}>${options(scanPairs(), ch.scanlist)}</select></td>` +
-      `<td><input type="checkbox" data-field="skip"${ch.skip ? ' checked' : ''} ${label('memColSkip')}></td>` +
-      `<td><input type="checkbox" data-field="txLock"${ch.txLock ? ' checked' : ''} ${label('memColTxLock')}></td>` +
-      `<td><input type="checkbox" data-field="busy"${ch.busy ? ' checked' : ''} ${label('memColBusy')}></td>` +
-      `<td><input type="checkbox" data-field="reverse"${ch.reverse ? ' checked' : ''} ${label('memColReverse')}></td>` +
-      `<td><select data-field="compander" ${label('memColCompander')}>${options(M.COMPANDERS.map((c, n) => [n, c]), ch.compander)}</select></td>` +
-      `<td><select data-field="pttId" ${label('memColPttId')}>${options(M.PTT_IDS.map((p, n) => [n, p]), ch.pttId)}</select></td>` +
-      `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" ${label('memDelete')}>✕</button></td></tr>`;
+    return head + CELL_FIELDS.map(field => `<td>${cellHtml(field, ch, label(field))}</td>`).join('') +
+      `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" aria-label="${escapeHtml(`${t('memDelete')} ${i + 1}`)}">✕</button></td></tr>`;
   }
 
   function counts() {
@@ -614,6 +693,11 @@
       }
     }
     body.innerHTML = rows.join('');
+    selectionBar.hidden = !image;
+    if (image) {
+      updateSelection();
+      renderBulkValue();
+    }
     updateState();
   }
 
@@ -647,10 +731,7 @@
     if (wasEmpty && input.value.trim() === '') return;
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
-      if (field === 'freq' || field === 'offset') ch[field] = M.parseMHz(input.value);
-      else if (input.type === 'checkbox') ch[field] = input.checked;
-      else if (['power', 'step', 'scanlist', 'compander', 'pttId'].includes(field)) ch[field] = Number(input.value);
-      else ch[field] = input.value;
+      ch[field] = fieldValue(input);
       M.encodeChannel(image, i, ch);
       input.removeAttribute('aria-invalid');
     } catch (error) {
@@ -690,6 +771,132 @@
     updateState();
   });
 
+  // ---------- Selection and table editing ----------
+  function visibleIndices() {
+    return Array.from(body.querySelectorAll('tr[data-index]'), tr => Number(tr.dataset.index));
+  }
+
+  function updateSelection() {
+    for (const i of selected) if (i >= M.CHANNEL_COUNT) selected.delete(i);
+    body.querySelectorAll('tr[data-index]').forEach(tr => {
+      const on = selected.has(Number(tr.dataset.index));
+      tr.classList.toggle('mem-selected', on);
+      tr.querySelector('[data-select]').checked = on;
+    });
+    const visible = visibleIndices();
+    selectAll.checked = visible.length > 0 && visible.every(i => selected.has(i));
+    selectionCount.textContent = t('memSelected', selected.size);
+    const none = selected.size === 0;
+    selectionBar.querySelectorAll('[data-edit]').forEach(button => {
+      button.disabled = none || (button.dataset.edit === 'paste' && !clipboard);
+    });
+    $('memBulkApply').disabled = none;
+  }
+
+  function renderBulkValue() {
+    const sample = [...selected].map(i => M.decodeChannel(image, i)).find(Boolean) || M.defaultChannel();
+    bulkValue.innerHTML = cellHtml(bulkField.value, sample, t('memBulkValue'));
+  }
+
+  bulkField.innerHTML = BULK_FIELDS.map(field => `<option value="${field}" data-i18n="${FIELD_LABELS[field]}">${escapeHtml(t(FIELD_LABELS[field]))}</option>`).join('');
+  bulkField.addEventListener('change', renderBulkValue);
+
+  body.addEventListener('click', event => {
+    const box = event.target.closest('[data-select]');
+    if (!box) return;
+    const i = Number(box.closest('tr').dataset.index);
+    if (event.shiftKey && lastClicked !== null) {
+      const visible = visibleIndices();
+      const [a, b] = [visible.indexOf(lastClicked), visible.indexOf(i)].sort((x, y) => x - y);
+      visible.slice(a, b + 1).forEach(n => (box.checked ? selected.add(n) : selected.delete(n)));
+    } else if (box.checked) {
+      selected.add(i);
+    } else {
+      selected.delete(i);
+    }
+    lastClicked = i;
+    updateSelection();
+  });
+
+  selectAll.addEventListener('change', () => {
+    visibleIndices().forEach(i => (selectAll.checked ? selected.add(i) : selected.delete(i)));
+    updateSelection();
+  });
+
+  function sortedSelection() {
+    return [...selected].sort((a, b) => a - b);
+  }
+
+  const edits = {
+    up: () => moveSelection(-1),
+    down: () => moveSelection(1),
+    insert: () => {
+      const at = sortedSelection()[0];
+      if (!M.isEmpty(image, M.CHANNEL_COUNT - 1)) throw new Error(t('memLastInUse', M.CHANNEL_COUNT));
+      M.insertChannel(image, at);
+      selected.clear();
+      selected.add(at);
+    },
+    removeShift: () => {
+      sortedSelection().reverse().forEach(i => M.removeChannel(image, i));
+      selected.clear();
+    },
+    copy: () => {
+      clipboard = sortedSelection().map(i => M.copyChannel(image, i));
+      log(t('memCopied', clipboard.length), 'info');
+    },
+    paste: () => {
+      const at = sortedSelection()[0];
+      if (at + clipboard.length > M.CHANNEL_COUNT) throw new Error(t('memPasteOverflow', at + 1, clipboard.length));
+      M.pasteChannels(image, at, clipboard);
+      selected.clear();
+      clipboard.forEach((_, k) => selected.add(at + k));
+    }
+  };
+
+  function moveSelection(delta) {
+    const moved = M.moveChannels(image, sortedSelection(), delta);
+    selected.clear();
+    moved.forEach(i => selected.add(i));
+  }
+
+  selectionBar.addEventListener('click', event => {
+    const button = event.target.closest('[data-edit]');
+    if (!button || !image) return;
+    try {
+      edits[button.dataset.edit]();
+    } catch (error) {
+      log(t('error', error.message), 'error');
+      return;
+    }
+    if (button.dataset.edit !== 'copy') render();
+    updateSelection();
+  });
+
+  $('memBulkApply').addEventListener('click', () => {
+    const input = bulkValue.querySelector('[data-field]');
+    let value;
+    try {
+      value = fieldValue(input);
+    } catch (error) {
+      log(t('memInvalidValue', error.message), 'error');
+      return;
+    }
+    let changed = 0;
+    for (const i of sortedSelection()) {
+      const ch = M.decodeChannel(image, i);
+      if (!ch) continue;
+      try {
+        M.encodeChannel(image, i, Object.assign(ch, { [bulkField.value]: value }));
+        changed++;
+      } catch (error) {
+        log(t('memInvalidValue', `${i + 1}: ${error.message}`), 'error');
+      }
+    }
+    log(t('memBulkDone', changed), changed ? 'success' : 'info');
+    render();
+  });
+
   body.addEventListener('click', event => {
     const button = event.target.closest('button[data-action="delete"]');
     if (!button) return;
@@ -708,6 +915,7 @@
         done => radio.progress(Math.round((done / M.IMAGE_SIZE) * 100)));
       radioImage = data;
       image = data.slice();
+      selected.clear();
       render();
       log(t('memReadComplete', counts().used), 'success');
     });
