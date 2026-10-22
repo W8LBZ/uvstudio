@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.0.0-w8lbz.4"></script>
+    <script src="js/studio-version.js?v=2.0.0-w8lbz.5"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
@@ -441,6 +441,32 @@
                             <tbody id="memTableBody"></tbody>
                         </table>
                     </div>
+                    <details class="mem-list-names-box mem-vfo-box" id="memVfoBox" hidden>
+                        <summary data-i18n="memVfos">VFOs</summary>
+                        <p class="tab-description" data-i18n="memVfoHint">The frequency each band's VFO A and VFO B starts on. A VFO frequency must stay inside its band.</p>
+                        <div class="slots-table-wrap mem-table-wrap">
+                            <table class="slots-table mem-table">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="memColVfo">VFO</th>
+                                        <th data-i18n="memColFreq">Frequency (MHz)</th>
+                                        <th data-i18n="memColDuplex">Duplex</th>
+                                        <th data-i18n="memColOffset">Offset (MHz)</th>
+                                        <th data-i18n="memColMode">Mode</th>
+                                        <th data-i18n="memColTxTone">TX tone</th>
+                                        <th data-i18n="memColRxTone">RX tone</th>
+                                        <th data-i18n="memColPower">Power</th>
+                                        <th data-i18n="memColStep">Step (kHz)</th>
+                                        <th data-i18n="memColTxLock">TX lock</th>
+                                        <th data-i18n="memColBusy">Busy lock</th>
+                                        <th data-i18n="memColReverse">Reverse</th>
+                                        <th data-i18n="memColPttId">PTT ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="memVfoBody"></tbody>
+                            </table>
+                        </div>
+                    </details>
                 </section>
             </div>
 
@@ -977,8 +1003,8 @@
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/flash.js?v=86"></script>
-<script src="js/memories.js?v=5"></script>
-<script src="js/settings.js?v=2"></script>
+<script src="js/memories.js?v=6"></script>
+<script src="js/settings.js?v=3"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
 <script src="js/studio.js?v=21"></script>

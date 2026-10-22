@@ -16,6 +16,7 @@ function noise() {
 
 test('round-trips every option of every field without touching other bits', () => {
   for (const f of set.FIELDS) {
+    if (f.values === 'fm') continue;   // MHz text in, 100 kHz units out: own test below
     const values = f.values === 'mask' ? [1, 0x800001, set.MIX_ALL]
       : f.values === 'channel' ? [0, 511, set.CHANNEL_NONE]
       : f.values === 'text' ? ['', 'F4HWN', 'W8LBZ 16 CHARS!!']
@@ -106,4 +107,21 @@ test('rejects invalid values', () => {
   assert.throws(() => set.setValue(img, 'Message 1', 'x'.repeat(17)), /Message 1/);
   assert.throws(() => set.setValue(img, 'PriCh1', 1025), /PriCh1/);
   assert.equal(bitfields.length > 40, true);
+});
+
+test('FM presets: 100 kHz units at 0xA028, empty 0xFFFF, limited to the current band', () => {
+  const img = new Uint8Array(set.SIZE).fill(0xFF);
+  img[0x023] = 0;                                   // band 0: 87.5-108 MHz
+  assert.equal(set.getValue(img, 'FM 1'), 0xFFFF);
+  set.setValue(img, 'FM 2', '101.1');
+  assert.deepEqual([img[0x02A], img[0x02B]], [1011 & 0xFF, 1011 >> 8]);
+  assert.throws(() => set.setValue(img, 'FM 3', '108.0'), /band/);   // hi is exclusive
+  assert.throws(() => set.setValue(img, 'FM 3', '80'), /band/);
+  set.setValue(img, 'FM band', 1);             // 76-108 MHz
+  assert.equal(img[0x023], 2);
+  set.setValue(img, 'FM 3', '80');
+  set.setValue(img, 'FM 2', '');
+  assert.equal(set.getValue(img, 'FM 2'), 0xFFFF);
+  assert.equal(set.getValue(img, 'FM 48'), 0xFFFF);
+  assert.throws(() => set.getValue(img, 'FM 49'), /unknown/);
 });

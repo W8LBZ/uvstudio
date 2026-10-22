@@ -191,6 +191,23 @@ test('imports with append, prepend, replace and duplicate skipping', () => {
   assert.equal(mem.importChirpCsv(blank(), 'Name,Frequency\nX,145.5', { mode: 'append' }).imported, 1);
 });
 
+test('encodes VFO records at 0x9000 with the shared per-band attribute', () => {
+  const image = blank();
+  const vfo = band => mem.CHANNEL_COUNT + band * 2;   // VFO A of a band; +1 = VFO B
+  assert.equal(mem.decodeChannel(image, vfo(2) + 1), null);              // erased
+  mem.encodeChannel(image, vfo(2) + 1, channel({ freq: 146520000, duplex: '+', offset: 600000, txTone: '100.0' }));
+  const view = new DataView(image.buffer);
+  assert.equal(view.getUint32(0x9050, true), 14652000);                  // band 2, VFO B
+  assert.equal(image[0x9050 + 11], 1);                                    // FM, +
+  assert.equal(image[0x8804] & 7, 2);                                     // attribute band
+  assert.equal(mem.decodeChannel(image, vfo(2) + 1).txTone, '100.0');
+  assert.equal(mem.decodeChannel(image, vfo(2)), null);                   // VFO A record still erased
+  assert.ok(mem.channelDirty(blank(), image, vfo(2) + 1));
+  assert.throws(() => mem.encodeChannel(image, vfo(2), channel({ freq: 446000000 })), /band/);
+  assert.throws(() => mem.encodeChannel(image, vfo(2) + 1, null), /VFO/);
+  assert.equal(image.subarray(0x8870, 0x9000).every(b => b === 0xFF), true);   // unmapped hole untouched
+});
+
 test('groups changed bytes into aligned write runs', () => {
   const before = new Uint8Array(512);
   const after = before.slice();

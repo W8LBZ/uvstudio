@@ -57,6 +57,13 @@
     img.set([mask & 0xFF, (mask >> 8) & 0xFF, mask >> 16, 0x4D, 0x49, 0x58, 1], 0x170);
   }
 
+  // FM broadcast (BK1080): band at 0xA023 bits 1-2, 48 presets at 0xA028 as u16 in 100 kHz
+  // units (0xFFFF empty). The firmware skips presets outside lo <= f < hi of the current band.
+  const FM_BANDS = [[875, 1080], [760, 1080], [760, 900], [640, 760]];
+  const FM_PRESETS = 48;
+  const fmBand = img => FM_BANDS[(img[0x023] >> 1) & 3];
+  const fmPreset = n => ({ id: `FM ${n + 1}`, group: 'fm', addr: 0xA028 + n * 2, shift: 0, bits: 16, values: 'fm' });
+
   const FIELDS = [
     // Radio
     field('Sql', 'radio', 0xA001, range(0, 9)),
@@ -134,10 +141,14 @@
     field('D Prel', 'dtmf', 0xA0ED, range(3, 99, v => `${v}*10ms`)),
     field('D Live', 'dtmf', 0xA157, list(ON_OFF), 1, 1),
     field('UPCode', 'dtmf', 0xA110, 'dtmf'),
-    field('DWCode', 'dtmf', 0xA120, 'dtmf')
+    field('DWCode', 'dtmf', 0xA120, 'dtmf'),
+
+    // FM radio
+    field('FM band', 'fm', 0xA023, list(FM_BANDS.map(([lo, hi]) => `${lo / 10}-${hi / 10} MHz`)), 1, 2),
+    ...Array.from({ length: FM_PRESETS }, (_, n) => fmPreset(n))
   ];
 
-  const GROUPS = ['radio', 'display', 'keys', 'scan', 'tx', 'dtmf'];
+  const GROUPS = ['radio', 'display', 'keys', 'scan', 'tx', 'dtmf', 'fm'];
   const TEXT_LENGTH = 16;
   const PROTECTED = [[0x138, 0x148], [0x160, 0x170]];   // AES key, firmware version (offsets in the area)
 
@@ -174,6 +185,17 @@
       if (text.length > TEXT_LENGTH || !allowed.test(text)) throw new Error(`invalid ${id} "${text}"`);
       img.fill(0, at, at + TEXT_LENGTH);
       for (let i = 0; i < text.length; i++) img[at + i] = text.charCodeAt(i);
+      return;
+    }
+    if (f.values === 'fm') {   // MHz text, '' = empty
+      const text = String(value ?? '').trim();
+      const units = text === '' ? 0xFFFF : Math.round(Number(text) * 10);
+      const [lo, hi] = fmBand(img);
+      if (units !== 0xFFFF && !(units >= lo && units < hi)) {
+        throw new Error(`${text} MHz outside the FM band ${lo / 10}-${hi / 10} MHz`);
+      }
+      img[at] = units & 0xFF;
+      img[at + 1] = units >> 8;
       return;
     }
     const v = Number(value);
@@ -234,6 +256,9 @@
         Array.from({ length: 24 }, (_, bit) => `<label><input type="checkbox" data-bit="${bit}"` +
           `${value & (1 << bit) ? ' checked' : ''}>${bit + 1}</label>`).join('') + '</div>';
     }
+    if (f.values === 'fm') {
+      return `<input ${attrs} inputmode="decimal" placeholder="—" value="${value === 0xFFFF ? '' : (value / 10).toFixed(1)}">`;
+    }
     if (f.values === 'channel') {
       const shown = value >= S.CHANNEL_NONE ? '' : value + 1;
       return `<input ${attrs} type="number" min="1" max="${S.CHANNEL_NONE}" placeholder="—" value="${shown}">`;
@@ -280,6 +305,7 @@
           : input.value;
       S.setValue(image, id, value);
       input.removeAttribute('aria-invalid');
+      if (f.values === 'fm') input.value = input.value.trim() && (S.getValue(image, id) / 10).toFixed(1);
     } catch (error) {
       log(t('memInvalidValue', `${id}: ${error.message}`), 'error');
       input.setAttribute('aria-invalid', 'true');

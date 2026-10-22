@@ -4,6 +4,8 @@
 //   0x4000 1024 x 16-byte names (10 chars used)
 //   0x8000 1024 x 2-byte attributes (band, compander, exclude, scan list), then 7 VFO attributes
 //   0x880E 24 x 4-byte scan list names (the radio shows 3 characters)
+//   0x9000 14 x 16-byte VFO records (VFO A, VFO B per band), then 8 fox hunt bytes
+// The image mirrors addresses 0x0000-0x90E7; 0x8870-0x8FFF is unmapped and stays 0xFF.
 // Codec and CHIRP CSV helpers are shared by the panel below and the tests.
 (function (root, factory) {
   const api = factory();
@@ -15,8 +17,11 @@
   const CHANNEL_COUNT = 1024;
   const NAME_BASE = 0x4000;
   const ATTR_BASE = 0x8000;
-  const IMAGE_SIZE = 0x8870;       // through the scan list names, 8-byte aligned
-  const LEGACY_IMAGE_SIZE = 0x8800; // backups made before scan list names were included
+  const CHANNELS_END = 0x8870;     // through the scan list names, 8-byte aligned
+  const VFO_BASE = 0x9000;
+  const VFO_COUNT = 14;            // 7 bands x VFO A/B, slots CHANNEL_COUNT..CHANNEL_COUNT+13
+  const IMAGE_SIZE = 0x90E8;       // through the VFOs and fox hunt bytes (firmware mapping end)
+  const BACKUP_SIZES = [0x8800, CHANNELS_END, IMAGE_SIZE];   // older backups lack list names / VFOs
   const LIST_NAME_BASE = 0x880E;
   const LIST_NAME_LENGTH = 3;
   const NAME_LENGTH = 10;
@@ -108,8 +113,17 @@
   }
 
   // ---------- Channel codec ----------
+  // Byte offsets of a slot: memory channel (index < CHANNEL_COUNT) or VFO. A band's
+  // VFO A and B share one attribute word; VFOs have no name.
+  function slot(index) {
+    if (index < CHANNEL_COUNT) return { r: index * 16, a: ATTR_BASE + index * 2, n: NAME_BASE + index * 16 };
+    const v = index - CHANNEL_COUNT;
+    return { r: VFO_BASE + v * 16, a: ATTR_BASE + (CHANNEL_COUNT + (v >> 1)) * 2, n: null, band: v >> 1 };
+  }
+
   function attrAt(image, index) {
-    return image[ATTR_BASE + index * 2] | (image[ATTR_BASE + index * 2 + 1] << 8);
+    const { a } = slot(index);
+    return image[a] | (image[a + 1] << 8);
   }
 
   function isEmpty(image, index) {
@@ -118,13 +132,14 @@
 
   function decodeChannel(image, index) {
     if (isEmpty(image, index)) return null;
-    const r = index * 16;
+    const { r, a, n } = slot(index);
     const view = new DataView(image.buffer, image.byteOffset, image.byteLength);
+    if (n === null && view.getUint32(r, true) === 0xFFFFFFFF) return null;   // erased VFO
     const modulation = image[r + 11] >> 4;
     const narrow = (image[r + 12] >> 1) & 1;
     let name = '';
-    for (let i = 0; i < NAME_LENGTH; i++) {
-      const c = image[NAME_BASE + r + i];
+    for (let i = 0; n !== null && i < NAME_LENGTH; i++) {
+      const c = image[n + i];
       if (c === 0x00 || c === 0xFF) break;
       name += String.fromCharCode(c);
     }
@@ -138,7 +153,7 @@
       rxTone: toneText(image[r + 10] & 0x0F, image[r + 8]),
       power: (image[r + 12] >> 2) & 7,
       step: image[r + 14],
-      scanlist: image[ATTR_BASE + index * 2 + 1],
+      scanlist: image[a + 1],
       skip: Boolean(attrAt(image, index) & 0x80),
       // TX_LOCK: apply the F Lock band plan to this channel (firmware default on).
       // Clear = this channel may transmit outside the band plan.
@@ -163,12 +178,12 @@
   // Bits the panel does not edit (busy lockout, reverse, DTMF, compander...) are kept.
   // ch === null deletes the channel the way the firmware does.
   function encodeChannel(image, index, ch) {
-    const r = index * 16;
-    const a = ATTR_BASE + index * 2;
-    if (!Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT) {
+    if (!Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT + VFO_COUNT) {
       throw new Error(`invalid channel ${index}`);
     }
+    const { r, a, n, band } = slot(index);
     if (ch === null) {
+      if (n === null) throw new Error('a VFO cannot be deleted');
       image.fill(0xFF, r, r + 16);
       image.fill(0xFF, NAME_BASE + r, NAME_BASE + r + 16);
       image[a] = EMPTY_BAND;
@@ -178,6 +193,9 @@
 
     if (!(ch.freq >= FREQ_MIN_HZ && ch.freq <= FREQ_MAX_HZ)) {
       throw new Error(`frequency ${formatMHz(ch.freq || 0)} MHz out of range`);
+    }
+    if (n === null && bandOf(ch.freq) !== band) {
+      throw new Error(`frequency ${formatMHz(ch.freq)} MHz is outside this VFO's band`);
     }
     if (!(ch.offset >= 0 && ch.offset / 10 <= 0xFFFFFFFF)) throw new Error('invalid offset');
     if (!DUPLEXES.includes(ch.duplex)) throw new Error(`invalid duplex "${ch.duplex}"`);
@@ -191,10 +209,8 @@
     const modeIndex = MODES.indexOf(ch.mode);
     const name = String(ch.name ?? '').replace(/[^\x20-\x7E]/g, '').trim().slice(0, NAME_LENGTH);
 
-    if (isEmpty(image, index)) {
-      image.fill(0, r, r + 16);
-      image[a] = 0;
-    }
+    if (!decodeChannel(image, index)) image.fill(0, r, r + 16);   // empty slot or erased VFO record
+    if (isEmpty(image, index)) image[a] = 0;
     const view = new DataView(image.buffer, image.byteOffset, image.byteLength);
     view.setUint32(r, Math.round(ch.freq / 10), true);
     view.setUint32(r + 4, Math.round(ch.offset / 10), true);
@@ -218,8 +234,9 @@
     image[a] = (image[a] & 0x60) | (ch.compander << 3) | bandOf(ch.freq) | (ch.skip ? 0x80 : 0);
     image[a + 1] = ch.scanlist;
 
-    image.fill(0, NAME_BASE + r, NAME_BASE + r + 16);
-    for (let i = 0; i < name.length; i++) image[NAME_BASE + r + i] = name.charCodeAt(i);
+    if (n === null) return;
+    image.fill(0, n, n + 16);
+    for (let i = 0; i < name.length; i++) image[n + i] = name.charCodeAt(i);
   }
 
   function getListName(image, list) {   // list 1..24
@@ -242,8 +259,8 @@
   }
 
   function channelDirty(before, after, index) {
-    const r = index * 16;
-    const ranges = [[r, 16], [NAME_BASE + r, 16], [ATTR_BASE + index * 2, 2]];
+    const { r, a, n } = slot(index);
+    const ranges = [[r, 16], [a, 2]].concat(n === null ? [] : [[n, 16]]);
     return ranges.some(([start, len]) => {
       for (let i = start; i < start + len; i++) if (before[i] !== after[i]) return true;
       return false;
@@ -570,7 +587,11 @@
   return {
     CHANNEL_COUNT,
     IMAGE_SIZE,
-    LEGACY_IMAGE_SIZE,
+    CHANNELS_END,
+    VFO_BASE,
+    VFO_COUNT,
+    BACKUP_SIZES,
+    BAND_LOWER_HZ,
     LIST_NAME_LENGTH,
     COMPANDERS,
     PTT_IDS,
@@ -633,6 +654,8 @@
   const toneList = $('memToneList');
   const listNames = $('memListNames');
   const listNamesBox = $('memListNamesBox');
+  const vfoBody = $('memVfoBody');
+  const vfoBox = $('memVfoBox');
 
   const selectionBar = $('memSelectionBar');
   const selectionCount = $('memSelectionCount');
@@ -671,6 +694,8 @@
     reverse: 'memColReverse', compander: 'memColCompander', pttId: 'memColPttId'
   };
   const CELL_FIELDS = Object.keys(FIELD_LABELS);
+  // VFOs have no name, scan list or skip; compander is shared by a band's A and B.
+  const VFO_FIELDS = CELL_FIELDS.filter(f => !['name', 'scanlist', 'skip', 'compander'].includes(f));
 
   function cellHtml(field, ch, labelText) {
     const attrs = `data-field="${field}" aria-label="${escapeHtml(labelText)}"`;
@@ -700,7 +725,19 @@
     return input.value;
   }
 
+  function vfoRowHtml(i) {
+    const v = i - M.CHANNEL_COUNT;
+    const name = `${'AB'[v & 1]} ${M.BAND_LOWER_HZ[v >> 1] / 1e6}`;
+    const ch = M.decodeChannel(image, i);
+    const dirty = radioImage && M.channelDirty(radioImage, image, i);
+    const label = field => `${t(FIELD_LABELS[field])} ${name}`;
+    const cells = ch ? VFO_FIELDS.map(field => `<td>${cellHtml(field, ch, label(field))}</td>`).join('')
+      : `<td>${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td><td colspan="${VFO_FIELDS.length - 1}"></td>`;
+    return `<tr data-index="${i}"${dirty ? ' class="mem-dirty"' : ''}><td class="slot-idx">${name}</td>${cells}</tr>`;
+  }
+
   function rowHtml(i) {
+    if (i >= M.CHANNEL_COUNT) return vfoRowHtml(i);
     const ch = M.decodeChannel(image, i);
     const dirty = radioImage && M.channelDirty(radioImage, image, i);
     const classes = [dirty && 'mem-dirty', selected.has(i) && 'mem-selected'].filter(Boolean).join(' ');
@@ -719,8 +756,8 @@
   function counts() {
     let used = 0;
     let dirty = 0;
-    for (let i = 0; i < M.CHANNEL_COUNT; i++) {
-      if (!M.isEmpty(image, i)) used++;
+    for (let i = 0; i < M.CHANNEL_COUNT + M.VFO_COUNT; i++) {
+      if (i < M.CHANNEL_COUNT && !M.isEmpty(image, i)) used++;
       if (radioImage && M.channelDirty(radioImage, image, i)) dirty++;
     }
     return { used, dirty };
@@ -757,6 +794,8 @@
       }
     }
     body.innerHTML = rows.join('');
+    vfoBody.innerHTML = image ? Array.from({ length: M.VFO_COUNT }, (_, v) => vfoRowHtml(M.CHANNEL_COUNT + v)).join('') : '';
+    vfoBox.hidden = !image;
     selectionBar.hidden = !image;
     if (image) {
       updateSelection();
@@ -767,11 +806,12 @@
 
   function replaceRow(tr, focusField) {
     const i = Number(tr.dataset.index);
-    if (!showEmpty.checked && M.isEmpty(image, i)) {
+    if (i < M.CHANNEL_COUNT && !showEmpty.checked && M.isEmpty(image, i)) {
       tr.remove();
     } else {
+      const table = tr.parentElement;
       tr.outerHTML = rowHtml(i);
-      body.querySelector(`tr[data-index="${i}"] [data-field="${focusField}"]`)?.focus();
+      table.querySelector(`tr[data-index="${i}"] [data-field="${focusField}"]`)?.focus();
     }
     updateState();
   }
@@ -785,13 +825,13 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  body.addEventListener('change', event => {
+  function onCellChange(event) {
     const input = event.target;
     const field = input.dataset.field;
     const tr = input.closest('tr');
     if (!field || !tr) return;
     const i = Number(tr.dataset.index);
-    const wasEmpty = M.isEmpty(image, i);
+    const wasEmpty = !M.decodeChannel(image, i);
     if (wasEmpty && input.value.trim() === '') return;
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
@@ -799,12 +839,12 @@
       M.encodeChannel(image, i, ch);
       input.removeAttribute('aria-invalid');
     } catch (error) {
-      log(t('memInvalidValue', `${i + 1}: ${error.message}`), 'error');
+      log(t('memInvalidValue', `${tr.querySelector('.slot-idx').textContent}: ${error.message}`), 'error');
       input.setAttribute('aria-invalid', 'true');
       return;
     }
     if (wasEmpty) {
-      replaceRow(tr, 'name');
+      replaceRow(tr, i < M.CHANNEL_COUNT ? 'name' : 'freq');
       return;
     }
     // Normalize the edited field in place so keyboard focus is not lost.
@@ -813,7 +853,9 @@
     else if (field === 'name' || field === 'txTone' || field === 'rxTone') input.value = ch[field];
     tr.classList.toggle('mem-dirty', Boolean(radioImage && M.channelDirty(radioImage, image, i)));
     updateState();
-  });
+  }
+  body.addEventListener('change', onCellChange);
+  vfoBody.addEventListener('change', onCellChange);
 
   listNames.addEventListener('change', event => {
     const input = event.target;
@@ -975,8 +1017,13 @@
     if (radioImage && counts().dirty > 0 && !window.confirm(t('memDiscardConfirm'))) return;
     void flash.runEepromOperation('read-memories', false, async radio => {
       log(t('memReading'), 'info');
-      const data = await radio.read(0, M.IMAGE_SIZE,
-        done => radio.progress(Math.round((done / M.IMAGE_SIZE) * 100)));
+      // Two ranges: 0x8870-0x8FFF is unmapped, so it stays 0xFF and is never written.
+      const vfoSize = M.IMAGE_SIZE - M.VFO_BASE;
+      const total = M.CHANNELS_END + vfoSize;
+      const data = new Uint8Array(M.IMAGE_SIZE).fill(0xFF);
+      data.set(await radio.read(0, M.CHANNELS_END, done => radio.progress(Math.round((done / total) * 100))), 0);
+      data.set(await radio.read(M.VFO_BASE, vfoSize,
+        done => radio.progress(Math.round(((M.CHANNELS_END + done) / total) * 100))), M.VFO_BASE);
       radioImage = data;
       image = data.slice();
       selected.clear();
@@ -1069,11 +1116,11 @@
     binInput.value = '';
     if (!file) return;
     const data = new Uint8Array(await file.arrayBuffer());
-    if (data.length !== M.IMAGE_SIZE && data.length !== M.LEGACY_IMAGE_SIZE) {
+    if (!M.BACKUP_SIZES.includes(data.length)) {
       log(t('memBackupSize', M.IMAGE_SIZE), 'error');
       return;
     }
-    // Older backups stop before the scan list names: keep the current ones.
+    // Older backups stop before the scan list names or VFOs: keep the current ones.
     const next = image.slice();
     next.set(data);
     image = next;
