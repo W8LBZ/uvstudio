@@ -112,7 +112,7 @@ test('round-trips every tone combination through CHIRP CSV', () => {
   const csv = mem.exportChirpCsv(source);
   const target = blank();
   const result = mem.importChirpCsv(target, csv);
-  assert.deepEqual(result, { imported: tones.length, errors: [], warnings: [] });
+  assert.deepEqual(result, { imported: tones.length, errors: [], warnings: [], duplicates: 0 });
   tones.forEach((_, i) => assert.deepEqual(mem.decodeChannel(target, i * 7), mem.decodeChannel(source, i * 7), `channel ${i * 7}`));
 });
 
@@ -140,6 +140,55 @@ test('imports CHIRP split duplex, watt powers and reports bad rows', () => {
   assert.equal(mem.decodeChannel(image, 1).power, 4);
   assert.equal(mem.decodeChannel(image, 1).step, 2);
   assert.throws(() => mem.importChirpCsv(image, 'a,b\n1,2'), /CHIRP/);
+});
+
+test('imports with append, prepend, replace and duplicate skipping', () => {
+  const head = 'Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power';
+  const csv = [head,
+    '9,A,146.520000,,0,,88.5,88.5,023,NN,023,Tone->Tone,FM,12.50,,',
+    '9,B,147.000000,+,0.600000,Tone,100.0,88.5,023,NN,023,Tone->Tone,FM,12.50,,',
+    '9,B2,147.000000,+,0.600000,Tone,100.0,88.5,023,NN,023,Tone->Tone,FM,12.50,,'
+  ].join('\n');
+  const names = image => Array.from({ length: 6 }, (_, i) => mem.decodeChannel(image, i)?.name ?? null);
+  const start = () => {
+    const image = blank();
+    mem.encodeChannel(image, 0, channel({ name: 'OLD', freq: 146520000 }));
+    mem.encodeChannel(image, 2, channel({ name: 'GAP' }));
+    return image;
+  };
+
+  let image = start();
+  assert.equal(mem.importChirpCsv(image, csv, { mode: 'append' }).imported, 3);
+  assert.deepEqual(names(image), ['OLD', null, 'GAP', 'A', 'B', 'B2']);
+
+  image = start();
+  const r = mem.importChirpCsv(image, csv, { mode: 'append', dedupe: true });
+  assert.equal(r.imported, 1);
+  assert.equal(r.duplicates, 2);   // A matches OLD (name ignored), B2 matches B
+  assert.deepEqual(names(image), ['OLD', null, 'GAP', 'B', null, null]);
+
+  image = start();
+  mem.importChirpCsv(image, csv, { mode: 'prepend' });
+  assert.deepEqual(names(image), ['A', 'B', 'B2', 'OLD', null, 'GAP']);
+
+  image = start();
+  mem.importChirpCsv(image, csv, { mode: 'replace' });
+  assert.deepEqual(names(image), [null, null, null, null, null, null]);
+  assert.equal(mem.decodeChannel(image, 8).name, 'B2');
+
+  image = start();
+  assert.throws(() => mem.importChirpCsv(image, head + '\n1,X,2000', { mode: 'replace' }), /unchanged/);
+  assert.equal(mem.decodeChannel(image, 0).name, 'OLD');
+
+  image = blank();
+  mem.encodeChannel(image, mem.CHANNEL_COUNT - 2, channel());
+  assert.throws(() => mem.importChirpCsv(image, csv, { mode: 'prepend' }), /no room/);
+  const full = mem.importChirpCsv(image, csv, { mode: 'append' });
+  assert.equal(full.imported, 1);
+  assert.deepEqual(full.errors.map(e => e.message), ['no free channel left', 'no free channel left']);
+
+  // Location column optional when it is ignored.
+  assert.equal(mem.importChirpCsv(blank(), 'Name,Frequency\nX,145.5', { mode: 'append' }).imported, 1);
 });
 
 test('groups changed bytes into aligned write runs', () => {

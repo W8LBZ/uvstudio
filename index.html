@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.0.0-w8lbz.3"></script>
+    <script src="js/studio-version.js?v=2.0.0-w8lbz.4"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=61" rel="stylesheet">
+<link href="css/tools.css?v=62" rel="stylesheet">
 <link href="css/studio.css?v=26" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -373,12 +373,24 @@
                         <button type="button" id="memReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
                         <button type="button" id="memWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
                         <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Import CSV</button>
+                        <select id="memImportMode" aria-label="Import mode" data-i18n-aria-label="memImportMode">
+                            <option value="location" data-i18n="memImportModeLocation">At CSV locations</option>
+                            <option value="append" data-i18n="memImportModeAppend">Append</option>
+                            <option value="prepend" data-i18n="memImportModePrepend">Prepend</option>
+                            <option value="replace" data-i18n="memImportModeReplace">Replace all</option>
+                        </select>
+                        <label class="mem-show-empty"><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip duplicates</span></label>
                         <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
                         <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
                         <button type="button" id="memSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
                         <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
                         <span class="mem-summary" id="memSummary" role="status" aria-live="polite"></span>
                     </div>
+                    <div class="mem-toolbar">
+                        <input type="url" id="memSourceUrl" class="mem-source-url" list="memSourceList" placeholder="CSV URL or pick a list" data-i18n-placeholder="memSourceUrl" aria-label="CSV URL" data-i18n-aria-label="memSourceUrl">
+                        <button type="button" id="memLoadUrlBtn" class="btn compact-toolbar-action" data-i18n="memLoadUrlBtn" disabled>Import from URL</button>
+                    </div>
+                    <datalist id="memSourceList"></datalist>
                     <input type="file" id="memCsvFile" accept=".csv,text/csv" hidden>
                     <input type="file" id="memBinFile" accept=".bin" hidden>
                     <datalist id="memToneList"></datalist>
@@ -965,7 +977,7 @@
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/flash.js?v=86"></script>
-<script src="js/memories.js?v=4"></script>
+<script src="js/memories.js?v=5"></script>
 <script src="js/settings.js?v=2"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>

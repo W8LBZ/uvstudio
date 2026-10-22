@@ -478,33 +478,93 @@
     };
   }
 
-  // Applies every CSV row to the image at its Location (1-based). Other channels stay.
-  function importChirpCsv(image, text) {
+  // Same RF setup (name ignored), used to skip duplicates on import.
+  function channelKey(ch) {
+    const tone = text => { const t = parseTone(text); return `${t.type}:${t.code}`; };
+    return [ch.freq, ch.duplex, ch.duplex ? ch.offset : 0, ch.mode, tone(ch.txTone), tone(ch.rxTone)].join('|');
+  }
+
+  // Applies CSV rows to the image. mode:
+  //   'location' each row at its Location (1-based), other channels stay
+  //   'replace'  clear every channel first, then as 'location'
+  //   'append'   rows in file order after the last used channel (Location ignored)
+  //   'prepend'  rows in file order from channel 1, existing channels shift down
+  // dedupe skips rows whose RF setup matches a channel already present or an earlier row.
+  function importChirpCsv(image, text, { mode = 'location', dedupe = false } = {}) {
     const rows = parseCsv(text);
     const header = (rows[0] || []).map(h => h.trim());
-    if (!header.includes('Location') || !header.includes('Frequency')) {
+    if (!header.includes('Frequency') || (!header.includes('Location') && (mode === 'location' || mode === 'replace'))) {
       throw new Error('not a CHIRP CSV file (missing Location or Frequency column)');
     }
-    let imported = 0;
+    const byLocation = mode === 'location' || mode === 'replace';
     const errors = [];
     const warnings = [];
+    const scratch = new Uint8Array(IMAGE_SIZE).fill(0xFF);
+    const parsed = [];
     rows.slice(1).forEach((row, i) => {
       if (row.every(field => field.trim() === '')) return;
       const rec = Object.fromEntries(header.map((name, col) => [name, row[col] ?? '']));
       try {
-        const location = Number(rec.Location);
-        if (!Number.isInteger(location) || location < 1 || location > CHANNEL_COUNT) {
-          throw new Error(`location "${rec.Location}" outside 1-${CHANNEL_COUNT}`);
+        let index = null;
+        if (byLocation) {
+          const location = Number(rec.Location);
+          if (!Number.isInteger(location) || location < 1 || location > CHANNEL_COUNT) {
+            throw new Error(`location "${rec.Location}" outside 1-${CHANNEL_COUNT}`);
+          }
+          index = location - 1;
         }
-        const ch = fromChirpRecord(rec, decodeChannel(image, location - 1));
-        encodeChannel(image, location - 1, ch);
-        if (ch.warning) warnings.push({ line: i + 2, message: ch.warning });
-        imported++;
+        const ch = fromChirpRecord(rec, byLocation && mode !== 'replace' ? decodeChannel(image, index) : null);
+        encodeChannel(scratch, 0, ch);   // validate before touching the image
+        parsed.push({ line: i + 2, index, ch });
       } catch (error) {
         errors.push({ line: i + 2, message: error.message });
       }
     });
-    return { imported, errors, warnings };
+
+    if (mode === 'replace' && !parsed.length) throw new Error('no valid rows: channels left unchanged');
+    if (mode === 'replace') for (let i = 0; i < CHANNEL_COUNT; i++) encodeChannel(image, i, null);
+
+    let duplicates = 0;
+    let accepted = parsed;
+    if (dedupe) {
+      const seen = new Set();
+      for (let i = 0; i < CHANNEL_COUNT; i++) {
+        const ch = decodeChannel(image, i);
+        if (ch && MODES.includes(ch.mode)) seen.add(channelKey(ch));
+      }
+      accepted = parsed.filter(p => {
+        const key = channelKey(p.ch);
+        if (seen.has(key)) { duplicates++; return false; }
+        seen.add(key);
+        return true;
+      });
+    }
+
+    let lastUsed = -1;
+    for (let i = 0; i < CHANNEL_COUNT; i++) if (!isEmpty(image, i)) lastUsed = i;
+    if (mode === 'prepend') {
+      const n = accepted.length;
+      if (lastUsed + n >= CHANNEL_COUNT) {
+        throw new Error(`no room to prepend ${n} channels (last used channel is ${lastUsed + 1})`);
+      }
+      for (let i = lastUsed + n; i >= n; i--) pasteChannel(image, i, copyChannel(image, i - n));
+      accepted.forEach((p, k) => { p.index = k; encodeChannel(image, k, null); });
+    } else if (mode === 'append') {
+      accepted.forEach((p, k) => { p.index = lastUsed + 1 + k; });
+    }
+
+    let imported = 0;
+    accepted.forEach(p => {
+      if (p.index >= CHANNEL_COUNT) {
+        errors.push({ line: p.line, message: 'no free channel left' });
+        return;
+      }
+      encodeChannel(image, p.index, p.ch);
+      if (p.ch.warning) warnings.push({ line: p.line, message: p.ch.warning });
+      imported++;
+    });
+    errors.sort((a, b) => a.line - b.line);
+    return { imported, errors, warnings, duplicates };
   }
 
   return {
@@ -563,6 +623,10 @@
   const openBtn = $('memOpenBackupBtn');
   const saveBtn = $('memSaveBackupBtn');
   const csvInput = $('memCsvFile');
+  const importMode = $('memImportMode');
+  const skipDuplicates = $('memSkipDuplicates');
+  const sourceUrl = $('memSourceUrl');
+  const loadUrlBtn = $('memLoadUrlBtn');
   const binInput = $('memBinFile');
   const showEmpty = $('memShowEmpty');
   const summary = $('memSummary');
@@ -669,7 +733,7 @@
     const changed = Boolean(radioImage && image && M.dirtyRuns(radioImage, image).length);
     readBtn.disabled = busy || !serial;
     writeBtn.disabled = busy || !serial || !changed;
-    importBtn.disabled = openBtn.disabled = busy || !image;
+    importBtn.disabled = loadUrlBtn.disabled = openBtn.disabled = busy || !image;
     exportBtn.disabled = saveBtn.disabled = !image;
   }
 
@@ -944,20 +1008,51 @@
     });
   });
 
-  importBtn.addEventListener('click', () => csvInput.click());
-  csvInput.addEventListener('change', async () => {
-    const file = csvInput.files[0];
-    csvInput.value = '';
-    if (!file) return;
+  // Shared CHIRP CSV lists offered in the URL box. Hosts must allow CORS
+  // (raw.githubusercontent.com and GitHub Pages do).
+  const SOURCES = [
+    // { name: 'W8LBZ club repeaters', url: 'https://raw.githubusercontent.com/W8LBZ/<repo>/main/<list>.csv' },
+  ];
+  const sourceList = $('memSourceList');
+  SOURCES.forEach(s => {
+    const option = document.createElement('option');
+    option.value = s.url;
+    option.label = s.name;
+    sourceList.append(option);
+  });
+
+  function importCsvText(text) {
     try {
-      const { imported, errors, warnings } = M.importChirpCsv(image, await file.text());
+      const { imported, errors, warnings, duplicates } = M.importChirpCsv(image, text, {
+        mode: importMode.value, dedupe: skipDuplicates.checked
+      });
       errors.forEach(e => log(t('memImportRowError', e.line, e.message), 'error'));
       warnings.forEach(w => log(t('memImportRowWarning', w.line, w.message), 'info'));
+      if (duplicates) log(t('memImportDuplicates', duplicates), 'info');
       log(t('memImportComplete', imported, errors.length), imported ? 'success' : 'error');
     } catch (e) {
       log(t('error', e?.message ?? String(e)), 'error');
     }
     render();
+  }
+
+  importBtn.addEventListener('click', () => csvInput.click());
+  csvInput.addEventListener('change', async () => {
+    const file = csvInput.files[0];
+    csvInput.value = '';
+    if (file) importCsvText(await file.text());
+  });
+
+  loadUrlBtn.addEventListener('click', async () => {
+    const url = sourceUrl.value.trim();
+    if (!url) return;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      importCsvText(await response.text());
+    } catch (e) {
+      log(t('memUrlFailed', url, e?.message ?? String(e)), 'error');
+    }
   });
 
   exportBtn.addEventListener('click', () => {
