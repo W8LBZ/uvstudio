@@ -195,17 +195,33 @@ test('encodes VFO records at 0x9000 with the shared per-band attribute', () => {
   const image = blank();
   const vfo = band => mem.CHANNEL_COUNT + band * 2;   // VFO A of a band; +1 = VFO B
   assert.equal(mem.decodeChannel(image, vfo(2) + 1), null);              // erased
-  mem.encodeChannel(image, vfo(2) + 1, channel({ freq: 146520000, duplex: '+', offset: 600000, txTone: '100.0' }));
+  mem.encodeChannel(image, vfo(2) + 1, channel({ freq: 146520000, step: 0, duplex: '+', offset: 600000, txTone: '100.0' }));
   const view = new DataView(image.buffer);
   assert.equal(view.getUint32(0x9050, true), 14652000);                  // band 2, VFO B
   assert.equal(image[0x9050 + 11], 1);                                    // FM, +
-  assert.equal(image[0x8804] & 7, 2);                                     // attribute band
+  assert.equal(image[0x8804], 0xFF);                                      // shared attribute untouched
   assert.equal(mem.decodeChannel(image, vfo(2) + 1).txTone, '100.0');
   assert.equal(mem.decodeChannel(image, vfo(2)), null);                   // VFO A record still erased
   assert.ok(mem.channelDirty(blank(), image, vfo(2) + 1));
   assert.throws(() => mem.encodeChannel(image, vfo(2), channel({ freq: 446000000 })), /band/);
-  assert.throws(() => mem.encodeChannel(image, vfo(2) + 1, null), /VFO/);
+  // The firmware snaps VFOs to half the step for steps >= 10 kHz: 12.5 kHz -> 6.25 kHz grid.
+  mem.encodeChannel(image, vfo(2), channel({ freq: 146520000, step: 4 }));
+  assert.equal(mem.decodeChannel(image, vfo(2)).freq, 146518750);
+  mem.encodeChannel(image, vfo(2), channel({ freq: 146520000, step: 0 }));   // 2.5 kHz: on grid
+  assert.equal(mem.decodeChannel(image, vfo(2)).freq, 146520000);
+  assert.equal(mem.roundToStep(118012000, 6), 118008330);                    // 8.33 kHz channel 2
+  mem.encodeChannel(image, vfo(2) + 1, null);                                // clear back to erased
+  assert.equal(mem.decodeChannel(image, vfo(2) + 1), null);
+  assert.equal(image.subarray(0x9050, 0x9060).every(b => b === 0xFF), true);
   assert.equal(image.subarray(0x8870, 0x9000).every(b => b === 0xFF), true);   // unmapped hole untouched
+});
+
+test('an erased record is empty even when its attribute claims a band', () => {
+  const image = blank();
+  image[0x8000 + 2 * 19] = 0; image[0x8000 + 2 * 19 + 1] = 0;   // slot 20: band 0, record 0xFF
+  assert.equal(mem.isEmpty(image, 19), true);
+  assert.equal(mem.decodeChannel(image, 19), null);
+  assert.equal(mem.exportChirpCsv(image).trim().split('\r\n').length, 1);   // header only
 });
 
 test('groups changed bytes into aligned write runs', () => {

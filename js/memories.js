@@ -126,15 +126,33 @@
     return image[a] | (image[a + 1] << 8);
   }
 
+  // Empty: erased record (0xFFFFFFFF frequency), or a memory attribute marked empty.
+  // VFOs ignore the attribute band (the firmware derives it from the slot).
   function isEmpty(image, index) {
-    return (attrAt(image, index) & 7) === EMPTY_BAND;
+    const { r, n } = slot(index);
+    if ((image[r] & image[r + 1] & image[r + 2] & image[r + 3]) === 0xFF) return true;
+    return n !== null && (attrAt(image, index) & 7) === EMPTY_BAND;
+  }
+
+  // Mirrors FREQUENCY_RoundToStep, which the firmware applies to VFO frequencies and
+  // offsets on load. Steps of 10 kHz and up snap to half a step (12.5 kHz -> 6.25 kHz).
+  function roundToStep(hz, stepIndex) {
+    const f = Math.round(hz / 10);
+    let step = Math.round(STEPS[stepIndex] * 100);
+    if (step === 833) {   // aviation 8.33 kHz channel numbering
+      const base = Math.floor(f / 2500) * 2500;
+      const chno = Math.floor((f - base) / 700);
+      return (base + chno * 833 + (chno === 3 ? 1 : 0)) * 10;
+    }
+    if (step === 1) return f * 10;
+    if (step >= 1000) step = Math.floor(step / 2);
+    return Math.floor((f + Math.floor((step + 1) / 2)) / step) * step * 10;
   }
 
   function decodeChannel(image, index) {
     if (isEmpty(image, index)) return null;
     const { r, a, n } = slot(index);
     const view = new DataView(image.buffer, image.byteOffset, image.byteLength);
-    if (n === null && view.getUint32(r, true) === 0xFFFFFFFF) return null;   // erased VFO
     const modulation = image[r + 11] >> 4;
     const narrow = (image[r + 12] >> 1) & 1;
     let name = '';
@@ -183,9 +201,9 @@
     }
     const { r, a, n, band } = slot(index);
     if (ch === null) {
-      if (n === null) throw new Error('a VFO cannot be deleted');
       image.fill(0xFF, r, r + 16);
-      image.fill(0xFF, NAME_BASE + r, NAME_BASE + r + 16);
+      if (n === null) return;   // erased VFO: the radio shows the band's lower edge
+      image.fill(0xFF, n, n + 16);
       image[a] = EMPTY_BAND;
       image[a + 1] = 0;
       return;
@@ -194,16 +212,20 @@
     if (!(ch.freq >= FREQ_MIN_HZ && ch.freq <= FREQ_MAX_HZ)) {
       throw new Error(`frequency ${formatMHz(ch.freq || 0)} MHz out of range`);
     }
-    if (n === null && bandOf(ch.freq) !== band) {
-      throw new Error(`frequency ${formatMHz(ch.freq)} MHz is outside this VFO's band`);
+    // Store VFO values the way the radio will show them.
+    const snap = hz => (n === null && ch.step >= 0 && ch.step < STEPS.length ? roundToStep(hz, ch.step) : hz);
+    const freq = snap(ch.freq);
+    const offset = snap(ch.offset);
+    if (n === null && bandOf(freq) !== band) {
+      throw new Error(`frequency ${formatMHz(freq)} MHz is outside this VFO's band`);
     }
-    if (!(ch.offset >= 0 && ch.offset / 10 <= 0xFFFFFFFF)) throw new Error('invalid offset');
+    if (!(offset >= 0 && offset / 10 <= 0xFFFFFFFF)) throw new Error('invalid offset');
     if (!DUPLEXES.includes(ch.duplex)) throw new Error(`invalid duplex "${ch.duplex}"`);
     const tx = parseTone(ch.txTone);
     const rx = parseTone(ch.rxTone);
     if (!(ch.power >= 0 && ch.power < POWERS.length)) throw new Error('invalid power');
     if (!(ch.step >= 0 && ch.step < STEPS.length)) throw new Error('invalid step');
-    if (!(ch.scanlist >= 0 && ch.scanlist <= SCANLIST_ALL)) throw new Error('invalid scan list');
+    if (n !== null && !(ch.scanlist >= 0 && ch.scanlist <= SCANLIST_ALL)) throw new Error('invalid scan list');
     if (!(ch.compander >= 0 && ch.compander < COMPANDERS.length)) throw new Error('invalid compander');
     if (!(ch.pttId >= 0 && ch.pttId < PTT_IDS.length)) throw new Error('invalid PTT ID');
     const modeIndex = MODES.indexOf(ch.mode);
@@ -212,8 +234,8 @@
     if (!decodeChannel(image, index)) image.fill(0, r, r + 16);   // empty slot or erased VFO record
     if (isEmpty(image, index)) image[a] = 0;
     const view = new DataView(image.buffer, image.byteOffset, image.byteLength);
-    view.setUint32(r, Math.round(ch.freq / 10), true);
-    view.setUint32(r + 4, Math.round(ch.offset / 10), true);
+    view.setUint32(r, Math.round(freq / 10), true);
+    view.setUint32(r + 4, Math.round(offset / 10), true);
     image[r + 8] = rx.code;
     image[r + 9] = tx.code;
     image[r + 10] = (tx.type << 4) | rx.type;
@@ -230,11 +252,11 @@
     if (image[r + 13] === 0xFF) image[r + 13] = 0;
     image[r + 13] = (image[r + 13] & 0xF1) | (ch.pttId << 1);   // bit 0 (DTMF decode) kept
     image[r + 14] = ch.step;
+    if (n === null) return;   // the shared VFO attribute (compander) is left alone
 
     image[a] = (image[a] & 0x60) | (ch.compander << 3) | bandOf(ch.freq) | (ch.skip ? 0x80 : 0);
     image[a + 1] = ch.scanlist;
 
-    if (n === null) return;
     image.fill(0, n, n + 16);
     for (let i = 0; i < name.length; i++) image[n + i] = name.charCodeAt(i);
   }
@@ -622,7 +644,8 @@
     dirtyRuns,
     parseCsv,
     exportChirpCsv,
-    importChirpCsv
+    importChirpCsv,
+    roundToStep
   };
 });
 
@@ -832,7 +855,14 @@
     if (!field || !tr) return;
     const i = Number(tr.dataset.index);
     const wasEmpty = !M.decodeChannel(image, i);
-    if (wasEmpty && input.value.trim() === '') return;
+    if (field === 'freq' && input.value.trim() === '') {   // blank frequency clears the slot
+      input.removeAttribute('aria-invalid');
+      if (!wasEmpty) {
+        M.encodeChannel(image, i, null);
+        replaceRow(tr, 'freq');
+      }
+      return;
+    }
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
       ch[field] = fieldValue(input);
@@ -1133,5 +1163,8 @@
     updateState();
   });
   window.addEventListener('uvstudio:languagechange', render);
+  window.addEventListener('beforeunload', event => {
+    if (radioImage && image && M.dirtyRuns(radioImage, image).length) event.preventDefault();
+  });
   updateState();
 })();
