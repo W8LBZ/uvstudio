@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=58" rel="stylesheet">
+<link href="css/tools.css?v=59" rel="stylesheet">
 <link href="css/studio.css?v=26" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -140,6 +140,10 @@
             <button class="nav-item" data-route="memories" data-app="tools" data-tool-view="memories" data-name="Memories" data-section-i18n="studio_nav_memories">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
                 <span class="nav-item-label" data-i18n="studio_nav_memories">Memories</span>
+            </button>
+            <button class="nav-item" data-route="settings" data-app="tools" data-tool-view="settings" data-name="Radio settings" data-section-i18n="studio_nav_settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+                <span class="nav-item-label" data-i18n="studio_nav_settings">Radio settings</span>
             </button>
             <button class="nav-item" data-route="calibration" data-app="tools" data-tool-view="calibration" data-default-action="dump" data-name="Calibration" data-section-i18n="studio_nav_calibration">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
@@ -401,6 +405,21 @@
                             <tbody id="memTableBody"></tbody>
                         </table>
                     </div>
+                </section>
+            </div>
+
+            <div class="tool-view" id="settings-content" role="region" hidden>
+                <section class="section">
+                    <p class="tab-description" data-i18n="setDescription">Read the radio settings, change them, then write the changes back. Names match the radio menu; see the manual for details.</p>
+                    <div class="mem-toolbar">
+                        <button type="button" id="setReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
+                        <button type="button" id="setWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
+                        <button type="button" id="setOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
+                        <button type="button" id="setSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
+                        <span class="mem-summary" id="setSummary" role="status" aria-live="polite"></span>
+                    </div>
+                    <input type="file" id="setBinFile" accept=".bin" hidden>
+                    <div class="set-form" id="setForm"></div>
                 </section>
             </div>
 
@@ -905,27 +924,28 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=65"></script>
-<script src="locales/fr.js?v=65"></script>
-<script src="locales/it.js?v=65"></script>
-<script src="locales/es.js?v=65"></script>
-<script src="locales/de.js?v=65"></script>
-<script src="locales/pt.js?v=65"></script>
-<script src="locales/ru.js?v=65"></script>
-<script src="locales/pl.js?v=65"></script>
-<script src="locales/zh.js?v=65"></script>
-<script src="locales/nl.js?v=65"></script>
+<script src="locales/en.js?v=66"></script>
+<script src="locales/fr.js?v=66"></script>
+<script src="locales/it.js?v=66"></script>
+<script src="locales/es.js?v=66"></script>
+<script src="locales/de.js?v=66"></script>
+<script src="locales/pt.js?v=66"></script>
+<script src="locales/ru.js?v=66"></script>
+<script src="locales/pl.js?v=66"></script>
+<script src="locales/zh.js?v=66"></script>
+<script src="locales/nl.js?v=66"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=2"></script>
 <script src="js/rf-log.js?v=4"></script>
     <script src="js/k5viewer.js?v=32"></script>
 <script src="js/keypad-detach.js?v=1"></script>
-<script src="js/flash.js?v=85"></script>
+<script src="js/flash.js?v=86"></script>
 <script src="js/memories.js?v=2"></script>
+<script src="js/settings.js?v=1"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
-<script src="js/studio.js?v=20"></script>
+<script src="js/studio.js?v=21"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 </body>
 </html>

@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.nl = {
   "memColSkip": "Overslaan",
   "memDelete": "Kanaal verwijderen",
   "memScanAll": "Alle",
-  "memLocked": "Deze radio is vergrendeld met een eigen AES-sleutel: de geheugens kunnen niet via USB worden gelezen of geschreven.",
+  "memLocked": "Deze radio is vergrendeld met een eigen AES-sleutel: geheugens en instellingen kunnen niet via USB worden gelezen of geschreven.",
   "memDiscardConfirm": "Wijzigingen die nog niet naar de radio zijn geschreven verwerpen?",
   "memReading": "Geheugenkanalen lezen…",
   "memReadComplete": "{0} geheugenkanalen gelezen.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.nl = {
   "memBackupLoaded": "{0} geladen. Schrijf naar de radio om toe te passen.",
   "memColTxLock": "TX-slot",
   "memTxLockHint": "Past het F Lock-bandplan toe op dit kanaal. Uit: dit kanaal kan buiten het bandplan zenden.",
-  "memImportRowWarning": "CSV-regel {0}: {1}"
+  "memImportRowWarning": "CSV-regel {0}: {1}",
+  "studio_nav_settings": "Radio-instellingen",
+  "studio_operation_read_settings": "Instellingen lezen…",
+  "studio_operation_write_settings": "Instellingen schrijven…",
+  "setDescription": "Leest de radio-instellingen, laat ze wijzigen en schrijft de wijzigingen terug. Namen komen overeen met het radiomenu; zie de handleiding voor details.",
+  "setGroup_radio": "Radio",
+  "setGroup_display": "Scherm",
+  "setGroup_keys": "Toetsen",
+  "setGroup_scan": "Scannen",
+  "setGroup_tx": "Zenden",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "{0} gewijzigd",
+  "setReadComplete": "Instellingen gelezen.",
+  "setBackupSize": "Een instellingenback-up moet precies {0} bytes zijn."
 };

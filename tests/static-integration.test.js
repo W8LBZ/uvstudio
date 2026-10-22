@@ -251,8 +251,8 @@ test('reorders complete app slots through the existing raw flash protocol', () =
   assert.match(toolsCss, /\.app-renumber-button\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(toolsCss, /\.apps-table-wrap\s*\{[^}]*overflow-anchor:\s*none/s);
   assert.match(toolsCss, /tr\.app-order-drop-before td\s*\{[^}]*box-shadow/s);
-  assert.match(html, /css\/tools\.css\?v=58/);
-  assert.match(html, /js\/flash\.js\?v=85/);
+  assert.match(html, /css\/tools\.css\?v=59/);
+  assert.match(html, /js\/flash\.js\?v=86/);
   assert.doesNotMatch(flashSource, /app-order-(?:up|down)/);
   assert.doesNotMatch(flashSource, /function appMoveInOrder/);
 
@@ -443,7 +443,7 @@ test('exposes the responsive sidebar toggle to assistive technologies', () => {
 
 test('groups paired maintenance actions into resource views', () => {
   const views = [...html.matchAll(/data-tool-view="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(views, ['flash', 'slots', 'apps', 'external-flash', 'factory-reset', 'memories', 'calibration', 'logo', 'rf-log']);
+  assert.deepEqual(views, ['flash', 'slots', 'apps', 'external-flash', 'factory-reset', 'memories', 'settings', 'calibration', 'logo', 'rf-log']);
   views.forEach(view => assert.match(html, new RegExp(`id="${view}-content"`)));
   ['dump', 'restore', 'logo-upload', 'logo-dump', 'flash-dump', 'flash-restore'].forEach(action => {
     assert.match(html, new RegExp(`id="${action}-content"[^>]+data-action-panel=`));

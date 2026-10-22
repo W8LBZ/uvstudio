@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.en = {
   "memColSkip": "Skip",
   "memDelete": "Delete channel",
   "memScanAll": "All",
-  "memLocked": "This radio is locked with a custom AES key: its memories cannot be read or written over USB.",
+  "memLocked": "This radio is locked with a custom AES key: its memories and settings cannot be read or written over USB.",
   "memDiscardConfirm": "Discard the changes not yet written to the radio?",
   "memReading": "Reading memory channels…",
   "memReadComplete": "{0} memory channels read.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.en = {
   "memBackupLoaded": "{0} loaded. Write to the radio to apply it.",
   "memColTxLock": "TX lock",
   "memTxLockHint": "Apply the F Lock band plan to this channel. When off, this channel can transmit outside the band plan.",
-  "memImportRowWarning": "CSV line {0}: {1}"
+  "memImportRowWarning": "CSV line {0}: {1}",
+  "studio_nav_settings": "Radio settings",
+  "studio_operation_read_settings": "Reading settings…",
+  "studio_operation_write_settings": "Writing settings…",
+  "setDescription": "Read the radio settings, change them, then write the changes back. Names match the radio menu; see the manual for details.",
+  "setGroup_radio": "Radio",
+  "setGroup_display": "Display",
+  "setGroup_keys": "Keys",
+  "setGroup_scan": "Scan",
+  "setGroup_tx": "Transmit",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "{0} changed",
+  "setReadComplete": "Settings read.",
+  "setBackupSize": "A settings backup must be exactly {0} bytes."
 };

@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.de = {
   "memColSkip": "Überspringen",
   "memDelete": "Kanal löschen",
   "memScanAll": "Alle",
-  "memLocked": "Dieses Funkgerät ist mit einem eigenen AES-Schlüssel gesperrt: Seine Speicher können über USB weder gelesen noch geschrieben werden.",
+  "memLocked": "Dieses Funkgerät ist mit einem eigenen AES-Schlüssel gesperrt: Speicher und Einstellungen können über USB weder gelesen noch geschrieben werden.",
   "memDiscardConfirm": "Noch nicht geschriebene Änderungen verwerfen?",
   "memReading": "Speicherkanäle werden gelesen…",
   "memReadComplete": "{0} Speicherkanäle gelesen.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.de = {
   "memBackupLoaded": "{0} geladen. Ins Funkgerät schreiben, um sie zu übernehmen.",
   "memColTxLock": "TX-Sperre",
   "memTxLockHint": "Wendet den F-Lock-Bandplan auf diesen Kanal an. Wenn aus, kann dieser Kanal außerhalb des Bandplans senden.",
-  "memImportRowWarning": "CSV-Zeile {0}: {1}"
+  "memImportRowWarning": "CSV-Zeile {0}: {1}",
+  "studio_nav_settings": "Funkgeräteeinstellungen",
+  "studio_operation_read_settings": "Einstellungen werden gelesen…",
+  "studio_operation_write_settings": "Einstellungen werden geschrieben…",
+  "setDescription": "Liest die Einstellungen des Funkgeräts, lässt sie ändern und schreibt die Änderungen zurück. Die Namen entsprechen dem Gerätemenü; Details im Handbuch.",
+  "setGroup_radio": "Funk",
+  "setGroup_display": "Anzeige",
+  "setGroup_keys": "Tasten",
+  "setGroup_scan": "Suchlauf",
+  "setGroup_tx": "Senden",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "{0} geändert",
+  "setReadComplete": "Einstellungen gelesen.",
+  "setBackupSize": "Eine Einstellungssicherung muss genau {0} Bytes groß sein."
 };

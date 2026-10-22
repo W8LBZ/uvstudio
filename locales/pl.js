@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "memColSkip": "Pomiń",
   "memDelete": "Usuń kanał",
   "memScanAll": "Wszystkie",
-  "memLocked": "To radio jest zablokowane własnym kluczem AES: jego pamięci nie można odczytać ani zapisać przez USB.",
+  "memLocked": "To radio jest zablokowane własnym kluczem AES: jego pamięci i ustawień nie można odczytać ani zapisać przez USB.",
   "memDiscardConfirm": "Odrzucić zmiany jeszcze niezapisane w radiu?",
   "memReading": "Odczyt kanałów pamięci…",
   "memReadComplete": "Odczytano kanałów pamięci: {0}.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.pl = {
   "memBackupLoaded": "Wczytano {0}. Zapisz w radiu, aby zastosować.",
   "memColTxLock": "Blokada TX",
   "memTxLockHint": "Stosuje plan pasm F Lock do tego kanału. Po wyłączeniu kanał może nadawać poza planem pasm.",
-  "memImportRowWarning": "Wiersz CSV {0}: {1}"
+  "memImportRowWarning": "Wiersz CSV {0}: {1}",
+  "studio_nav_settings": "Ustawienia radia",
+  "studio_operation_read_settings": "Odczyt ustawień…",
+  "studio_operation_write_settings": "Zapis ustawień…",
+  "setDescription": "Odczytuje ustawienia radia, pozwala je zmienić, a następnie zapisuje zmiany. Nazwy odpowiadają menu radia; szczegóły w instrukcji.",
+  "setGroup_radio": "Radio",
+  "setGroup_display": "Wyświetlacz",
+  "setGroup_keys": "Klawisze",
+  "setGroup_scan": "Skanowanie",
+  "setGroup_tx": "Nadawanie",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "Zmienione: {0}",
+  "setReadComplete": "Ustawienia odczytane.",
+  "setBackupSize": "Kopia ustawień musi mieć dokładnie {0} bajtów."
 };

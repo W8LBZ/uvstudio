@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "memColSkip": "跳过",
   "memDelete": "删除信道",
   "memScanAll": "全部",
-  "memLocked": "此电台已使用自定义 AES 密钥锁定：无法通过 USB 读取或写入其存储信道。",
+  "memLocked": "此电台已使用自定义 AES 密钥锁定：无法通过 USB 读取或写入其存储信道和设置。",
   "memDiscardConfirm": "放弃尚未写入电台的更改？",
   "memReading": "正在读取存储信道…",
   "memReadComplete": "已读取 {0} 个存储信道。",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.zh = {
   "memBackupLoaded": "已加载 {0}。写入电台以应用。",
   "memColTxLock": "发射锁定",
   "memTxLockHint": "对此信道应用 F Lock 频段规划。关闭后，此信道可在频段规划之外发射。",
-  "memImportRowWarning": "CSV 第 {0} 行：{1}"
+  "memImportRowWarning": "CSV 第 {0} 行：{1}",
+  "studio_nav_settings": "电台设置",
+  "studio_operation_read_settings": "正在读取设置…",
+  "studio_operation_write_settings": "正在写入设置…",
+  "setDescription": "读取电台设置，修改后再写回更改。名称与电台菜单一致；详情请参阅手册。",
+  "setGroup_radio": "电台",
+  "setGroup_display": "显示",
+  "setGroup_keys": "按键",
+  "setGroup_scan": "扫描",
+  "setGroup_tx": "发射",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "{0} 项已修改",
+  "setReadComplete": "设置已读取。",
+  "setBackupSize": "设置备份必须正好为 {0} 字节。"
 };

@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.ru = {
   "memColSkip": "Пропуск",
   "memDelete": "Удалить канал",
   "memScanAll": "Все",
-  "memLocked": "Рация заблокирована пользовательским ключом AES: её память нельзя прочитать или записать по USB.",
+  "memLocked": "Рация заблокирована пользовательским ключом AES: её память и настройки нельзя прочитать или записать по USB.",
   "memDiscardConfirm": "Отменить изменения, ещё не записанные в рацию?",
   "memReading": "Чтение каналов памяти…",
   "memReadComplete": "Прочитано каналов памяти: {0}.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.ru = {
   "memBackupLoaded": "{0} загружен. Запишите в рацию, чтобы применить.",
   "memColTxLock": "Блок. TX",
   "memTxLockHint": "Применять к каналу план диапазонов F Lock. Если выключено, канал может передавать вне плана диапазонов.",
-  "memImportRowWarning": "Строка CSV {0}: {1}"
+  "memImportRowWarning": "Строка CSV {0}: {1}",
+  "studio_nav_settings": "Настройки рации",
+  "studio_operation_read_settings": "Чтение настроек…",
+  "studio_operation_write_settings": "Запись настроек…",
+  "setDescription": "Считывает настройки рации, позволяет их изменить и записывает изменения обратно. Названия совпадают с меню рации; подробности в руководстве.",
+  "setGroup_radio": "Рация",
+  "setGroup_display": "Дисплей",
+  "setGroup_keys": "Кнопки",
+  "setGroup_scan": "Сканирование",
+  "setGroup_tx": "Передача",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "Изменено: {0}",
+  "setReadComplete": "Настройки прочитаны.",
+  "setBackupSize": "Копия настроек должна быть ровно {0} байт."
 };

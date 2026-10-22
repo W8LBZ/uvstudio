@@ -618,7 +618,7 @@
 
   readBtn.addEventListener('click', () => {
     if (radioImage && counts().dirty > 0 && !window.confirm(t('memDiscardConfirm'))) return;
-    void flash.runMemoryOperation('read-memories', false, async radio => {
+    void flash.runEepromOperation('read-memories', false, async radio => {
       log(t('memReading'), 'info');
       const data = await radio.read(0, M.IMAGE_SIZE,
         done => radio.progress(Math.round((done / M.IMAGE_SIZE) * 100)));
@@ -636,23 +636,14 @@
       log(t('memNoChanges'), 'info');
       return;
     }
-    void flash.runMemoryOperation('write-memories', true, async radio => {
+    void flash.runEepromOperation('write-memories', true, async radio => {
       const total = runs.reduce((sum, run) => sum + run.length, 0);
       let done = 0;
       log(t('memWriting', total), 'info');
       for (const run of runs) {
-        await radio.write(run.offset, target.subarray(run.offset, run.offset + run.length));
+        await radio.writeVerified(run.offset, target.subarray(run.offset, run.offset + run.length));
         done += run.length;
-        radio.progress(Math.round((done / total) * 80));
-      }
-      // Read back: catches dropped writes (e.g. a locked radio still acknowledges them).
-      done = 0;
-      for (const run of runs) {
-        const back = await radio.read(run.offset, run.length);
-        const bad = back.findIndex((byte, k) => byte !== target[run.offset + k]);
-        if (bad >= 0) throw new Error(t('memVerifyError', (run.offset + bad).toString(16)));
-        done += run.length;
-        radio.progress(80 + Math.round((done / total) * 20));
+        radio.progress(Math.round((done / total) * 100));
       }
       radioImage = target;
       render();

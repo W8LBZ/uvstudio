@@ -18,6 +18,7 @@ No installation, server, dependency, or build step is required.
 - Upload and download custom 128 × 64 boot logos
 - Export the latest RF Log activities as CSV
 - View, edit, back up, and restore the 1024 memory channels, with CHIRP CSV import and export
+- View, edit, back up, and restore the radio menu settings
 - Light and dark themes
 - Global serial connection and operation status
 - Interface translations for ten languages
@@ -65,6 +66,17 @@ the channels at their Location (1–1024). Save backup and Open backup use a raw
 34 KiB image of the channel, name, and attribute areas. A radio locked with a
 custom AES key cannot be read or written over USB and is reported as such.
 
+The TX lock column keeps a channel within the F Lock band plan (the firmware
+default). Clearing it lets that channel transmit outside the band plan.
+
+### Radio settings
+
+Open Radio settings, select Read from radio, change settings, then select Write
+changes to radio. Settings use the radio's own menu names and values. Hidden
+menu items (F Lock, 350 En, battery calibration) and the volume gain stored in
+the calibration area are not shown. Opening a settings backup never restores
+its AES key or firmware version bytes.
+
 ## Run locally
 
 UV Studio is a static HTML, CSS, and JavaScript application. Open index.html
@@ -85,6 +97,7 @@ directly in a compatible browser. A local web server is not required.
 - js/flash.js — firmware, calibration, and boot logo operations
 - js/rf-log.js — RF Log packet parsing and CSV generation
 - js/memories.js — memory channel codec, CHIRP CSV, and the Memories panel
+- js/settings.js — radio settings field table and the Radio settings panel
 - js/studio-i18n.js — shared translation engine and language preference
 - locales/ — unified dictionaries for Studio, K5Viewer, and UVTools2
 - tests/ — Node.js protocol, controller, locale, and static integration tests
@@ -96,8 +109,9 @@ Run the local test suite with `node --test tests/*.test.js`.
 UV Studio incorporates K5Viewer and UVTools2. Their original attribution notices
 are retained in [NOTICE](NOTICE).
 
-This fork adds the Memories panel (js/memories.js, with supporting changes to
-index.html, js/flash.js, js/studio.js, css/tools.css, locales/, and tests/).
+This fork adds the Memories and Radio settings panels (js/memories.js,
+js/settings.js, with supporting changes to index.html, js/flash.js,
+js/studio.js, css/tools.css, locales/, and tests/).
 
 ## License
 

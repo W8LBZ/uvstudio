@@ -603,7 +603,7 @@ window.UVStudioFlash = Object.freeze({
   deleteAppSlot,
   clearAppFromCatalog: () => beginAppImageLoad('catalog'),
   hasFirmware: () => Boolean(firmwareData),
-  runMemoryOperation,
+  runEepromOperation,
   log
 });
 
@@ -833,7 +833,9 @@ async function readLoop() {
           activeOperationName === 'restore-flash' ||
           activeOperationName === 'factory-reset' ||
           activeOperationName === 'read-memories' ||
-          activeOperationName === 'write-memories';
+          activeOperationName === 'write-memories' ||
+          activeOperationName === 'read-settings' ||
+          activeOperationName === 'write-settings';
         if (activeToolsView !== 'slots' && !isBulkFlashTransfer) {
           log(t('rxData', value.length, readBuffer.length), 'info');
         }
@@ -2111,9 +2113,9 @@ async function writeEepromRange(offset, data, timestamp) {
   }
 }
 
-// Runs task(radio) as one tools operation on a connected radio, for the Memories
-// panel. Returns false when the operation could not start or failed (already logged).
-async function runMemoryOperation(name, critical, task) {
+// Runs task(radio) as one tools operation on a connected radio, for the Memories and
+// Settings panels. Returns false when the operation could not start or failed (already logged).
+async function runEepromOperation(name, critical, task) {
   const operation = beginToolsOperation(name, critical);
   if (!operation) return false;
   if (progressContainer) progressContainer.style.display = 'block';
@@ -2127,7 +2129,13 @@ async function runMemoryOperation(name, critical, task) {
     const ts = devInfo.timestamp;
     await task({
       read: (offset, size, onProgress) => readEepromRange(offset, size, ts, onProgress),
-      write: (offset, data) => writeEepromRange(offset, data, ts),
+      // Write then read back: catches dropped writes (a locked radio still acknowledges them).
+      writeVerified: async (offset, data) => {
+        await writeEepromRange(offset, data, ts);
+        const back = await readEepromRange(offset, data.length, ts);
+        const bad = back.findIndex((byte, k) => byte !== data[k]);
+        if (bad >= 0) throw new Error(t('memVerifyError', (offset + bad).toString(16)));
+      },
       progress: updateProgress,
       reboot: async () => {
         log(t('rebooting'), 'info');

@@ -1448,7 +1448,8 @@
 }
 
 /* ---------- Memories ---------- */
-#pane-tools .container:has(#memories-content.active) {
+#pane-tools .container:has(#memories-content.active),
+#pane-tools .container:has(#settings-content.active) {
   max-width: none;
 }
 #pane-tools .mem-toolbar {
@@ -1501,5 +1502,54 @@
 #pane-tools .mem-table input[list] { width: 8ch; }
 #pane-tools .mem-table input[aria-invalid="true"] { border-color: var(--error); }
 #pane-tools .mem-table tr.mem-dirty td {
+  background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+}
+
+/* ---------- Radio settings ---------- */
+#pane-tools .set-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+#pane-tools .set-group {
+  margin: 0;
+  padding: 8px 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+#pane-tools .set-group legend {
+  padding: 0 6px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+#pane-tools .set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 4px;
+  border-radius: 6px;
+}
+#pane-tools .set-row label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+#pane-tools .set-row input,
+#pane-tools .set-row select {
+  width: 190px;
+  height: 28px;
+  margin: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: none;
+}
+#pane-tools .set-row select { padding-right: 24px; }
+#pane-tools .set-row [aria-invalid="true"] { border-color: var(--error); }
+#pane-tools .set-row.set-dirty {
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
 }

@@ -541,7 +541,7 @@ window.UVSTUDIO_LOCALES.it = {
   "memColSkip": "Salta",
   "memDelete": "Elimina canale",
   "memScanAll": "Tutte",
-  "memLocked": "Questa radio è bloccata con una chiave AES personalizzata: le sue memorie non possono essere lette né scritte via USB.",
+  "memLocked": "Questa radio è bloccata con una chiave AES personalizzata: memorie e impostazioni non possono essere lette né scritte via USB.",
   "memDiscardConfirm": "Annullare le modifiche non ancora scritte nella radio?",
   "memReading": "Lettura dei canali di memoria…",
   "memReadComplete": "{0} canali di memoria letti.",
@@ -556,5 +556,18 @@ window.UVSTUDIO_LOCALES.it = {
   "memBackupLoaded": "{0} caricato. Scrivi nella radio per applicarlo.",
   "memColTxLock": "Blocco TX",
   "memTxLockHint": "Applica il piano di banda F Lock a questo canale. Se disattivato, il canale può trasmettere fuori dal piano di banda.",
-  "memImportRowWarning": "Riga CSV {0}: {1}"
+  "memImportRowWarning": "Riga CSV {0}: {1}",
+  "studio_nav_settings": "Impostazioni radio",
+  "studio_operation_read_settings": "Lettura delle impostazioni…",
+  "studio_operation_write_settings": "Scrittura delle impostazioni…",
+  "setDescription": "Legge le impostazioni della radio, permette di modificarle e poi riscrive le modifiche. I nomi corrispondono al menu della radio; vedere il manuale per i dettagli.",
+  "setGroup_radio": "Radio",
+  "setGroup_display": "Display",
+  "setGroup_keys": "Tasti",
+  "setGroup_scan": "Scansione",
+  "setGroup_tx": "Trasmissione",
+  "setGroup_dtmf": "DTMF",
+  "setSummary": "{0} modificati",
+  "setReadComplete": "Impostazioni lette.",
+  "setBackupSize": "Un backup delle impostazioni deve essere di esattamente {0} byte."
 };
