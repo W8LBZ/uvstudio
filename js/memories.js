@@ -24,7 +24,7 @@
   const FREQ_MAX_HZ = 1300e6;
 
   const MODES = ['FM', 'NFM', 'AM', 'NAM', 'USB'];   // index = modulation * 2 + narrow
-  const DUPLEXES = ['', '+', '-', 'off'];             // 'off' = per-channel TX lock
+  const DUPLEXES = ['', '+', '-'];
   const POWERS = ['USER', 'LOW1', 'LOW2', 'LOW3', 'LOW4', 'LOW5', 'MID', 'HIGH'];
   const CHIRP_POWERS = [
     'USER = < 20mW to 5W', 'LOW 1 = < 20mW', 'LOW 2 = 125mW', 'LOW 3 = 250mW',
@@ -126,21 +126,24 @@
       name: name.trimEnd(),
       freq: view.getUint32(r, true) * 10,
       offset: view.getUint32(r + 4, true) * 10,
-      duplex: image[r + 12] & 0x40 ? 'off' : (DUPLEXES[image[r + 11] & 0x0F] || ''),
+      duplex: DUPLEXES[image[r + 11] & 0x0F] || '',
       mode: modulation <= 2 ? MODES[Math.min(modulation * 2 + narrow, 4)] : `MOD${modulation}`,
       txTone: toneText(image[r + 10] >> 4, image[r + 9]),
       rxTone: toneText(image[r + 10] & 0x0F, image[r + 8]),
       power: (image[r + 12] >> 2) & 7,
       step: image[r + 14],
       scanlist: image[ATTR_BASE + index * 2 + 1],
-      skip: Boolean(attrAt(image, index) & 0x80)
+      skip: Boolean(attrAt(image, index) & 0x80),
+      // TX_LOCK: apply the F Lock band plan to this channel (firmware default on).
+      // Clear = this channel may transmit outside the band plan.
+      txLock: Boolean(image[r + 12] & 0x40)
     };
   }
 
   function defaultChannel() {
     return {
       name: '', freq: 0, offset: 0, duplex: '', mode: 'FM', txTone: '', rxTone: '',
-      power: 7, step: DEFAULT_STEP, scanlist: SCANLIST_ALL, skip: false
+      power: 7, step: DEFAULT_STEP, scanlist: SCANLIST_ALL, skip: false, txLock: true
     };
   }
 
@@ -191,9 +194,8 @@
       modulation = modeIndex >> 1;
       narrow = modeIndex & 1;
     }
-    const direction = ch.duplex === 'off' ? image[r + 11] & 0x0F : DUPLEXES.indexOf(ch.duplex);
-    image[r + 11] = (modulation << 4) | direction;
-    image[r + 12] = (image[r + 12] & 0xA1) | (ch.duplex === 'off' ? 0x40 : 0) |
+    image[r + 11] = (modulation << 4) | DUPLEXES.indexOf(ch.duplex);
+    image[r + 12] = (image[r + 12] & 0xA1) | (ch.txLock === false ? 0 : 0x40) |
       (ch.power << 2) | (narrow << 1);
     image[r + 14] = ch.step;
 
@@ -344,6 +346,10 @@
       duplex = offset >= freq ? '+' : '-';
       offset = Math.abs(offset - freq);
     }
+    // CHIRP 'off' (TX inhibit) has no F4HWN equivalent: import as simplex with TX lock,
+    // which blocks TX only outside the F Lock band plan.
+    const warning = duplex === 'off' ? 'duplex "off" imported as simplex with TX lock (TX still possible inside the band plan)' : null;
+    if (warning) duplex = '';
     if (!DUPLEXES.includes(duplex)) throw new Error(`unsupported duplex "${rec.Duplex}"`);
 
     // Mirrors chirp_common.split_tone_encode.
@@ -385,7 +391,9 @@
       power: parsePower(rec.Power) ?? base.power,
       step: stepIndex >= 0 ? stepIndex : base.step,
       scanlist: base.scanlist,
-      skip: String(rec.Skip ?? '').trim().toUpperCase() === 'S'
+      skip: String(rec.Skip ?? '').trim().toUpperCase() === 'S',
+      txLock: warning ? true : base.txLock,
+      warning
     };
   }
 
@@ -398,6 +406,7 @@
     }
     let imported = 0;
     const errors = [];
+    const warnings = [];
     rows.slice(1).forEach((row, i) => {
       if (row.every(field => field.trim() === '')) return;
       const rec = Object.fromEntries(header.map((name, col) => [name, row[col] ?? '']));
@@ -406,13 +415,15 @@
         if (!Number.isInteger(location) || location < 1 || location > CHANNEL_COUNT) {
           throw new Error(`location "${rec.Location}" outside 1-${CHANNEL_COUNT}`);
         }
-        encodeChannel(image, location - 1, fromChirpRecord(rec, decodeChannel(image, location - 1)));
+        const ch = fromChirpRecord(rec, decodeChannel(image, location - 1));
+        encodeChannel(image, location - 1, ch);
+        if (ch.warning) warnings.push({ line: i + 2, message: ch.warning });
         imported++;
       } catch (error) {
         errors.push({ line: i + 2, message: error.message });
       }
     });
-    return { imported, errors };
+    return { imported, errors, warnings };
   }
 
   return {
@@ -491,7 +502,7 @@
     const head = `<tr data-index="${i}"${dirty ? ' class="mem-dirty"' : ''}><td class="slot-idx">${i + 1}</td>`;
     if (!ch) {
       return `${head}<td></td><td><input data-field="freq" inputmode="decimal" ${label('memColFreq')}></td>` +
-        '<td colspan="10"></td></tr>';
+        '<td colspan="11"></td></tr>';
     }
     const modes = M.MODES.includes(ch.mode) ? M.MODES : M.MODES.concat(ch.mode);
     const steps = ch.step < M.STEPS.length ? stepPairs : stepPairs.concat([[ch.step, `#${ch.step}`]]);
@@ -507,6 +518,7 @@
       `<td><select data-field="step" ${label('memColStep')}>${options(steps, ch.step)}</select></td>` +
       `<td><select data-field="scanlist" ${label('memColScanList')}>${options(scanPairs(), ch.scanlist)}</select></td>` +
       `<td><input type="checkbox" data-field="skip"${ch.skip ? ' checked' : ''} ${label('memColSkip')}></td>` +
+      `<td><input type="checkbox" data-field="txLock"${ch.txLock ? ' checked' : ''} ${label('memColTxLock')}></td>` +
       `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" ${label('memDelete')}>✕</button></td></tr>`;
   }
 
@@ -572,7 +584,7 @@
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
       if (field === 'freq' || field === 'offset') ch[field] = M.parseMHz(input.value);
-      else if (field === 'skip') ch.skip = input.checked;
+      else if (field === 'skip' || field === 'txLock') ch[field] = input.checked;
       else if (field === 'power' || field === 'step' || field === 'scanlist') ch[field] = Number(input.value);
       else ch[field] = input.value;
       M.encodeChannel(image, i, ch);
@@ -655,8 +667,9 @@
     csvInput.value = '';
     if (!file) return;
     try {
-      const { imported, errors } = M.importChirpCsv(image, await file.text());
+      const { imported, errors, warnings } = M.importChirpCsv(image, await file.text());
       errors.forEach(e => log(t('memImportRowError', e.line, e.message), 'error'));
+      warnings.forEach(w => log(t('memImportRowWarning', w.line, w.message), 'info'));
       log(t('memImportComplete', imported, errors.length), imported ? 'success' : 'error');
     } catch (e) {
       log(t('error', e?.message ?? String(e)), 'error');

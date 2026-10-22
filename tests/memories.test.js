@@ -24,7 +24,7 @@ test('encodes the firmware channel record, name and attribute layout', () => {
   assert.equal(image[r + 9], 8);                              // tx code: 88.5 Hz index
   assert.equal(image[r + 10], (1 << 4) | 3);                  // tx CTCSS, rx reversed DCS
   assert.equal(image[r + 11], (0 << 4) | 2);                  // FM, offset SUB
-  assert.equal(image[r + 12], (6 << 2) | (1 << 1));           // MID, narrow
+  assert.equal(image[r + 12], 0x40 | (6 << 2) | (1 << 1));    // TX lock, MID, narrow
   assert.equal(image[r + 14], 4);
   assert.equal(String.fromCharCode(...image.subarray(0x4000 + r, 0x4000 + r + 6)), 'RELAIS');
   assert.equal(image[0x4000 + r + 6], 0);
@@ -54,14 +54,23 @@ test('rejects invalid values without touching the image', () => {
   assert.deepEqual(image, before);
 });
 
-test('deletes channels as empty and maps TX lock to duplex off', () => {
+test('deletes channels as empty', () => {
   const image = blank();
-  mem.encodeChannel(image, 5, channel({ duplex: 'off' }));
-  assert.equal(mem.decodeChannel(image, 5).duplex, 'off');
-  assert.equal(image[5 * 16 + 12] & 0x40, 0x40);
+  mem.encodeChannel(image, 5, channel());
   mem.encodeChannel(image, 5, null);
   assert.equal(mem.decodeChannel(image, 5), null);
   assert.equal(mem.decodeChannel(blank(), 0), null);
+});
+
+test('keeps TX lock separate from duplex and on by default', () => {
+  const image = blank();
+  mem.encodeChannel(image, 0, channel({ duplex: '-', offset: 600000 }));
+  assert.equal(image[12] & 0x40, 0x40);                         // firmware default: band plan applies
+  assert.equal(mem.decodeChannel(image, 0).duplex, '-');
+  mem.encodeChannel(image, 0, Object.assign(mem.decodeChannel(image, 0), { txLock: false }));
+  assert.equal(image[12] & 0x40, 0);
+  assert.equal(mem.decodeChannel(image, 0).duplex, '-');
+  assert.equal(mem.decodeChannel(image, 0).txLock, false);
 });
 
 test('round-trips every tone combination through CHIRP CSV', () => {
@@ -74,7 +83,7 @@ test('round-trips every tone combination through CHIRP CSV', () => {
   const csv = mem.exportChirpCsv(source);
   const target = blank();
   const result = mem.importChirpCsv(target, csv);
-  assert.deepEqual(result, { imported: tones.length, errors: [] });
+  assert.deepEqual(result, { imported: tones.length, errors: [], warnings: [] });
   tones.forEach((_, i) => assert.deepEqual(mem.decodeChannel(target, i * 7), mem.decodeChannel(source, i * 7), `channel ${i * 7}`));
 });
 
@@ -86,11 +95,15 @@ test('imports CHIRP split duplex, watt powers and reports bad rows', () => {
     '2,LOW,433.500000,,0.000000,,88.5,88.5,023,NN,023,Tone->Tone,NFM,6.25,,0.5W',
     '3,BAD,145.500000,,0.000000,TSQL-R,88.5,88.5,023,NN,023,Tone->Tone,FM,12.50,,',
     '1025,FAR,145.500000,,0,,88.5,88.5,023,NN,023,Tone->Tone,FM,12.50,,',
-    '4,WFM,98.000000,,0,,88.5,88.5,023,NN,023,Tone->Tone,WFM,12.50,,'
+    '4,WFM,98.000000,,0,,88.5,88.5,023,NN,023,Tone->Tone,WFM,12.50,,',
+    '5,RXONLY,162.550000,off,0,,88.5,88.5,023,NN,023,Tone->Tone,NFM,12.50,,'
   ].join('\n');
   const result = mem.importChirpCsv(image, csv);
-  assert.equal(result.imported, 2);
+  assert.equal(result.imported, 3);
   assert.deepEqual(result.errors.map(e => e.line), [4, 5, 6]);
+  assert.deepEqual(result.warnings.map(w => w.line), [7]);
+  assert.equal(mem.decodeChannel(image, 4).duplex, '');
+  assert.equal(mem.decodeChannel(image, 4).txLock, true);
   const split = mem.decodeChannel(image, 0);
   assert.equal(split.duplex, '-');
   assert.equal(split.offset, 600000);

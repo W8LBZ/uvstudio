@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.zh = {
   "memImportRowError": "已跳过 CSV 第 {0} 行：{1}",
   "memImportComplete": "已导入 {0} 个信道，跳过 {1} 行。请检查后写入电台。",
   "memBackupSize": "存储信道备份必须正好为 {0} 字节。",
-  "memBackupLoaded": "已加载 {0}。写入电台以应用。"
+  "memBackupLoaded": "已加载 {0}。写入电台以应用。",
+  "memColTxLock": "发射锁定",
+  "memTxLockHint": "对此信道应用 F Lock 频段规划。关闭后，此信道可在频段规划之外发射。",
+  "memImportRowWarning": "CSV 第 {0} 行：{1}"
 };

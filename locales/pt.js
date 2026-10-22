@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.pt = {
   "memImportRowError": "Linha CSV {0} ignorada: {1}",
   "memImportComplete": "{0} canais importados, {1} linhas ignoradas. Reveja-os e depois escreva no rádio.",
   "memBackupSize": "Uma cópia de memórias deve ter exatamente {0} bytes.",
-  "memBackupLoaded": "{0} carregado. Escreva no rádio para o aplicar."
+  "memBackupLoaded": "{0} carregado. Escreva no rádio para o aplicar.",
+  "memColTxLock": "Bloqueio TX",
+  "memTxLockHint": "Aplica o plano de bandas F Lock a este canal. Desligado, o canal pode transmitir fora do plano de bandas.",
+  "memImportRowWarning": "Linha CSV {0}: {1}"
 };

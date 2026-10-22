@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.fr = {
   "memImportRowError": "Ligne CSV {0} ignorée : {1}",
   "memImportComplete": "{0} canaux importés, {1} lignes ignorées. Vérifiez-les, puis écrivez dans la radio.",
   "memBackupSize": "Une sauvegarde des mémoires doit faire exactement {0} octets.",
-  "memBackupLoaded": "{0} chargé. Écrivez dans la radio pour l'appliquer."
+  "memBackupLoaded": "{0} chargé. Écrivez dans la radio pour l'appliquer.",
+  "memColTxLock": "Verr. TX",
+  "memTxLockHint": "Applique le plan de bandes F Lock à ce canal. Désactivé, ce canal peut émettre hors du plan de bandes.",
+  "memImportRowWarning": "Ligne CSV {0} : {1}"
 };

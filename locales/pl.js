@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.pl = {
   "memImportRowError": "Wiersz CSV {0} pominięty: {1}",
   "memImportComplete": "Zaimportowano kanałów: {0}, pominięto wierszy: {1}. Sprawdź je, a następnie zapisz w radiu.",
   "memBackupSize": "Kopia pamięci musi mieć dokładnie {0} bajtów.",
-  "memBackupLoaded": "Wczytano {0}. Zapisz w radiu, aby zastosować."
+  "memBackupLoaded": "Wczytano {0}. Zapisz w radiu, aby zastosować.",
+  "memColTxLock": "Blokada TX",
+  "memTxLockHint": "Stosuje plan pasm F Lock do tego kanału. Po wyłączeniu kanał może nadawać poza planem pasm.",
+  "memImportRowWarning": "Wiersz CSV {0}: {1}"
 };

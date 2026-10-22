@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.it = {
   "memImportRowError": "Riga CSV {0} ignorata: {1}",
   "memImportComplete": "{0} canali importati, {1} righe ignorate. Controllali, poi scrivi nella radio.",
   "memBackupSize": "Un backup delle memorie deve essere di esattamente {0} byte.",
-  "memBackupLoaded": "{0} caricato. Scrivi nella radio per applicarlo."
+  "memBackupLoaded": "{0} caricato. Scrivi nella radio per applicarlo.",
+  "memColTxLock": "Blocco TX",
+  "memTxLockHint": "Applica il piano di banda F Lock a questo canale. Se disattivato, il canale può trasmettere fuori dal piano di banda.",
+  "memImportRowWarning": "Riga CSV {0}: {1}"
 };

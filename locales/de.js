@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.de = {
   "memImportRowError": "CSV-Zeile {0} übersprungen: {1}",
   "memImportComplete": "{0} Kanäle importiert, {1} Zeilen übersprungen. Prüfen und dann ins Funkgerät schreiben.",
   "memBackupSize": "Eine Speichersicherung muss genau {0} Bytes groß sein.",
-  "memBackupLoaded": "{0} geladen. Ins Funkgerät schreiben, um sie zu übernehmen."
+  "memBackupLoaded": "{0} geladen. Ins Funkgerät schreiben, um sie zu übernehmen.",
+  "memColTxLock": "TX-Sperre",
+  "memTxLockHint": "Wendet den F-Lock-Bandplan auf diesen Kanal an. Wenn aus, kann dieser Kanal außerhalb des Bandplans senden.",
+  "memImportRowWarning": "CSV-Zeile {0}: {1}"
 };

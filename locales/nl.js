@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.nl = {
   "memImportRowError": "CSV-regel {0} overgeslagen: {1}",
   "memImportComplete": "{0} kanalen geïmporteerd, {1} regels overgeslagen. Controleer ze en schrijf ze naar de radio.",
   "memBackupSize": "Een geheugenback-up moet precies {0} bytes zijn.",
-  "memBackupLoaded": "{0} geladen. Schrijf naar de radio om toe te passen."
+  "memBackupLoaded": "{0} geladen. Schrijf naar de radio om toe te passen.",
+  "memColTxLock": "TX-slot",
+  "memTxLockHint": "Past het F Lock-bandplan toe op dit kanaal. Uit: dit kanaal kan buiten het bandplan zenden.",
+  "memImportRowWarning": "CSV-regel {0}: {1}"
 };

@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.en = {
   "memImportRowError": "CSV line {0} skipped: {1}",
   "memImportComplete": "{0} channels imported, {1} rows skipped. Review them, then write to the radio.",
   "memBackupSize": "A memories backup must be exactly {0} bytes.",
-  "memBackupLoaded": "{0} loaded. Write to the radio to apply it."
+  "memBackupLoaded": "{0} loaded. Write to the radio to apply it.",
+  "memColTxLock": "TX lock",
+  "memTxLockHint": "Apply the F Lock band plan to this channel. When off, this channel can transmit outside the band plan.",
+  "memImportRowWarning": "CSV line {0}: {1}"
 };

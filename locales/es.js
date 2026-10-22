@@ -553,5 +553,8 @@ window.UVSTUDIO_LOCALES.es = {
   "memImportRowError": "Línea CSV {0} omitida: {1}",
   "memImportComplete": "{0} canales importados, {1} filas omitidas. Revíselos y luego escriba en la radio.",
   "memBackupSize": "Una copia de memorias debe tener exactamente {0} bytes.",
-  "memBackupLoaded": "{0} cargado. Escriba en la radio para aplicarlo."
+  "memBackupLoaded": "{0} cargado. Escriba en la radio para aplicarlo.",
+  "memColTxLock": "Bloqueo TX",
+  "memTxLockHint": "Aplica el plan de bandas F Lock a este canal. Desactivado, el canal puede transmitir fuera del plan de bandas.",
+  "memImportRowWarning": "Línea CSV {0}: {1}"
 };
