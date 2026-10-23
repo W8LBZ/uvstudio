@@ -367,7 +367,7 @@ async function connectSerial() {
         if (!viewerSerial.isOwner()) {
             throw Object.assign(new Error(t('disconnected')), { code: 'UVSTUDIO_SERIAL_RELEASED' });
         }
-        port = await navigator.serial.requestPort();
+        port = await window.UVStudioSerial.pickPort();
         if (!viewerSerial.isOwner()) {
             throw Object.assign(new Error(t('disconnected')), { code: 'UVSTUDIO_SERIAL_RELEASED' });
         }
@@ -390,6 +390,7 @@ async function connectSerial() {
         tempInvertLcd = invertLcd;
         startLcdAnimation();
         lastPortInfo = port.getInfo();
+        window.UVStudioSerial.rememberPort(port);
         userDisconnected = false;
         updateConnectionButtonState('connected');
         updateKeyboardState();

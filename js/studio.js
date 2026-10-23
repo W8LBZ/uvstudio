@@ -6,6 +6,7 @@
     const serialStatus = document.getElementById("studioSerialStatus");
     const serialStatusText = document.getElementById("studioSerialText");
     const serialDisconnect = document.getElementById("studioSerialDisconnect");
+    const serialChangePort = document.getElementById("studioSerialChangePort");
     const versionLabel = document.getElementById("studioVersion");
     const aboutVersion = document.getElementById("aboutVersion");
     const paneViewer = document.getElementById("pane-viewer");
@@ -82,6 +83,9 @@
             const held = lastSerialSnapshot.state === "connected" ||
                 lastSerialSnapshot.state === "reconnecting";
             serialDisconnect.hidden = !held || Boolean(operation);
+        }
+        if (serialChangePort) {
+            serialChangePort.hidden = lastSerialSnapshot.state !== "disconnected" || Boolean(operation);
         }
     }
 
@@ -267,6 +271,17 @@
     window.addEventListener("uvstudio:languagechange", () => {
         renderSerialStatus(lastSerialSnapshot);
     });
+
+    /* "Change port": pick now; the choice is reused by the next connect, viewer or tools. */
+    if (serialChangePort && serialController) {
+        serialChangePort.addEventListener("click", async () => {
+            try {
+                serialController.rememberPort(await navigator.serial.requestPort());
+            } catch (error) {
+                if (error?.name !== "NotFoundError") console.warn("Port selection failed:", error);   /* NotFoundError = picker cancelled */
+            }
+        });
+    }
 
     if (serialDisconnect && serialController) {
         serialDisconnect.addEventListener("click", async () => {

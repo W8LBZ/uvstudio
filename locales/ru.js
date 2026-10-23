@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.ru = {
   "connected_deep_sleep": "Подключено — глубокий сон",
   "connect": "Подключить",
   "disconnect": "Отключить",
+  "changePort": "Сменить порт",
   "reboot_radio": "Перезапустить",
   "help_title": "Управление с клавиатуры",
   "close_help": "Закрыть справку",

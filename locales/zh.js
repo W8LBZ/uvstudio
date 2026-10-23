@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "connected_deep_sleep": "已连接 - 深度睡眠",
   "connect": "连接",
   "disconnect": "断开连接",
+  "changePort": "更换端口",
   "reboot_radio": "重启",
   "help_title": "键盘控制",
   "close_help": "关闭帮助",

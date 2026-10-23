@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.pt = {
   "connected_deep_sleep": "Conectado - Suspensão profunda",
   "connect": "Conectar",
   "disconnect": "Desconectar",
+  "changePort": "Trocar porta",
   "reboot_radio": "Reiniciar",
   "help_title": "Controles do Teclado",
   "close_help": "Fechar a ajuda",

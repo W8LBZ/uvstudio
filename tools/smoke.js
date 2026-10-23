@@ -110,10 +110,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         this.readable = new ReadableStream({ start(c) { ctrl = c; } });
         this.writable = new WritableStream({ write(chunk) { rx.push(...chunk); handle(); } });
       },
-      async close() {}, getInfo() { return {}; }, async forget() {}
+      async close() {}, getInfo() { return { usbVendorId: 0x1a86, usbProductId: 0x7523 }; }, async forget() {}
     };
     Object.defineProperty(navigator, 'serial', { configurable: true,
-      value: { requestPort: async () => fakePort, getPorts: async () => [], addEventListener() {} } });
+      value: { requestPort: async () => (window.pickerCount = (window.pickerCount || 0) + 1, fakePort),
+        getPorts: async () => (window.pickerCount ? [fakePort] : []), addEventListener() {} } });
     window.dispatchEvent(new CustomEvent('uvstudio:serialstatechange', { detail: {} }));
   })()`);
 
@@ -182,6 +183,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(500);
   await evaluate("document.getElementById('setReadBtn').click()");
   await waitIdle();
+  // Port reuse: only the first action may open the picker.
+  const pickers = await evaluate('window.pickerCount');
+  console.log('pickers', pickers);
+  if (pickers !== 1) throw new Error(`expected 1 port picker, got ${pickers}`);
   console.log('settings read', await evaluate(`({ fields: document.querySelectorAll('#setForm [data-id]').length,
     sql: document.querySelector('[data-id="Sql"]').value, msg: document.querySelector('[data-id="Message 1"]').value,
     pwr: document.querySelector('[data-id="SetPwr"]').selectedOptions[0].textContent,

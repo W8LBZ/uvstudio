@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "connected_deep_sleep": "Połączono — głęboki sen",
   "connect": "Połącz",
   "disconnect": "Rozłącz",
+  "changePort": "Zmień port",
   "reboot_radio": "Uruchom ponownie",
   "help_title": "Sterowanie klawiaturą",
   "close_help": "Zamknij pomoc",

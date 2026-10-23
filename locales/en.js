@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.en = {
   "connected_deep_sleep": "Connected - Deep sleep",
   "connect": "Connect",
   "disconnect": "Disconnect",
+  "changePort": "Change port",
   "reboot_radio": "Restart",
   "help_title": "Keyboard Controls",
   "close_help": "Close help",

@@ -151,9 +151,37 @@
         });
     }
 
+    /* The last radio port's USB VID/PID, shared by Live Viewer and the tools. Chrome
+       keeps the grant per origin, so when exactly one granted port matches, it is
+       reused without the picker. None or several (e.g. two identical adapters):
+       picker, so the wrong device is never grabbed. */
+    const PORT_KEY = "uvstudio.toolsPort";
+
+    function rememberPort(port) {
+        const { usbVendorId, usbProductId } = port.getInfo();
+        if (usbVendorId === undefined) return;   /* not USB: nothing stable to match */
+        window.UVStudioPreferences.set(PORT_KEY, JSON.stringify({ usbVendorId, usbProductId }));
+    }
+
+    async function pickPort(onPicker) {
+        let saved = null;
+        try { saved = JSON.parse(window.UVStudioPreferences.get(PORT_KEY, "null")); } catch (error) {}
+        if (saved) {
+            const matches = (await navigator.serial.getPorts()).filter((candidate) => {
+                const info = candidate.getInfo();
+                return info.usbVendorId === saved.usbVendorId && info.usbProductId === saved.usbProductId;
+            });
+            if (matches.length === 1) return matches[0];
+        }
+        if (onPicker) onPicker();
+        return navigator.serial.requestPort();
+    }
+
     const controller = Object.freeze({
         register,
         closeResources,
+        pickPort,
+        rememberPort,
 
         releaseFor(nextOwner) {
             return enqueue(async () => {

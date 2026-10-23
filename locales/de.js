@@ -138,6 +138,7 @@ window.UVSTUDIO_LOCALES.de = {
   "connected_deep_sleep": "Verbunden – Tiefschlaf",
   "connect": "Verbinden",
   "disconnect": "Trennen",
+  "changePort": "Port wechseln",
   "reboot_radio": "Neu starten",
   "help_title": "Tastatursteuerung",
   "close_help": "Hilfe schließen",

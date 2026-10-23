@@ -685,8 +685,7 @@ async function connect() {
     if (!toolsSerial.isOwner()) {
       throw Object.assign(new Error(t('tools_disconnected')), { code: 'UVSTUDIO_SERIAL_RELEASED' });
     }
-    log(t('requestingPort'), 'info');
-    port = await navigator.serial.requestPort();
+    port = await window.UVStudioSerial.pickPort(() => log(t('requestingPort'), 'info'));
     if (!toolsSerial.isOwner()) {
       throw Object.assign(new Error(t('tools_disconnected')), { code: 'UVSTUDIO_SERIAL_RELEASED' });
     }
@@ -704,6 +703,7 @@ async function connect() {
     writer = port.writable.getWriter();
     toolsSerialSession++;
     slotLastPortInfo = port.getInfo();
+    window.UVStudioSerial.rememberPort(port);
 
     log(t('startingRead'), 'info');
     startReading();
