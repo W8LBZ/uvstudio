@@ -5,6 +5,7 @@
     const sectionName = document.getElementById("sectionName");
     const serialStatus = document.getElementById("studioSerialStatus");
     const serialStatusText = document.getElementById("studioSerialText");
+    const radioFirmware = document.getElementById("studioRadioFirmware");
     const serialDisconnect = document.getElementById("studioSerialDisconnect");
     const serialChangePort = document.getElementById("studioSerialChangePort");
     const versionLabel = document.getElementById("studioVersion");
@@ -73,16 +74,19 @@
             key = `studio_serial_${lastSerialSnapshot.state || "disconnected"}`;
         }
 
-        /* Firmware string from the last device info reply; tools release the port after
-           each operation, so it stays shown until the next reply replaces it. */
-        const firmware = !operation && window.UVStudioRadioFirmware;
-        const label = firmware ? `${translate(key)} · ${firmware}` : translate(key);
+        const label = translate(key);
         serialStatus.dataset.state = lastSerialSnapshot.state || "disconnected";
         serialStatus.dataset.operation = String(Boolean(operation));
         serialStatus.dataset.critical = String(Boolean(operation?.critical));
         serialStatusText.textContent = label;
         serialStatus.setAttribute("aria-label", label);
         serialStatus.title = label;
+        /* Firmware string from the last device info reply; tools release the port after
+           each operation, so it stays shown until the next reply replaces it. */
+        if (radioFirmware) {
+            radioFirmware.textContent = radioFirmware.title = window.UVStudioRadioFirmware || "";
+            radioFirmware.hidden = !window.UVStudioRadioFirmware;
+        }
 
         /* Offer a global disconnect while a port is held, whichever space owns
            it; hidden during an operation, which releaseCurrent() refuses anyway. */

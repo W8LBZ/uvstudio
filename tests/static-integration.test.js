@@ -484,7 +484,7 @@ test('keeps Labs-only tools together in the sidebar', () => {
   assert.match(studioCss, /\.nav-item-labs \.tag\s*\{[^}]*margin-right:\s*0/);
   assert.match(studioCss, /\.nav-item:disabled > svg,\s*\.nav-item:disabled \.nav-item-label\s*\{[^}]*opacity:\s*0\.5/s);
   assert.match(studioCss, /\.nav-item:disabled \.tag\s*\{[^}]*opacity:\s*1[^}]*filter:\s*none/s);
-  assert.match(html, /css\/studio\.css\?v=34/);
+  assert.match(html, /css\/studio\.css\?v=35/);
 });
 
 test('adapts tool badges to the connected firmware generation', () => {
