@@ -119,6 +119,21 @@ test('adds presentation metadata without changing the app binary format', () => 
     author: 'armel',
     label: 'Flash Map'
   });
+  assert.deepEqual(catalog.appDetails('GeoNav.app'), {
+    id: 'geonav',
+    category: 'tools',
+    description: 'Azimuth, distance and elevation from the APRS position to a radiosonde, opened from Sonde M10, M20 or RS41.',
+    descriptionKey: 'appDescription_geonav',
+    author: 'armel'
+  });
+  assert.deepEqual(catalog.appDetails('QRMap.app'), {
+    id: 'qrmap',
+    category: 'tools',
+    description: 'Show a position received from another app as a QR code that a phone can scan to open it on a map.',
+    descriptionKey: 'appDescription_qrmap',
+    author: 'jdenoy',
+    label: 'QR Map'
+  });
   assert.equal(catalog.appDetails('APRSDIGI.app').label, 'APRS DIGI');
   assert.equal(catalog.appCatalogId('Spectrum-3D.app'), 'spectrum3d');
 });
@@ -186,7 +201,7 @@ test('provides dedicated SVG pictograms for every catalog app and keeps a monogr
   [
     'acarsrx', 'aisrx', 'aprsdigi', 'aprsedit', 'aprsrx', 'aprstx', 'atisdscrx', 'atisrx', 'beacon', 'beam', 'breakout', 'broadcastfm',
     'cwdecode', 'cwkeyer', 'cwtrainer', 'cwusb', 'cube3d', 'epirb406', 'flashmap', 'foxhunt', 'hellmaze', 'minesweeper',
-    'plasma', 'pocsagrx', 'rapidroll', 'resistor', 'sigfinder', 'snake', 'sokoban', 'sondem10', 'sondem20', 'sonders41', 'spaceimpact',
+    'plasma', 'pocsagrx', 'qrmap', 'rapidroll', 'resistor', 'sigfinder', 'snake', 'sokoban', 'sondem10', 'sondem20', 'sonders41', 'spaceimpact',
     'spectrum3d', 'sstv', 'systeminfo', 'tetris', 'tonecall'
   ].forEach(id => {
     assert.match(catalog.appIconSVG(id), /<(?:path|circle)/);
