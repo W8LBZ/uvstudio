@@ -807,6 +807,7 @@
   max-width: 650px;
   margin: 3px 0 0;
 }
+#pane-tools .app-manager-heading .tab-help { margin: 6px 0 0; }
 #pane-tools .app-manager-eyebrow {
   color: var(--accent);
   font-size: 10.5px;

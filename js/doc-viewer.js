@@ -26,7 +26,7 @@
 
   async function load(urls) {
     for (const url of urls) {
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: 'no-cache' });   // revalidate: Pages caches files for 10 min
       if (res.ok) return { url: res.url || url, text: await res.text() };
     }
     throw new Error('not found');
