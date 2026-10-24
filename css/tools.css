@@ -1661,3 +1661,8 @@
 #pane-tools .mem-list-names-box summary::-webkit-details-marker { display: none; }
 #pane-tools .mem-list-names-box summary::before { content: '▸'; color: var(--text-muted); }
 #pane-tools .mem-list-names-box[open] summary::before { content: '▾'; }
+#pane-tools .tab-help-top { margin: 0 0 12px; }
+#pane-tools .calib-warning {
+  margin: 0 0 16px; padding: 10px 12px; border-left: 3px solid #d97706; border-radius: var(--radius);
+  background: color-mix(in oklab, #d97706 10%, var(--surface)); color: var(--text); font-size: 13px; line-height: 1.5;
+}

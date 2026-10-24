@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.es = {
   "studio_nav_memories": "Memorias",
   "studio_operation_read_memories": "Leyendo memorias…",
   "studio_operation_write_memories": "Escribiendo memorias…",
+  "calibRestoreWarning": "Restaure solo una copia de calibración de esta misma radio. La calibración de otra radio altera la potencia de transmisión, la frecuencia y el S-meter.",
   "helpGuide": "Cómo funciona esta página",
   "memDescription": "Lee los 1024 canales de memoria de la radio, permite editarlos y luego escribe los cambios. La importación y exportación usan el formato CSV de CHIRP.",
   "memReadBtn": "Leer de la radio",

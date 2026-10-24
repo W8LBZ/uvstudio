@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.fr = {
   "studio_nav_memories": "Mémoires",
   "studio_operation_read_memories": "Lecture des mémoires…",
   "studio_operation_write_memories": "Écriture des mémoires…",
+  "calibRestoreWarning": "Ne restaurez qu’une sauvegarde de calibration issue de cette même radio. La calibration d’une autre radio fausse la puissance d’émission, la fréquence et le S-mètre.",
   "helpGuide": "Comment fonctionne cette page",
   "memDescription": "Lit les 1024 canaux mémoire de votre radio, permet de les modifier, puis réécrit les changements. L'import et l'export utilisent le format CSV de CHIRP.",
   "memReadBtn": "Lire depuis la radio",
