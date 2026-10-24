@@ -84,7 +84,8 @@
         /* Firmware string from the last device info reply; tools release the port after
            each operation, so it stays shown until the next reply replaces it. */
         if (radioFirmware) {
-            radioFirmware.textContent = radioFirmware.title = window.UVStudioRadioFirmware || "";
+            radioFirmware.textContent = radioFirmware.title =
+                (window.UVStudioRadioFirmware || "") + (window.UVStudioRadioLabs ? " · Labs" : "");
             radioFirmware.hidden = !window.UVStudioRadioFirmware;
         }
 
@@ -369,6 +370,7 @@
 
     window.addEventListener("uvstudio:navigationcapabilitieschange", () => {
         applyNavigationDisabledState();
+        renderSerialStatus(lastSerialSnapshot);
     });
 
     window.addEventListener("uvstudio:languagechange", () => {

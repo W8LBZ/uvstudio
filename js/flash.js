@@ -370,6 +370,8 @@ function applyNavigationCapabilities(capabilities) {
   }
 
   navigationCapabilities = resolvedCapabilities;
+  // Labs is the only edition the radio reveals (by answering the app and flash probes).
+  if (resolvedCapabilities) window.UVStudioRadioLabs = resolvedCapabilities.apps === true;
   updateNavigationCapability(appsNavigationItem, resolvedCapabilities?.apps);
   updateNavigationCapability(externalFlashNavigationItem, resolvedCapabilities?.externalFlash);
   updateNavigationCapability(factoryResetNavigationItem, resolvedCapabilities?.externalFlash);
