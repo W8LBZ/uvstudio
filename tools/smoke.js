@@ -195,6 +195,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     sql: document.querySelector('[data-id="Sql"]').value, msg: document.querySelector('[data-id="Message 1"]').value,
     pwr: document.querySelector('[data-id="SetPwr"]').selectedOptions[0].textContent,
     summary: document.getElementById('setSummary').textContent })`));
+  const service = () => evaluate(`Boolean(document.querySelector('[data-id="F Lock"]'))`);
+  const hiddenBefore = !(await service());
+  await evaluate(`(() => { const v = document.getElementById('studioVersion'); for (let i = 0; i < 5; i++) v.click(); })()`);
+  console.log('service group', { hiddenBefore, shownAfter: await service() });
+  if (!hiddenBefore || !(await service())) throw new Error('Service group reveal broken');
   await evaluate(`(() => {
     const set = (id, v) => { const el = document.querySelector('[data-id="' + id + '"]'); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
     set('Sql', '6'); set('RxMode', '1'); set('Message 2', 'HELLO'); set('UPCode', '12E');

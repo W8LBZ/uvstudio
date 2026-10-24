@@ -125,3 +125,13 @@ test('FM presets: 100 kHz units at 0xA028, empty 0xFFFF, limited to the current 
   assert.equal(set.getValue(img, 'FM 48'), 0xFFFF);
   assert.throws(() => set.getValue(img, 'FM 49'), /unknown/);
 });
+
+test('F Lock follows TxLockModes_t of the release editions', () => {
+  const labels = set.FIELDS.find(f => f.id === 'F Lock').values.map(([v, label]) => `${v}:${label.split(' (')[0]}`);
+  assert.deepEqual(labels, ['0:DEFAULT+', '1:FCC HAM', '2:CA HAM', '3:CE HAM', '4:GB HAM', '5:137-174, 400-430',
+    '6:137-174, 400-438', '7:PMR 446', '8:GMRS FRS MURS', '9:DISABLE ALL', '10:UNLOCK ALL']);
+  const img = new Uint8Array(set.SIZE);
+  set.setValue(img, 'F Lock', 1);
+  set.setValue(img, '350 En', 1);
+  assert.deepEqual([img[0x150], img[0x155]], [1, 1]);
+});

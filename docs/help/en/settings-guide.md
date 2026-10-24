@@ -20,4 +20,4 @@ Click a setting name for its help. Click a group title to fold or unfold the gro
 - [FM radio](settings-fm.md): broadcast FM band and saved stations.
 
 ### Not shown here
-Some menus are left out on purpose: transmit band unlocks, battery calibration, volume calibration and a few others that are risky or live elsewhere on the radio. Change those on the radio itself if you really need to.
+Some menus are left out on purpose: battery calibration, volume calibration and a few others that are risky or live elsewhere on the radio. Change those on the radio itself if you really need to.

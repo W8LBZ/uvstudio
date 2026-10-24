@@ -20,4 +20,4 @@ Cliquez sur le nom d’un réglage pour son aide. Cliquez sur le titre d’un gr
 - [Radio FM](settings-fm.md) : bande FM de radiodiffusion et stations mémorisées.
 
 ### Absent ici
-Certains menus sont volontairement absents : déblocage des bandes d’émission, étalonnage de la batterie, étalonnage du volume et quelques autres, risqués ou stockés ailleurs dans la radio. Modifiez-les sur la radio elle-même si besoin.
+Certains menus sont volontairement absents : étalonnage de la batterie, étalonnage du volume et quelques autres, risqués ou stockés ailleurs dans la radio. Modifiez-les sur la radio elle-même si besoin.

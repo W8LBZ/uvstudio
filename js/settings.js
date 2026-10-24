@@ -143,12 +143,20 @@
     field('UPCode', 'dtmf', 0xA110, 'dtmf'),
     field('DWCode', 'dtmf', 0xA120, 'dtmf'),
 
+    // Service (hidden until the version number is clicked 5 times, like the radio's
+    // PTT + side key 1 power-on menu). F Lock order = TxLockModes_t with the CA, PMR and
+    // GMRS flags on, as in every release edition. Labels give what TX_freq_check allows.
+    field('F Lock', 'service', 0xA150, list(['DEFAULT+ (137-350, 400-600)', 'FCC HAM (144-148, 420-450)',
+      'CA HAM (144-148, 430-450)', 'CE HAM (144-146, 430-440)', 'GB HAM (144-148, 430-440)',
+      '137-174, 400-430', '137-174, 400-438', 'PMR 446', 'GMRS FRS MURS', 'DISABLE ALL', 'UNLOCK ALL'])),
+    field('350 En', 'service', 0xA155, list(ON_OFF)),
+
     // FM radio
     field('FM band', 'fm', 0xA023, list(FM_BANDS.map(([lo, hi]) => `${lo / 10}-${hi / 10} MHz`)), 1, 2),
     ...Array.from({ length: FM_PRESETS }, (_, n) => fmPreset(n))
   ];
 
-  const GROUPS = ['radio', 'display', 'keys', 'scan', 'tx', 'dtmf', 'fm'];
+  const GROUPS = ['radio', 'display', 'keys', 'scan', 'tx', 'dtmf', 'fm', 'service'];
   const TEXT_LENGTH = 16;
   const PROTECTED = [[0x138, 0x148], [0x160, 0x170]];   // AES key, firmware version (offsets in the area)
 
@@ -244,6 +252,20 @@
   let radioImage = null;
   let image = null;
   let busy = false;
+  let serviceShown = false;   // this page load only
+
+  // Five quick clicks on the sidebar version number show the Service group.
+  let versionClicks = 0;
+  let versionClickAt = 0;
+  $('studioVersion')?.addEventListener('click', () => {
+    const now = Date.now();
+    versionClicks = now - versionClickAt < 1500 ? versionClicks + 1 : 1;
+    versionClickAt = now;
+    if (versionClicks < 5 || serviceShown) return;
+    serviceShown = true;
+    log(t('plus_service_shown'), 'info');
+    render();
+  });
 
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
   const groupKey = g => `setGroup_${g}`;
@@ -282,7 +304,7 @@
     } else {
       const dirty = new Set(dirtyIds());
       const help = topic => (topic ? ` data-help="${topic}" tabindex="0" role="button"` : '');
-      form.innerHTML = S.GROUPS.map(group => `<details class="set-group" data-group="${group}"${folded.has(group) ? '' : ' open'}><summary>${escapeHtml(t(groupKey(group)))}</summary>` +
+      form.innerHTML = S.GROUPS.filter(group => group !== 'service' || serviceShown).map(group => `<details class="set-group" data-group="${group}"${folded.has(group) ? '' : ' open'}><summary>${escapeHtml(t(groupKey(group)))}</summary>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
           `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
           `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
