@@ -73,7 +73,10 @@
             key = `studio_serial_${lastSerialSnapshot.state || "disconnected"}`;
         }
 
-        const label = translate(key);
+        /* Firmware string from the last device info reply; tools release the port after
+           each operation, so it stays shown until the next reply replaces it. */
+        const firmware = !operation && window.UVStudioRadioFirmware;
+        const label = firmware ? `${translate(key)} · ${firmware}` : translate(key);
         serialStatus.dataset.state = lastSerialSnapshot.state || "disconnected";
         serialStatus.dataset.operation = String(Boolean(operation));
         serialStatus.dataset.critical = String(Boolean(operation?.critical));

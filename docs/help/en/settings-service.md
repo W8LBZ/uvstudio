@@ -18,9 +18,11 @@ The transmit band plan. Channels with **TX lock** checked (the default) can only
 | DISABLE ALL | nothing: receive only |
 | UNLOCK ALL | every frequency the radio can tune |
 
+- **DEFAULT+**: the radio's own label ("137-174, 400-470") is narrower than what the firmware really allows; the table shows the real ranges.
 - With a US amateur license, **FCC HAM** keeps you inside the bands you may use.
 - **GMRS FRS MURS** only limits frequencies. GMRS and FRS normally require a radio certified for that service, which this radio generally isn't, even with a GMRS license. It doesn't limit power or channel width either.
-- **UNLOCK ALL** removes every limit. The radio's own label for DEFAULT+ ("137-174, 400-470") is narrower than what the firmware really allows; the table shows the real ranges.
+- **UNLOCK ALL** removes every limit.
+- F Lock applies only to memories with **TX lock** on (the default). A memory with TX lock off can transmit outside the band plan, for example one simplex channel outside FCC HAM.
 
 ### 350 En
 Turns the 350–400 MHz band on or off. **OFF**: the radio skips that band and moves any channel in it to 433.000 MHz. **ON** (default): the radio receives there and, with F Lock on **DEFAULT+**, can transmit there too.

@@ -1535,7 +1535,10 @@ dumpBtn.addEventListener('click', async () => {
     const blob = new Blob([dumpedData], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     dumpLink.href = url;
-    dumpLink.download = 'calibration.dat';
+    // Calibration is factory-trimmed per radio, so a short hash of it tells radios apart.
+    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', dumpedData)).slice(0, 4);
+    const id = Array.from(hash, b => b.toString(16).padStart(2, '0')).join('');
+    dumpLink.download = `calibration-${id}-${new Date().toISOString().slice(0, 10)}.dat`;
     dumpDownload.style.display = 'flex';
     log(t('dumpSaved'), 'success');
 
@@ -2329,6 +2332,7 @@ function logDeviceInfo(data) {
   
   if (deviceInfoStr) {
     log(`Device: ${deviceInfoStr}`, 'success');
+    window.UVStudioRadioFirmware = deviceInfoStr;   // shown in the serial status pill
     
     // The canonical version is everything numeric after "v": v50 and
     // dotted forms such as v5.0.0 are both valid.

@@ -18,9 +18,11 @@ Le plan de bandes d’émission. Les canaux dont le **TX lock** est coché (par 
 | DISABLE ALL | rien : réception seule |
 | UNLOCK ALL | toutes les fréquences que la radio peut accorder |
 
+- **DEFAULT+** : l’étiquette de la radio (« 137-174, 400-470 ») est plus étroite que ce que le firmware autorise vraiment ; le tableau donne les plages réelles.
 - En Europe, **CE HAM** vous garde dans les bandes radioamateur.
 - **GMRS FRS MURS** ne limite que les fréquences. GMRS et FRS exigent normalement une radio certifiée pour ce service, ce que cette radio n’est généralement pas, même avec une licence GMRS. La puissance et la largeur de canal ne sont pas limitées non plus.
-- **UNLOCK ALL** supprime toute limite. L’étiquette de la radio pour DEFAULT+ (« 137-174, 400-470 ») est plus étroite que ce que le firmware autorise vraiment ; le tableau donne les plages réelles.
+- **UNLOCK ALL** supprime toute limite.
+- F Lock ne s’applique qu’aux mémoires dont le **TX lock** est activé (par défaut). Une mémoire avec TX lock désactivé peut émettre hors du plan de bandes, par exemple un canal simplex hors de FCC HAM.
 
 ### 350 En
 Active ou désactive la bande 350–400 MHz. **OFF** : la radio saute cette bande et déplace tout canal qui s’y trouve sur 433,000 MHz. **ON** (par défaut) : la radio y reçoit et, avec F Lock sur **DEFAULT+**, peut aussi y émettre.
