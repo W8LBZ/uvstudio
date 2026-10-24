@@ -1,4 +1,4 @@
-**En bref :** la puissance des canaux USER, et les minuteries et alertes d’émission.
+> 💡 **En bref :** la puissance des canaux USER, et les minuteries et alertes d’émission.
 
 ### SetPwr
 La puissance utilisée par un canal dont la Puissance vaut **USER**. Changez-la ici (ou dans le menu de la radio) et tous les canaux USER suivent.

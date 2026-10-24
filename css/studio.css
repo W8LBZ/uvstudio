@@ -507,7 +507,11 @@ body.sidebar-collapsed .sidebar {
 .doc-body h1:first-child, .doc-body h2:first-child { margin-top: 0; }
 .doc-body h1 { font-size: 22px; }
 .doc-body h2 { font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-.doc-body h3 { font-size: 15px; }
+.doc-body h3 { font-size: 15px; color: var(--accent); padding-top: 0.8em; border-top: 1px solid var(--border); }
+.doc-body h3:first-child, .doc-body blockquote + h3 { padding-top: 0; border-top: 0; }
+.doc-body blockquote { margin: 0 0 1em; padding: 10px 14px; border-left: 4px solid var(--accent); border-radius: 8px; background: color-mix(in oklab, var(--accent) 8%, var(--surface)); }
+.doc-body blockquote > :last-child { margin-bottom: 0; }
+.doc-body li::marker { color: var(--accent); }
 .doc-body p, .doc-body ul, .doc-body ol, .doc-body pre, .doc-body table { margin: 0 0 0.9em; }
 .doc-body ul, .doc-body ol { padding-left: 1.4em; }
 .doc-body a { color: var(--accent); }
@@ -516,6 +520,7 @@ body.sidebar-collapsed .sidebar {
 .doc-body pre code { background: none; padding: 0; }
 .doc-body table { border-collapse: collapse; }
 .doc-body th, .doc-body td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
+.doc-body th { background: color-mix(in oklab, var(--accent) 8%, var(--surface)); }
 .doc-body img { max-width: 100%; }
 /* Field help: the label itself opens the help page; no extra icons. */
 [data-help] { cursor: help; text-decoration: underline dotted; text-decoration-color: var(--text-muted); text-underline-offset: 3px; }

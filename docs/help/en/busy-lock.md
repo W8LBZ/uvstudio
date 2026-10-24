@@ -1,4 +1,4 @@
-**TL;DR:** Stops you transmitting while someone else is talking on this channel.
+> 💡 **TL;DR:** Stops you transmitting while someone else is talking on this channel.
 
 - Checked: pressing PTT does nothing while a signal is being received. That keeps you from talking over people.
 - Unchecked: you can always transmit.

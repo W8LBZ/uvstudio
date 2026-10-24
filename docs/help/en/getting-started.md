@@ -1,4 +1,4 @@
-**TL;DR:** Back up first, change a little at a time, and write only when you're happy. You can always restore a backup.
+> 💡 **TL;DR:** Back up first, change a little at a time, and write only when you're happy. You can always restore a backup.
 
 ### 1. Connect
 Use a USB programming cable that carries data. Switch the radio on normally, then press **Read from radio** on any page and pick the radio's serial port.

@@ -1,4 +1,4 @@
-**TL;DR:** Key sounds, what the side buttons do, and key locking.
+> 💡 **TL;DR:** Key sounds, what the side buttons do, and key locking.
 
 ### Beep
 Beep on every key press.

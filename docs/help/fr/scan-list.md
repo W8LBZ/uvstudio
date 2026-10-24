@@ -1,4 +1,4 @@
-**En bref :** le groupe auquel appartient ce canal lors d’un scan.
+> 💡 **En bref :** le groupe auquel appartient ce canal lors d’un scan.
 
 - Les listes **1 à 24** permettent de scanner seulement certains canaux, par exemple vos relais locaux ou la bande aéro.
 - **Toutes** : le canal est dans toutes les listes.

@@ -1,4 +1,4 @@
-**TL;DR:** Leave this channel out when scanning.
+> 💡 **TL;DR:** Leave this channel out when scanning.
 
 - Checked: scanning passes over it. You can still pick it by hand.
 - Handy for a noisy channel you want to keep but not hear during a scan.

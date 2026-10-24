@@ -1,4 +1,4 @@
-**En bref :** sons des touches, rôle des boutons latéraux et verrouillage du clavier.
+> 💡 **En bref :** sons des touches, rôle des boutons latéraux et verrouillage du clavier.
 
 ### Beep
 Bip à chaque appui sur une touche.

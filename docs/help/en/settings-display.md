@@ -1,4 +1,4 @@
-**TL;DR:** What the screen shows and how the backlight behaves. Nothing here affects radio performance, so experiment freely.
+> 💡 **TL;DR:** What the screen shows and how the backlight behaves. Nothing here affects radio performance, so experiment freely.
 
 ### ChDisp
 How memory channels appear: frequency, channel number, name, or name with frequency underneath.

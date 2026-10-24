@@ -1,4 +1,4 @@
-**En bref :** envoie une courte salve de tonalités quand vous appuyez sur l’alternat et/ou le relâchez.
+> 💡 **En bref :** envoie une courte salve de tonalités quand vous appuyez sur l’alternat et/ou le relâchez.
 
 - **OFF** : rien n’est envoyé. Normal en radioamateur.
 - **UP** : envoie votre identifiant DTMF à l’appui sur PTT.

@@ -1,4 +1,4 @@
-**En bref :** installe un nouveau firmware (le logiciel de la radio). Sauvegardez d’abord votre calibration (voir [Calibration](calibration-guide.md)).
+> 💡 **En bref :** installe un nouveau firmware (le logiciel de la radio). Sauvegardez d’abord votre calibration (voir [Calibration](calibration-guide.md)).
 
 ### Avant de commencer
 - Faites une sauvegarde de la calibration tant que la radio fonctionne normalement.

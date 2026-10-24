@@ -1,4 +1,4 @@
-**TL;DR:** The boot logo is the picture shown when the radio switches on. You can read the current one or upload your own.
+> 💡 **TL;DR:** The boot logo is the picture shown when the radio switches on. You can read the current one or upload your own.
 
 ### Read
 Press **Read logo from radio** to see the current logo, then download it as a PNG.

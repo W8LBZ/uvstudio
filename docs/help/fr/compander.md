@@ -1,4 +1,4 @@
-**En bref :** une compression audio qui réduit le souffle. Les deux radios doivent l’activer pour que le son soit correct.
+> 💡 **En bref :** une compression audio qui réduit le souffle. Les deux radios doivent l’activer pour que le son soit correct.
 
 - **OFF** : normal. À garder sauf si vous savez que l’autre station utilise un compandeur.
 - **TX** : compresse ce que vous envoyez.

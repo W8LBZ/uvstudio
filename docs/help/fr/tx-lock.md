@@ -1,4 +1,4 @@
-**En bref :** limite ce canal au plan de bandes d’émission autorisé de la radio (le réglage **F Lock**).
+> 💡 **En bref :** limite ce canal au plan de bandes d’émission autorisé de la radio (le réglage **F Lock**).
 
 - **Coché (par défaut)** : le canal n’émet que là où F Lock l’autorise. Laissez-le coché.
 - **Décoché** : ce canal ignore F Lock et peut émettre partout où le matériel le permet.

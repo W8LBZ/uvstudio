@@ -1,4 +1,4 @@
-**TL;DR:** Read the radio's menu settings, change them here, then write them back. Nothing reaches the radio until you press **Write changes to radio**.
+> 💡 **TL;DR:** Read the radio's menu settings, change them here, then write them back. Nothing reaches the radio until you press **Write changes to radio**.
 
 ### Read and write
 - **Read from radio** loads the settings. The groups appear only after a read.

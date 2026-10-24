@@ -1,4 +1,4 @@
-**En bref :** la fréquence d’écoute, en MHz (mégahertz).
+> 💡 **En bref :** la fréquence d’écoute, en MHz (mégahertz).
 
 - Exemple : `145.500` est la fréquence d’appel FM sur 2 m en Europe.
 - Pour un relais, c’est sa fréquence de *sortie*, celle sur laquelle vous l’entendez. Votre fréquence d’émission découle de [Duplex](duplex.md) et de [Décalage](offset.md).

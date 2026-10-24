@@ -1,4 +1,4 @@
-**En bref :** la radio garde un historique de ses dernières réceptions et émissions. Cette page l’exporte en fichier CSV lisible dans un tableur.
+> 💡 **En bref :** la radio garde un historique de ses dernières réceptions et émissions. Cette page l’exporte en fichier CSV lisible dans un tableur.
 
 - Gardez la radio en mode normal et appuyez sur **Exporter RF Log**.
 - Jusqu’aux 512 dernières activités sont lues, avec un repère à chaque allumage.

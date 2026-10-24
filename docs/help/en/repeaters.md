@@ -1,4 +1,4 @@
-**TL;DR:** A repeater is a radio station on a hilltop or tall building that rebroadcasts your signal much farther than your handheld can reach. To use one you need three things from its listing: its frequency, its offset, and its tone.
+> 💡 **TL;DR:** A repeater is a radio station on a hilltop or tall building that rebroadcasts your signal much farther than your handheld can reach. To use one you need three things from its listing: its frequency, its offset, and its tone.
 
 ### How it works
 The repeater listens on one frequency (its *input*) and transmits on another (its *output*) at the same time. You listen on its output and transmit on its input.

@@ -1,4 +1,4 @@
-**TL;DR:** DTMF is the keypad tones you hear on a phone. Hams use them to control repeaters and to send short IDs. Most beginners can leave this alone.
+> 💡 **TL;DR:** DTMF is the keypad tones you hear on a phone. Hams use them to control repeaters and to send short IDs. Most beginners can leave this alone.
 
 ### D ST
 Sidetone: hear the DTMF tones in your own speaker while you send them.

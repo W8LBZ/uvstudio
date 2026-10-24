@@ -1,4 +1,4 @@
-**TL;DR:** Squelch keeps the speaker quiet until a signal is strong enough. Tones (CTCSS/DCS) add a second check: the right code must be present too.
+> 💡 **TL;DR:** Squelch keeps the speaker quiet until a signal is strong enough. Tones (CTCSS/DCS) add a second check: the right code must be present too.
 
 ### Squelch
 - The radio's **[Sql](settings-radio.md#sql)** setting sets how strong a signal must be to open the speaker.

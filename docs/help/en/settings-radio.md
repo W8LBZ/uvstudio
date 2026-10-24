@@ -1,4 +1,4 @@
-**TL;DR:** How the radio receives, transmits and sounds. If you're new, the defaults are fine. **Sql** is the one most people change.
+> 💡 **TL;DR:** How the radio receives, transmits and sounds. If you're new, the defaults are fine. **Sql** is the one most people change.
 
 ### Sql
 Squelch: how strong a signal must be before the speaker opens. **0** is always open (constant hiss). Higher numbers stay quieter but can cut off weak stations. 3 to 5 suits most people.
@@ -15,7 +15,7 @@ Microphone gain, from **+1.5 dB** (quietest) to **+31.5 dB** (loudest). Raise it
 Voice-operated transmit: talking into the radio starts a transmission without pressing PTT, and it stops shortly after you go quiet.
 - **OFF** (recommended to start): you always press PTT.
 - **1–10**: how loud a sound must be to start transmitting. If it keys up on background noise or breathing, change the level one step; if it misses the start of your words, go the other way.
-- VOX can transmit by accident (a cough, a loud room). Turn it off when you put the radio down.
+- ⚠️ VOX can transmit by accident (a cough, a loud room). Turn it off when you put the radio down.
 
 ### RxMode
 How the radio listens with its two VFOs (A and B):
@@ -28,12 +28,22 @@ How the radio listens with its two VFOs (A and B):
 - The two FULL modes aren't in every firmware edition.
 
 ### BatSav
-Battery saver. When the radio sits idle on its main screen for about 10 seconds, the receiver starts napping: it wakes for 0.1 s to check for a signal, then sleeps for a while, over and over.
-- The number after **1:** is how long it sleeps for each 0.1 s awake: **1:1** sleeps 0.1 s, **1:2** 0.2 s … **1:5** 0.5 s.
-- Higher saves more battery (at 1:5 the receiver is off most of the time), but the radio can take up to that long to notice a call, so the first word may get cut off.
+Battery saver. When the radio sits idle on its main screen for about 10 seconds, the receiver starts napping: it wakes briefly to check for a signal, sleeps, and repeats.
+
+**1:N** is the ratio of awake to asleep. The receiver is always awake for 1 part (100 ms, a tenth of a second) and then asleep for N parts:
+
+| Setting | Awake | Asleep | Receiver off |
+|---|---|---|---|
+| **1:1** | 100 ms | 100 ms | half the time |
+| **1:2** | 100 ms | 200 ms | 2/3 of the time |
+| **1:3** | 100 ms | 300 ms | 3/4 of the time |
+| **1:4** | 100 ms | 400 ms | 4/5 of the time |
+| **1:5** | 100 ms | 500 ms | 5/6 of the time |
+
+- 🔋 A bigger N saves more battery, but a call can arrive while the receiver sleeps, so the first word may get cut off (up to half a second at 1:5).
 - **OFF**: the receiver never naps. Uses the most battery, misses nothing.
 - It only naps when nothing's happening: not while receiving, scanning, transmitting, in a menu or listening to FM broadcast.
-- **1:4** is the firmware's default and a good balance.
+- 👍 **1:4** is the firmware's default and a good balance.
 
 ### BatTyp
 Which battery pack is fitted, so the battery gauge reads correctly.

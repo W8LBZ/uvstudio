@@ -1,4 +1,4 @@
-**En bref :** le DTMF, ce sont les tonalités des touches d’un téléphone. Les radioamateurs s’en servent pour commander des relais et envoyer de courts identifiants. Un débutant peut laisser cette partie de côté.
+> 💡 **En bref :** le DTMF, ce sont les tonalités des touches d’un téléphone. Les radioamateurs s’en servent pour commander des relais et envoyer de courts identifiants. Un débutant peut laisser cette partie de côté.
 
 ### D ST
 Retour local : entendre les tonalités DTMF dans votre haut-parleur quand vous les envoyez.

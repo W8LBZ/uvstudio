@@ -1,4 +1,4 @@
-**TL;DR:** An inaudible code sent along with your voice. Many repeaters ignore you unless you send the right one.
+> 💡 **TL;DR:** An inaudible code sent along with your voice. Many repeaters ignore you unless you send the right one.
 
 - If a repeater's listing shows a "PL", "CTCSS" or "tone" value, put it here (for example `88.5`).
 - **Blank**: no tone sent.

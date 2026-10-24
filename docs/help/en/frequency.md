@@ -1,4 +1,4 @@
-**TL;DR:** The frequency you listen on, in MHz (megahertz).
+> 💡 **TL;DR:** The frequency you listen on, in MHz (megahertz).
 
 - Example: `146.520` is the national 2 m simplex calling frequency in the US.
 - When you use a repeater, this is the repeater's *output*, the frequency you hear it on. Your transmit frequency comes from [Duplex](duplex.md) and [Offset](offset.md).

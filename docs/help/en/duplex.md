@@ -1,4 +1,4 @@
-**TL;DR:** Whether you transmit on the same frequency you listen on, or a shifted one.
+> 💡 **TL;DR:** Whether you transmit on the same frequency you listen on, or a shifted one.
 
 - **(blank)**: *simplex*. You talk and listen on the same frequency, radio to radio.
 - **+**: transmit [Offset](offset.md) MHz *above* the receive frequency.

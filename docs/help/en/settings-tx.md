@@ -1,4 +1,4 @@
-**TL;DR:** Power level for USER channels, and transmit timers and alerts.
+> 💡 **TL;DR:** Power level for USER channels, and transmit timers and alerts.
 
 ### SetPwr
 The power a channel uses when its Power is set to **USER**. Change it here (or in the radio menu) and every USER channel follows.

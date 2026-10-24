@@ -1,4 +1,4 @@
-**TL;DR:** How far your transmit frequency moves away from the receive frequency, in MHz.
+> 💡 **TL;DR:** How far your transmit frequency moves away from the receive frequency, in MHz.
 
 - Only used when [Duplex](duplex.md) is + or −. With simplex it's ignored.
 - Common US values: **0.6** on 2 m (144–148 MHz) and **5** on 70 cm (420–450 MHz).

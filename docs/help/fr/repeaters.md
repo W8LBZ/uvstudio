@@ -1,4 +1,4 @@
-**En bref :** un relais est une station radio placée sur un point haut qui retransmet votre signal bien plus loin que votre portatif. Pour l’utiliser, il faut trois informations de sa fiche : sa fréquence, son décalage et sa tonalité.
+> 💡 **En bref :** un relais est une station radio placée sur un point haut qui retransmet votre signal bien plus loin que votre portatif. Pour l’utiliser, il faut trois informations de sa fiche : sa fréquence, son décalage et sa tonalité.
 
 ### Fonctionnement
 Le relais écoute sur une fréquence (son *entrée*) et émet sur une autre (sa *sortie*) en même temps. Vous écoutez sa sortie et émettez sur son entrée.

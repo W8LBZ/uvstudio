@@ -1,4 +1,4 @@
-**En bref :** lisez les réglages du menu de la radio, modifiez-les ici, puis écrivez-les. Rien n’arrive à la radio avant d’appuyer sur **Écrire les changements**.
+> 💡 **En bref :** lisez les réglages du menu de la radio, modifiez-les ici, puis écrivez-les. Rien n’arrive à la radio avant d’appuyer sur **Écrire les changements**.
 
 ### Lire et écrire
 - **Lire depuis la radio** charge les réglages. Les groupes n’apparaissent qu’après une lecture.

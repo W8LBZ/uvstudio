@@ -1,4 +1,4 @@
-**TL;DR:** How scanning picks channels, and what happens when it finds a signal.
+> 💡 **TL;DR:** How scanning picks channels, and what happens when it finds a signal.
 
 ### ScList
 Which scan list the radio scans: one list (**01** to **24**), **ALL** channels, or **MIX** (the lists ticked in **ScMix**). A channel's list is set in the Memories table.

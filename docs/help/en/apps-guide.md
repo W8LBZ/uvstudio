@@ -1,4 +1,4 @@
-**TL;DR:** Labs edition only. Small extra programs (tools, radio utilities, games) that you install on the radio and start from its **F + 7** menu.
+> 💡 **TL;DR:** Labs edition only. Small extra programs (tools, radio utilities, games) that you install on the radio and start from its **F + 7** menu.
 
 - **On your radio** lists the installed apps. Press **Read apps from radio** to refresh, then reorder, update or delete them.
 - **Catalog** offers apps that match your firmware version. Pick one and install it into a free slot.

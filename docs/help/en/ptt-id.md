@@ -1,4 +1,4 @@
-**TL;DR:** Sends a short burst of tones when you press and/or release the talk button.
+> 💡 **TL;DR:** Sends a short burst of tones when you press and/or release the talk button.
 
 - **OFF**: nothing sent. Normal for ham use.
 - **UP**: sends your DTMF ID when you press PTT.

@@ -1,4 +1,4 @@
-**TL;DR:** A filter for your own speaker. The radio stays silent until it hears a signal carrying this code.
+> 💡 **TL;DR:** A filter for your own speaker. The radio stays silent until it hears a signal carrying this code.
 
 - Nothing is sent, and repeaters don't care about it. It only changes what *you* hear.
 - **Blank** (most common): you hear everything on the frequency.

@@ -1,4 +1,4 @@
-**TL;DR:** A short label the radio shows instead of the frequency.
+> 💡 **TL;DR:** A short label the radio shows instead of the frequency.
 
 - Up to 10 characters. Letters, numbers and simple symbols work best.
 - Pick something you'll recognize at a glance: a repeater's call sign, a club name, "CALLING".

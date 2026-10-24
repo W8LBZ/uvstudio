@@ -1,4 +1,4 @@
-**En bref :** lisez la radio, modifiez le tableau, puis écrivez les changements. Rien n’arrive à la radio avant d’appuyer sur **Écrire les changements**, vous pouvez donc essayer librement jusque-là.
+> 💡 **En bref :** lisez la radio, modifiez le tableau, puis écrivez les changements. Rien n’arrive à la radio avant d’appuyer sur **Écrire les changements**, vous pouvez donc essayer librement jusque-là.
 
 ### Lire et écrire
 - **Lire depuis la radio** charge les 1024 canaux, les VFO et les noms des listes de scan dans la page.

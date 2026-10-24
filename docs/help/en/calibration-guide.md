@@ -1,4 +1,4 @@
-**TL;DR:** Calibration is a small block of factory-measured data, unique to **your** radio, that keeps its power, frequency and signal meter accurate. Back it up once and keep the file safe. Only restore it to the same radio.
+> 💡 **TL;DR:** Calibration is a small block of factory-measured data, unique to **your** radio, that keeps its power, frequency and signal meter accurate. Back it up once and keep the file safe. Only restore it to the same radio.
 
 ### Back up
 - With the radio in normal mode, press **Read calibration data**, then download `calibration.dat`.

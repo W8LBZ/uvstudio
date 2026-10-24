@@ -1,4 +1,4 @@
-**En bref :** écouter est permis presque partout. Émettre ne l’est pas : sur les bandes radioamateur il faut une licence radioamateur, et la plupart des autres fréquences appartiennent à des services pour lesquels cette radio n’est pas homologuée. Vous êtes responsable du respect des règles de votre pays.
+> 💡 **En bref :** écouter est permis presque partout. Émettre ne l’est pas : sur les bandes radioamateur il faut une licence radioamateur, et la plupart des autres fréquences appartiennent à des services pour lesquels cette radio n’est pas homologuée. Vous êtes responsable du respect des règles de votre pays.
 
 Cette page donne des repères généraux, pas un avis juridique.
 

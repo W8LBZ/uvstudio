@@ -1,4 +1,4 @@
-**En bref :** exclure ce canal du scan.
+> 💡 **En bref :** exclure ce canal du scan.
 
 - Coché : le scan passe par-dessus. Vous pouvez toujours le choisir à la main.
 - Pratique pour un canal bruyant que vous voulez garder sans l’entendre pendant un scan.

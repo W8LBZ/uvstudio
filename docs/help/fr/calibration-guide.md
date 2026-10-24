@@ -1,4 +1,4 @@
-**En bref :** la calibration est un petit bloc de données mesurées en usine, propre à **votre** radio, qui garde justes sa puissance, sa fréquence et son S-mètre. Sauvegardez-la une fois et gardez le fichier en lieu sûr. Ne la restaurez que sur la même radio.
+> 💡 **En bref :** la calibration est un petit bloc de données mesurées en usine, propre à **votre** radio, qui garde justes sa puissance, sa fréquence et son S-mètre. Sauvegardez-la une fois et gardez le fichier en lieu sûr. Ne la restaurez que sur la même radio.
 
 ### Sauvegarder
 - Radio en mode normal, appuyez sur **Lire les données de calibration**, puis téléchargez `calibration.dat`.

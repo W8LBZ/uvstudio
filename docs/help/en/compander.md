@@ -1,4 +1,4 @@
-**TL;DR:** Audio compression that cuts hiss. Both radios need it on for it to sound right.
+> 💡 **TL;DR:** Audio compression that cuts hiss. Both radios need it on for it to sound right.
 
 - **OFF**: normal. Use this unless you know the other side uses a compander.
 - **TX**: compress what you send.

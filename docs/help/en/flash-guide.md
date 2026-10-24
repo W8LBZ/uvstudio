@@ -1,4 +1,4 @@
-**TL;DR:** Installs new firmware (the radio's operating software) on the radio. Back up your calibration first (see [Calibration](calibration-guide.md)).
+> 💡 **TL;DR:** Installs new firmware (the radio's operating software) on the radio. Back up your calibration first (see [Calibration](calibration-guide.md)).
 
 ### Before you start
 - Save a calibration backup while the radio still works normally.

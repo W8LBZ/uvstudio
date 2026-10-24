@@ -1,4 +1,4 @@
-**TL;DR:** Which group this channel belongs to when the radio scans.
+> 💡 **TL;DR:** Which group this channel belongs to when the radio scans.
 
 - Lists **1–24** let you scan only a set of channels, such as your local repeaters or airband.
 - **All**: the channel is in every list.

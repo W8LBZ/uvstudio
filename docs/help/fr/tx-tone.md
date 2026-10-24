@@ -1,4 +1,4 @@
-**En bref :** un code inaudible envoyé avec votre voix. Beaucoup de relais vous ignorent si vous n’envoyez pas le bon.
+> 💡 **En bref :** un code inaudible envoyé avec votre voix. Beaucoup de relais vous ignorent si vous n’envoyez pas le bon.
 
 - Si la fiche d’un relais indique une tonalité « CTCSS » ou « subaudible », mettez-la ici (par exemple `88.5`).
 - **Vide** : aucune tonalité envoyée.

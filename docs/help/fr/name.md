@@ -1,4 +1,4 @@
-**En bref :** une courte étiquette que la radio affiche à la place de la fréquence.
+> 💡 **En bref :** une courte étiquette que la radio affiche à la place de la fréquence.
 
 - 10 caractères maximum. Lettres, chiffres et symboles simples de préférence.
 - Choisissez un nom reconnaissable d’un coup d’œil : l’indicatif d’un relais, le nom d’un club, « APPEL ».

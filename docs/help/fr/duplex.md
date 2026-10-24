@@ -1,4 +1,4 @@
-**En bref :** émettre sur la fréquence d’écoute, ou sur une fréquence décalée.
+> 💡 **En bref :** émettre sur la fréquence d’écoute, ou sur une fréquence décalée.
 
 - **(vide)** : *simplex*. Vous émettez et écoutez sur la même fréquence, de radio à radio.
 - **+** : émission [Décalage](offset.md) MHz *au-dessus* de la fréquence de réception.

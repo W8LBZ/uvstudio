@@ -1,4 +1,4 @@
-**En bref :** les fréquences « libres » de la radio, une paire (A et B) par bande, par opposition aux canaux mémoire.
+> 💡 **En bref :** les fréquences « libres » de la radio, une paire (A et B) par bande, par opposition aux canaux mémoire.
 
 - Le VFO, c’est ce que vous voyez en mode fréquence quand vous tapez ou tournez une fréquence.
 - La radio retient la dernière fréquence et les réglages VFO de chaque bande. Ces lignes permettent de les régler directement.

@@ -1,4 +1,4 @@
-**TL;DR:** Read from the radio, edit the table, then write the changes back. Nothing reaches the radio until you press **Write changes to radio**, so you can experiment freely until then.
+> 💡 **TL;DR:** Read from the radio, edit the table, then write the changes back. Nothing reaches the radio until you press **Write changes to radio**, so you can experiment freely until then.
 
 ### Read and write
 - **Read from radio** loads all 1024 channels, the VFOs and the scan list names into the page.

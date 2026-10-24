@@ -1,4 +1,4 @@
-**En bref :** le logo de démarrage est l’image affichée à l’allumage. Vous pouvez lire l’actuel ou envoyer le vôtre.
+> 💡 **En bref :** le logo de démarrage est l’image affichée à l’allumage. Vous pouvez lire l’actuel ou envoyer le vôtre.
 
 ### Lire
 Appuyez sur **Lire le logo de la radio** pour voir le logo actuel, puis téléchargez-le en PNG.

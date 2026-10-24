@@ -1,4 +1,4 @@
-**En bref :** édition Labs uniquement. Sauvegarde et restauration complètes de la puce mémoire externe de 2 Mo (logo, slots firmware, apps, banques de réglages). Pour utilisateurs avertis.
+> 💡 **En bref :** édition Labs uniquement. Sauvegarde et restauration complètes de la puce mémoire externe de 2 Mo (logo, slots firmware, apps, banques de réglages). Pour utilisateurs avertis.
 
 ### Sauvegarder
 **Lire la flash externe** copie toute la puce dans un fichier .bin. Cela peut prendre plusieurs minutes. Gardez la radio connectée jusqu’à la fin.

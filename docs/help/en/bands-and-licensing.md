@@ -1,4 +1,4 @@
-**TL;DR:** Listening is allowed almost everywhere. Transmitting is not: on amateur (ham) bands you need an amateur license, and most other frequencies belong to services this radio isn't approved for. You're responsible for following your country's rules.
+> 💡 **TL;DR:** Listening is allowed almost everywhere. Transmitting is not: on amateur (ham) bands you need an amateur license, and most other frequencies belong to services this radio isn't approved for. You're responsible for following your country's rules.
 
 This page is general guidance, not legal advice.
 

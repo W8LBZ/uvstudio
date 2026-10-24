@@ -1,4 +1,4 @@
-**TL;DR:** Labs edition only. A full backup and restore of the radio's 2 MB external memory chip (logo, firmware slots, apps, settings banks). For advanced users.
+> 💡 **TL;DR:** Labs edition only. A full backup and restore of the radio's 2 MB external memory chip (logo, firmware slots, apps, settings banks). For advanced users.
 
 ### Back up
 **Read external flash** copies the whole chip to a .bin file. It can take several minutes. Keep the radio connected until it finishes.

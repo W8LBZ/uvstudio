@@ -1,4 +1,4 @@
-**En bref :** le squelch garde le haut-parleur muet tant que le signal n’est pas assez fort. Les tonalités (CTCSS/DCS) ajoutent un second contrôle : le bon code doit aussi être présent.
+> 💡 **En bref :** le squelch garde le haut-parleur muet tant que le signal n’est pas assez fort. Les tonalités (CTCSS/DCS) ajoutent un second contrôle : le bon code doit aussi être présent.
 
 ### Squelch
 - Le réglage **[Sql](settings-radio.md#sql)** de la radio fixe la force de signal nécessaire pour ouvrir le haut-parleur.

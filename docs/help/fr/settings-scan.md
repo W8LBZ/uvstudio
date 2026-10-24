@@ -1,4 +1,4 @@
-**En bref :** comment le scan choisit les canaux, et ce qu’il fait quand il trouve un signal.
+> 💡 **En bref :** comment le scan choisit les canaux, et ce qu’il fait quand il trouve un signal.
 
 ### ScList
 La liste scannée : une liste (**01** à **24**), **ALL** pour tous les canaux, ou **MIX** (les listes cochées dans **ScMix**). La liste d’un canal se règle dans le tableau Mémoires.

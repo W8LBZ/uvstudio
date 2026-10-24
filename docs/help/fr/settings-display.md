@@ -1,4 +1,4 @@
-**En bref :** ce qu’affiche l’écran et le comportement du rétroéclairage. Rien ici n’affecte les performances radio : essayez librement.
+> 💡 **En bref :** ce qu’affiche l’écran et le comportement du rétroéclairage. Rien ici n’affecte les performances radio : essayez librement.
 
 ### ChDisp
 Affichage des canaux mémoire : fréquence, numéro de canal, nom, ou nom avec la fréquence en dessous.

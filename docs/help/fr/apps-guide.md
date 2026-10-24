@@ -1,4 +1,4 @@
-**En bref :** édition Labs uniquement. De petits programmes supplémentaires (outils, utilitaires radio, jeux) que vous installez sur la radio et lancez depuis son menu **F + 7**.
+> 💡 **En bref :** édition Labs uniquement. De petits programmes supplémentaires (outils, utilitaires radio, jeux) que vous installez sur la radio et lancez depuis son menu **F + 7**.
 
 - **Sur votre radio** liste les apps installées. Appuyez sur **Lire les apps de la radio** pour actualiser, puis réordonnez, mettez à jour ou supprimez-les.
 - **Catalogue** propose les apps adaptées à votre version de firmware. Choisissez-en une et installez-la dans un slot libre.

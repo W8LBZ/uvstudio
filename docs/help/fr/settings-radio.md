@@ -1,4 +1,4 @@
-**En bref :** comment la radio reçoit, émet et sonne. Si vous débutez, les valeurs par défaut conviennent. **Sql** est le réglage que l’on change le plus.
+> 💡 **En bref :** comment la radio reçoit, émet et sonne. Si vous débutez, les valeurs par défaut conviennent. **Sql** est le réglage que l’on change le plus.
 
 ### Sql
 Squelch : le niveau de signal nécessaire pour ouvrir le haut-parleur. **0** reste toujours ouvert (souffle permanent). Plus le chiffre est haut, plus c’est silencieux, au risque de couper les stations faibles. 3 à 5 convient à la plupart.
@@ -15,7 +15,7 @@ Gain du micro, de **+1,5 dB** (le plus faible) à **+31,5 dB** (le plus fort). A
 Émission déclenchée par la voix : parler dans la radio lance l’émission sans appuyer sur PTT, et elle s’arrête peu après le silence.
 - **OFF** (conseillé pour débuter) : vous appuyez toujours sur PTT.
 - **1 à 10** : le volume sonore nécessaire pour déclencher l’émission. Si elle se déclenche sur le bruit de fond ou la respiration, changez le niveau d’un cran ; si elle coupe le début de vos mots, allez dans l’autre sens.
-- Le VOX peut émettre par accident (une toux, une pièce bruyante). Coupez-le quand vous posez la radio.
+- ⚠️ Le VOX peut émettre par accident (une toux, une pièce bruyante). Coupez-le quand vous posez la radio.
 
 ### RxMode
 Comment la radio écoute avec ses deux VFO (A et B) :
@@ -28,12 +28,22 @@ Comment la radio écoute avec ses deux VFO (A et B) :
 - Les deux modes FULL ne sont pas présents dans toutes les éditions du firmware.
 
 ### BatSav
-Économiseur de batterie. Quand la radio reste inactive sur l’écran principal une dizaine de secondes, le récepteur fait de petites siestes : il se réveille 0,1 s pour chercher un signal, puis dort un moment, en boucle.
-- Le chiffre après **1:** est la durée de sommeil pour chaque 0,1 s d’éveil : **1:1** dort 0,1 s, **1:2** 0,2 s … **1:5** 0,5 s.
-- Plus le chiffre est haut, plus la batterie dure (à 1:5 le récepteur est éteint la plupart du temps), mais la radio peut mettre jusqu’à cette durée pour remarquer un appel : le premier mot peut être coupé.
+Économiseur de batterie. Quand la radio reste inactive sur l’écran principal une dizaine de secondes, le récepteur fait de petites siestes : il se réveille brièvement pour chercher un signal, se rendort, et recommence.
+
+**1:N** est le rapport entre éveil et sommeil. Le récepteur est toujours éveillé 1 part (100 ms, un dixième de seconde), puis endormi N parts :
+
+| Réglage | Éveil | Sommeil | Récepteur éteint |
+|---|---|---|---|
+| **1:1** | 100 ms | 100 ms | la moitié du temps |
+| **1:2** | 100 ms | 200 ms | 2/3 du temps |
+| **1:3** | 100 ms | 300 ms | 3/4 du temps |
+| **1:4** | 100 ms | 400 ms | 4/5 du temps |
+| **1:5** | 100 ms | 500 ms | 5/6 du temps |
+
+- 🔋 Plus N est grand, plus la batterie dure, mais un appel peut arriver pendant le sommeil : le premier mot peut être coupé (jusqu’à une demi-seconde à 1:5).
 - **OFF** : le récepteur ne dort jamais. Consomme le plus, ne manque rien.
 - Il ne dort que lorsqu’il ne se passe rien : pas pendant une réception, un scan, une émission, dans un menu ou en écoute de la radio FM.
-- **1:4** est la valeur par défaut du firmware et un bon compromis.
+- 👍 **1:4** est la valeur par défaut du firmware et un bon compromis.
 
 ### BatTyp
 Le modèle de batterie installé, pour que la jauge soit juste.

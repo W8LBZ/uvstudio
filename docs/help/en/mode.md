@@ -1,4 +1,4 @@
-**TL;DR:** How the voice is put onto the radio wave. Match whatever the other station uses.
+> 💡 **TL;DR:** How the voice is put onto the radio wave. Match whatever the other station uses.
 
 - **FM**: wide FM. Standard for ham repeaters and simplex on 2 m and 70 cm.
 - **NFM**: narrow FM. Used by many repeaters outside the US, plus GMRS/FRS/PMR446-style channels. It sounds quieter and muffled if the other side is wide.

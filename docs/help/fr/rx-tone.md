@@ -1,4 +1,4 @@
-**En bref :** un filtre pour votre propre haut-parleur. La radio reste muette tant qu’elle n’entend pas un signal portant ce code.
+> 💡 **En bref :** un filtre pour votre propre haut-parleur. La radio reste muette tant qu’elle n’entend pas un signal portant ce code.
 
 - Rien n’est envoyé, et les relais n’en tiennent pas compte. Seul ce que *vous* entendez change.
 - **Vide** (le plus courant) : vous entendez tout ce qui passe sur la fréquence.

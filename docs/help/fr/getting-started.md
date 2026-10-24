@@ -1,4 +1,4 @@
-**En bref :** sauvegardez d’abord, changez peu à la fois, et n’écrivez que lorsque vous êtes satisfait. Vous pouvez toujours restaurer une sauvegarde.
+> 💡 **En bref :** sauvegardez d’abord, changez peu à la fois, et n’écrivez que lorsque vous êtes satisfait. Vous pouvez toujours restaurer une sauvegarde.
 
 ### 1. Connecter
 Utilisez un câble USB de programmation qui transmet les données. Allumez la radio normalement, puis appuyez sur **Lire depuis la radio** sur n’importe quelle page et choisissez le port série de la radio.

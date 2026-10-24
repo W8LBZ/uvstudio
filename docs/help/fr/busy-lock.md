@@ -1,4 +1,4 @@
-**En bref :** empêche d’émettre pendant que quelqu’un parle sur ce canal.
+> 💡 **En bref :** empêche d’émettre pendant que quelqu’un parle sur ce canal.
 
 - Coché : appuyer sur PTT ne fait rien tant qu’un signal est reçu. Vous évitez de couper la parole.
 - Décoché : vous pouvez toujours émettre.

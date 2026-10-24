@@ -1,4 +1,4 @@
-**TL;DR:** Keeps this channel inside the radio's allowed transmit band plan (the **F Lock** setting).
+> 💡 **TL;DR:** Keeps this channel inside the radio's allowed transmit band plan (the **F Lock** setting).
 
 - **Checked (default)**: the channel can only transmit where F Lock allows. Leave it on.
 - **Unchecked**: this channel ignores F Lock and can transmit anywhere the hardware can.
