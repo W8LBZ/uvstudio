@@ -4,12 +4,12 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.0.0-w8lbz.10"></script>
+    <script src="js/studio-version.js?v=2.0.0-w8lbz.11"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
 <link href="css/tools.css?v=64" rel="stylesheet">
-<link href="css/studio.css?v=28" rel="stylesheet">
+<link href="css/studio.css?v=29" rel="stylesheet">
 </head>
 <body data-theme="light">
 
@@ -426,22 +426,22 @@
                                 <tr>
                                     <th><input type="checkbox" id="memSelectAll" aria-label="Select all shown" data-i18n-aria-label="memSelectAll"></th>
                                     <th class="slot-col-idx">#</th>
-                                    <th data-i18n="memColName">Name</th>
-                                    <th data-i18n="memColFreq">Frequency (MHz)</th>
-                                    <th data-i18n="memColDuplex">Duplex</th>
-                                    <th data-i18n="memColOffset">Offset (MHz)</th>
-                                    <th data-i18n="memColMode">Mode</th>
-                                    <th data-i18n="memColTxTone">TX tone</th>
-                                    <th data-i18n="memColRxTone">RX tone</th>
-                                    <th data-i18n="memColPower">Power</th>
-                                    <th data-i18n="memColStep">Step (kHz)</th>
-                                    <th data-i18n="memColScanList">Scan list</th>
-                                    <th data-i18n="memColSkip">Skip</th>
-                                    <th data-i18n="memColTxLock" data-i18n-title="memTxLockHint" title="Apply the F Lock band plan to this channel">TX lock</th>
-                                    <th data-i18n="memColBusy">Busy lock</th>
-                                    <th data-i18n="memColReverse">Reverse</th>
-                                    <th data-i18n="memColCompander">Compander</th>
-                                    <th data-i18n="memColPttId">PTT ID</th>
+                                    <th data-help="name" data-i18n="memColName">Name</th>
+                                    <th data-help="frequency" data-i18n="memColFreq">Frequency (MHz)</th>
+                                    <th data-help="duplex" data-i18n="memColDuplex">Duplex</th>
+                                    <th data-help="offset" data-i18n="memColOffset">Offset (MHz)</th>
+                                    <th data-help="mode" data-i18n="memColMode">Mode</th>
+                                    <th data-help="tones" data-i18n="memColTxTone">TX tone</th>
+                                    <th data-help="tones" data-i18n="memColRxTone">RX tone</th>
+                                    <th data-help="power" data-i18n="memColPower">Power</th>
+                                    <th data-help="step" data-i18n="memColStep">Step (kHz)</th>
+                                    <th data-help="scan-list" data-i18n="memColScanList">Scan list</th>
+                                    <th data-help="skip" data-i18n="memColSkip">Skip</th>
+                                    <th data-help="tx-lock" data-i18n="memColTxLock" data-i18n-title="memTxLockHint" title="Apply the F Lock band plan to this channel">TX lock</th>
+                                    <th data-help="busy-lock" data-i18n="memColBusy">Busy lock</th>
+                                    <th data-help="reverse" data-i18n="memColReverse">Reverse</th>
+                                    <th data-help="compander" data-i18n="memColCompander">Compander</th>
+                                    <th data-help="ptt-id" data-i18n="memColPttId">PTT ID</th>
                                     <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
                                 </tr>
                             </thead>
@@ -455,19 +455,19 @@
                             <table class="slots-table mem-table">
                                 <thead>
                                     <tr>
-                                        <th data-i18n="memColVfo">VFO</th>
-                                        <th data-i18n="memColFreq">Frequency (MHz)</th>
-                                        <th data-i18n="memColDuplex">Duplex</th>
-                                        <th data-i18n="memColOffset">Offset (MHz)</th>
-                                        <th data-i18n="memColMode">Mode</th>
-                                        <th data-i18n="memColTxTone">TX tone</th>
-                                        <th data-i18n="memColRxTone">RX tone</th>
-                                        <th data-i18n="memColPower">Power</th>
-                                        <th data-i18n="memColStep">Step (kHz)</th>
-                                        <th data-i18n="memColTxLock">TX lock</th>
-                                        <th data-i18n="memColBusy">Busy lock</th>
-                                        <th data-i18n="memColReverse">Reverse</th>
-                                        <th data-i18n="memColPttId">PTT ID</th>
+                                        <th data-help="vfo" data-i18n="memColVfo">VFO</th>
+                                        <th data-help="frequency" data-i18n="memColFreq">Frequency (MHz)</th>
+                                        <th data-help="duplex" data-i18n="memColDuplex">Duplex</th>
+                                        <th data-help="offset" data-i18n="memColOffset">Offset (MHz)</th>
+                                        <th data-help="mode" data-i18n="memColMode">Mode</th>
+                                        <th data-help="tones" data-i18n="memColTxTone">TX tone</th>
+                                        <th data-help="tones" data-i18n="memColRxTone">RX tone</th>
+                                        <th data-help="power" data-i18n="memColPower">Power</th>
+                                        <th data-help="step" data-i18n="memColStep">Step (kHz)</th>
+                                        <th data-help="tx-lock" data-i18n="memColTxLock">TX lock</th>
+                                        <th data-help="busy-lock" data-i18n="memColBusy">Busy lock</th>
+                                        <th data-help="reverse" data-i18n="memColReverse">Reverse</th>
+                                        <th data-help="ptt-id" data-i18n="memColPttId">PTT ID</th>
                                     </tr>
                                 </thead>
                                 <tbody id="memVfoBody"></tbody>
@@ -1031,6 +1031,6 @@
 <script src="js/studio.js?v=22"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 <script src="js/vendor/marked.min.js?v=12.0.2"></script>
-<script src="js/doc-viewer.js?v=1"></script>
+<script src="js/doc-viewer.js?v=2"></script>
 </body>
 </html>

@@ -517,3 +517,6 @@ body.sidebar-collapsed .sidebar {
 .doc-body table { border-collapse: collapse; }
 .doc-body th, .doc-body td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
 .doc-body img { max-width: 100%; }
+/* Field help: the label itself opens the help page; no extra icons. */
+.has-help { cursor: help; text-decoration: underline dotted; text-decoration-color: var(--text-muted); text-underline-offset: 3px; }
+.has-help:hover, .has-help:focus-visible { color: var(--accent); text-decoration-color: var(--accent); }

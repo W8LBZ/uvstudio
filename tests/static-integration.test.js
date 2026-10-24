@@ -885,3 +885,11 @@ test('opens project documents in the in-page viewer', () => {
   assert.ok(fs.existsSync(path.join(root, 'js', 'vendor', 'marked.min.js')));
   assert.match(fs.readFileSync(path.join(root, 'NOTICE'), 'utf8'), /marked v12\.0\.2/);
 });
+
+test('every field help topic has an English page', () => {
+  const topics = [...new Set([...html.matchAll(/data-help="([^"]+)"/g)].map(m => m[1]))];
+  assert.ok(topics.length >= 16);
+  for (const topic of topics) {
+    assert.ok(fs.existsSync(path.join(root, 'docs', 'help', 'en', `${topic}.md`)), `docs/help/en/${topic}.md`);
+  }
+});
