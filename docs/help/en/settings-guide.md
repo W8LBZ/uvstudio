@@ -10,7 +10,7 @@
 - A backup never restores the radio's lock key or firmware version stamp, so it's safe to load onto another radio of the same model.
 
 ### What each group covers
-Click a group title or a setting name for its help.
+Click a setting name for its help. Click a group title to fold or unfold the group; your choice is remembered, and **FM radio** starts folded.
 - [Radio](settings-radio.md): squelch, receive modes, battery saver, audio.
 - [Display](settings-display.md): screen, backlight, power-on message.
 - [Keys](settings-keys.md): side buttons, key lock, PTT style.

@@ -247,6 +247,9 @@
 
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
   const groupKey = g => `setGroup_${g}`;
+  // Folded groups survive re-renders and reloads; FM radio (48 presets) starts folded.
+  const prefs = window.UVStudioPreferences;
+  const folded = new Set((() => { try { return JSON.parse(prefs.get('settingsFolded', '["fm"]')); } catch { return ['fm']; } })());
   const dirtyIds = () => (radioImage ? S.FIELDS.filter(f =>
     String(S.getValue(radioImage, f.id)) !== String(S.getValue(image, f.id))).map(f => f.id) : []);
 
@@ -279,11 +282,11 @@
     } else {
       const dirty = new Set(dirtyIds());
       const help = (topic, pageTitle) => (topic ? ` data-help="${topic}" data-help-title="${escapeHtml(pageTitle)}" tabindex="0" role="button"` : '');
-      form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend><span${help(`settings-${group}`, t(groupKey(group)))}>${escapeHtml(t(groupKey(group)))}</span></legend>` +
+      form.innerHTML = S.GROUPS.map(group => `<details class="set-group" data-group="${group}"${folded.has(group) ? '' : ' open'}><summary>${escapeHtml(t(groupKey(group)))}</summary>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
           `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
           `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f), t(groupKey(f.group)))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
-        ).join('') + '</fieldset>').join('');
+        ).join('') + '</details>').join('');
     }
     updateState();
   }
@@ -385,6 +388,14 @@
     render();
     log(t('memBackupLoaded', file.name), 'success');
   });
+
+  // toggle doesn't bubble, so listen in the capture phase.
+  form.addEventListener('toggle', e => {
+    const group = e.target.dataset?.group;
+    if (!group) return;
+    if (e.target.open) folded.delete(group); else folded.add(group);
+    prefs.set('settingsFolded', JSON.stringify([...folded]));
+  }, true);
 
   window.addEventListener('uvstudio:serialstatechange', event => {
     busy = Boolean(event.detail?.operation);

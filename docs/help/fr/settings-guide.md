@@ -10,7 +10,7 @@
 - Une sauvegarde ne restaure jamais la clé de verrouillage ni le numéro de version du firmware : on peut donc la charger sans risque sur une autre radio du même modèle.
 
 ### Contenu de chaque groupe
-Cliquez sur le titre d’un groupe ou le nom d’un réglage pour son aide.
+Cliquez sur le nom d’un réglage pour son aide. Cliquez sur le titre d’un groupe pour le replier ou le déplier ; votre choix est mémorisé, et **Radio FM** démarre replié.
 - [Radio](settings-radio.md) : squelch, modes de réception, économiseur de batterie, audio.
 - [Affichage](settings-display.md) : écran, rétroéclairage, message d’accueil.
 - [Touches](settings-keys.md) : boutons latéraux, verrouillage, style de PTT.
