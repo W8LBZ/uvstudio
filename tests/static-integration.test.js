@@ -892,4 +892,10 @@ test('every field help topic has an English page', () => {
   for (const topic of topics) {
     assert.ok(fs.existsSync(path.join(root, 'docs', 'help', 'en', `${topic}.md`)), `docs/help/en/${topic}.md`);
   }
+  // A translated help folder is all or nothing, so one language never mixes in English pages.
+  const helpDir = path.join(root, 'docs', 'help');
+  const english = fs.readdirSync(path.join(helpDir, 'en')).sort();
+  for (const lang of fs.readdirSync(helpDir)) {
+    assert.deepEqual(fs.readdirSync(path.join(helpDir, lang)).sort(), english, `docs/help/${lang}`);
+  }
 });

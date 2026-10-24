@@ -73,8 +73,8 @@
       return;
     }
     e.preventDefault();
-    const base = a.closest('#docModalBody') ? current : location.href;
-    show([new URL(href, base).href], a.textContent.trim() || href);
+    const url = new URL(href, a.closest('#docModalBody') ? current : location.href).href;
+    show([...new Set([url, url.replace(/\/docs\/help\/[^/]+\//, '/docs/help/en/')])], a.textContent.trim() || href);
   });
   document.addEventListener('keydown', (e) => {
     const help = e.target.closest && e.target.closest('[data-help]');
