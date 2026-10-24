@@ -878,3 +878,10 @@ test('gates every Labs-only feature on one Labs modal, before any confirmation',
   gateThen('async function runFactoryReset', "showFactoryResetModal('confirm'");
   gateThen("beginToolsOperation('restore-flash'", 'confirmExternalFlashRestore()');
 });
+
+test('opens project documents in the in-page viewer', () => {
+  assert.match(html, /<div class="modal" id="docModal"[\s\S]*id="docModalBody"/);
+  assert.match(html, /src="js\/vendor\/marked\.min\.js[^"]*"><\/script>\s*<script src="js\/doc-viewer\.js/);
+  assert.ok(fs.existsSync(path.join(root, 'js', 'vendor', 'marked.min.js')));
+  assert.match(fs.readFileSync(path.join(root, 'NOTICE'), 'utf8'), /marked v12\.0\.2/);
+});

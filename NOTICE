@@ -8,3 +8,9 @@ Copyright 2025 Armel FAUVEAU
 
 UVTools2
 Copyright 2025 Armel FAUVEAU
+
+W8LBZ fork (https://github.com/W8LBZ/uvstudio) bundles:
+
+marked v12.0.2 (js/vendor/marked.min.js)
+Copyright (c) 2011-2024, Christopher Jeffrey. MIT License.
+https://github.com/markedjs/marked

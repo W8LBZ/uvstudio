@@ -499,3 +499,21 @@ body.sidebar-collapsed .sidebar {
         justify-content: space-between;
     }
 }
+
+/* Project documents viewer (js/doc-viewer.js) */
+.modal-content.doc-modal { max-width: 860px; max-height: 85vh; }
+.doc-body { color: var(--text); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.doc-body h1, .doc-body h2, .doc-body h3 { margin: 1.2em 0 0.5em; line-height: 1.3; }
+.doc-body h1:first-child, .doc-body h2:first-child { margin-top: 0; }
+.doc-body h1 { font-size: 22px; }
+.doc-body h2 { font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.doc-body h3 { font-size: 15px; }
+.doc-body p, .doc-body ul, .doc-body ol, .doc-body pre, .doc-body table { margin: 0 0 0.9em; }
+.doc-body ul, .doc-body ol { padding-left: 1.4em; }
+.doc-body a { color: var(--accent); }
+.doc-body code { font-family: ui-monospace, monospace; font-size: 0.9em; background: var(--bg); padding: 1px 4px; border-radius: 4px; }
+.doc-body pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12.5px; }
+.doc-body pre code { background: none; padding: 0; }
+.doc-body table { border-collapse: collapse; }
+.doc-body th, .doc-body td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
+.doc-body img { max-width: 100%; }
