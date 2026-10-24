@@ -4,12 +4,12 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.0.0-w8lbz.16"></script>
+    <script src="js/studio-version.js?v=2.0.0-w8lbz.17"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=66" rel="stylesheet">
-<link href="css/studio.css?v=30" rel="stylesheet">
+<link href="css/tools.css?v=67" rel="stylesheet">
+<link href="css/studio.css?v=32" rel="stylesheet">
 </head>
 <body data-theme="light">
 
@@ -939,6 +939,28 @@
     </div>
 </div>
 
+<!-- W8LBZ fork: one-time license acknowledgement before the first radio write (js/license-ack.js) -->
+<div class="modal" id="licenseAckModal" role="dialog" aria-modal="true"
+     aria-labelledby="licenseAckTitle" aria-describedby="licenseAckBody" aria-hidden="true">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="licenseAckTitle" data-i18n="licenseTitle">Before you write to the radio</h2>
+            <button class="modal-close" id="licenseAckClose" type="button"
+                    data-i18n-title="appClose" data-i18n-aria-label="appClose"
+                    title="Close" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="licenseAckBody" data-i18n="licenseBody">UV Studio can set this radio up to transmit on many frequencies. Transmitting usually needs a license: an amateur radio license on ham bands, and certified equipment for most other services. Transmitting where you aren't authorized can break the law where you live.</p>
+            <p class="license-statement" data-i18n="licenseStatement">I hold an amateur radio license, or I will only transmit where I'm legally allowed to. I'm responsible for how I use this radio.</p>
+            <p><span data-help="bands-and-licensing" data-i18n="licenseReadMore">Bands and licensing</span></p>
+            <div class="modal-actions">
+                <button class="btn" id="licenseAckLater" type="button" data-i18n="licenseLater">Not now</button>
+                <button class="btn primary" id="licenseAckAgree" type="button" data-i18n="licenseAgree">I agree</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Overlay-apps capability notice: shown when the booted firmware has no 0x073x support -->
 <div class="modal" id="labsRequiredModal" role="dialog" aria-modal="true"
      aria-labelledby="labsRequiredTitle" aria-hidden="true">
@@ -1019,30 +1041,31 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=71"></script>
-<script src="locales/fr.js?v=71"></script>
-<script src="locales/it.js?v=71"></script>
-<script src="locales/es.js?v=71"></script>
-<script src="locales/de.js?v=71"></script>
-<script src="locales/pt.js?v=71"></script>
-<script src="locales/ru.js?v=71"></script>
-<script src="locales/pl.js?v=71"></script>
-<script src="locales/zh.js?v=71"></script>
-<script src="locales/nl.js?v=71"></script>
+<script src="locales/en.js?v=72"></script>
+<script src="locales/fr.js?v=72"></script>
+<script src="locales/it.js?v=72"></script>
+<script src="locales/es.js?v=72"></script>
+<script src="locales/de.js?v=72"></script>
+<script src="locales/pt.js?v=72"></script>
+<script src="locales/ru.js?v=72"></script>
+<script src="locales/pl.js?v=72"></script>
+<script src="locales/zh.js?v=72"></script>
+<script src="locales/nl.js?v=72"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=3"></script>
 <script src="js/rf-log.js?v=4"></script>
     <script src="js/k5viewer.js?v=33"></script>
 <script src="js/keypad-detach.js?v=1"></script>
-<script src="js/flash.js?v=88"></script>
+<script src="js/flash.js?v=89"></script>
 <script src="js/memories.js?v=7"></script>
-<script src="js/settings.js?v=5"></script>
+<script src="js/settings.js?v=6"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
 <script src="js/studio.js?v=22"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 <script src="js/vendor/marked.min.js?v=12.0.2"></script>
-<script src="js/doc-viewer.js?v=5"></script>
+<script src="js/doc-viewer.js?v=7"></script>
+<script src="js/license-ack.js?v=2"></script>
 </body>
 </html>

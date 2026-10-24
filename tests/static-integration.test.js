@@ -251,8 +251,8 @@ test('reorders complete app slots through the existing raw flash protocol', () =
   assert.match(toolsCss, /\.app-renumber-button\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(toolsCss, /\.apps-table-wrap\s*\{[^}]*overflow-anchor:\s*none/s);
   assert.match(toolsCss, /tr\.app-order-drop-before td\s*\{[^}]*box-shadow/s);
-  assert.match(html, /css\/tools\.css\?v=66/);
-  assert.match(html, /js\/flash\.js\?v=88/);
+  assert.match(html, /css\/tools\.css\?v=67/);
+  assert.match(html, /js\/flash\.js\?v=89/);
   assert.doesNotMatch(flashSource, /app-order-(?:up|down)/);
   assert.doesNotMatch(flashSource, /function appMoveInOrder/);
 
@@ -912,4 +912,11 @@ test('every Radio settings field has a heading on its group help page', () => {
       assert.ok(ids.includes(anchor), `docs/help/${lang}/${page}.md is missing ### ${f.id}`);
     }
   }
+});
+
+test('asks for the license acknowledgement before writing operations only', () => {
+  const flashSource = fs.readFileSync(path.join(root, 'js', 'flash.js'), 'utf8');
+  assert.match(flashSource, /function beginToolsOperation\(name, critical\) \{[^}]*if \(critical && window\.uvStudioLicenseAck && !window\.uvStudioLicenseAck\(\)\) return null;/);
+  assert.match(html, /id="licenseAckModal"[\s\S]*id="licenseAckAgree"/);
+  assert.match(html, /<script src="js\/license-ack\.js\?v=\d+"><\/script>/);
 });

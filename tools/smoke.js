@@ -167,6 +167,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   fs.writeFileSync(path.join(outDir, 'memories.png'), Buffer.from(shot.result.data, 'base64'));
 
   await evaluate(`document.getElementById('memWriteBtn').click()`);
+  // First write: the one-time license acknowledgement opens; agreeing re-presses Write.
+  await sleep(300);
+  console.log('license gate', await evaluate(`document.getElementById('licenseAckModal').classList.contains('show')`));
+  await evaluate(`document.getElementById('licenseAckAgree').click()`);
   await waitIdle();
   console.log('after write', await state(), await evaluate("JSON.stringify(radioLog.reduce((m, k) => (m[k] = (m[k] || 0) + 1, m), {}))"));
   console.log('radio ch2', await evaluate('JSON.stringify(UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, 1))'));

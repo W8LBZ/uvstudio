@@ -10,7 +10,7 @@ Scan prioritaire : pendant le scan, la radio revient régulièrement sur les can
 Premier canal prioritaire, vérifié souvent pendant le scan quand **ScPri** est ON. Les modes FULL RX (**RxMode** dans Radio) le surveillent aussi.
 
 ### PriCh2
-Deuxième canal prioritaire.
+Deuxième canal prioritaire. Il fonctionne exactement comme **PriCh1** : vérifié souvent pendant le scan quand **ScPri** est ON, et surveillé par les modes FULL RX.
 
 ### ScnRev
 Ce que fait le scan quand il trouve un signal :

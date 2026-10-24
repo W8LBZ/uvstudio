@@ -1666,3 +1666,4 @@
   margin: 0 0 16px; padding: 10px 12px; border-left: 3px solid #d97706; border-radius: var(--radius);
   background: color-mix(in oklab, #d97706 10%, var(--surface)); color: var(--text); font-size: 13px; line-height: 1.5;
 }
+.license-statement { font-weight: 600; }

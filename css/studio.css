@@ -520,4 +520,6 @@ body.sidebar-collapsed .sidebar {
 /* Field help: the label itself opens the help page; no extra icons. */
 [data-help] { cursor: help; text-decoration: underline dotted; text-decoration-color: var(--text-muted); text-underline-offset: 3px; }
 [data-help]:hover, [data-help]:focus-visible { color: var(--accent); text-decoration-color: var(--accent); }
-.doc-body .doc-target { color: var(--accent); border-left: 3px solid var(--accent); padding-left: 8px; margin-left: -11px; }
+.doc-body .doc-show-all { margin: 1.2em 0 0; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; }
+/* Help can open from another modal (license acknowledgement), so it stacks on top. */
+#docModal { z-index: 1001; }

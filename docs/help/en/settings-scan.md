@@ -10,7 +10,7 @@ Priority scan: while scanning, the radio keeps checking the priority channels (*
 First priority channel, checked often while scanning when **ScPri** is ON. The FULL RX modes (**RxMode** under Radio) watch it too.
 
 ### PriCh2
-Second priority channel.
+Second priority channel. It works exactly like **PriCh1**: checked often while scanning when **ScPri** is ON, and watched by the FULL RX modes.
 
 ### ScnRev
 What scanning does when it finds a signal:

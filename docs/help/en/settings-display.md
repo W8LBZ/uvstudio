@@ -10,16 +10,16 @@ What happens at power-on: a sound, your messages, the battery voltage, the boot 
 First line of the power-on message (up to 16 characters). Your call sign is a popular choice.
 
 ### Message 2
-Second line of the power-on message.
+Second line of the power-on message (up to 16 characters), shown under **Message 1** when **POnMsg** includes messages.
 
 ### BLTime
 How long the backlight stays on after a key press. **OFF** never lights. **ON** stays lit always and uses the most battery.
 
 ### BLMin
-Backlight brightness when it's "off". **0** is fully dark.
+Backlight brightness while the light is "off" (after **BLTime** runs out), from **0** (fully dark, saves the most battery) to **9**. A low value like 1 keeps the screen readable at night.
 
 ### BLMax
-Backlight brightness when it's on.
+Backlight brightness while the light is on, from **1** to **10** (brightest). Lower values save battery and are easier on the eyes in the dark.
 
 ### BLTxRx
 Also light the screen while transmitting (**TX**), receiving (**RX**), or both.
@@ -37,10 +37,16 @@ Screen contrast. Raise it if text looks faint, lower it if the background looks 
 Invert the screen: light text on a dark background.
 
 ### SetMet
-S-meter (signal strength meter) style: **TINY** or **CLASSIC**.
+Style of the S-meter, the bar that shows how strong the received signal is. **TINY** is a compact bar that leaves more room for other information; **CLASSIC** is the larger traditional meter. Purely a matter of taste.
 
 ### SetGUI
-How much VFO information is shown: **TINY** or **CLASSIC** layout.
+Layout of the frequency (VFO) screen. **TINY** uses smaller text to fit more details such as power, tones and step; **CLASSIC** keeps the larger, simpler layout. Try both and keep what reads best.
 
 ### SetSav
-Screensaver shown when the backlight turns off: the boot logo, an animated logo (**LOGO+**), or a **MATRIX** effect. It needs a **BLTime** that isn't OFF or ON.
+Screensaver. When the backlight times out (see **BLTime**), the screen shows a picture instead of the frequency display:
+- **OFF**: no screensaver; the normal display stays, just unlit.
+- **LOGO**: your boot logo (you can change it on the Boot logo page).
+- **LOGO+**: the boot logo, slowly scrolling sideways.
+- **MATRIX**: falling "digital rain" characters, like the film.
+
+Any key press, or an incoming signal, brings the normal display back. The key press that wakes the screen does nothing else, so you can't change a setting by accident. It needs a **BLTime** that isn't OFF or ON, because it waits for the backlight to time out.

@@ -278,11 +278,11 @@
       form.innerHTML = '';
     } else {
       const dirty = new Set(dirtyIds());
-      const help = topic => (topic ? ` data-help="${topic}" tabindex="0" role="button"` : '');
-      form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend><span${help(`settings-${group}`)}>${escapeHtml(t(groupKey(group)))}</span></legend>` +
+      const help = (topic, pageTitle) => (topic ? ` data-help="${topic}" data-help-title="${escapeHtml(pageTitle)}" tabindex="0" role="button"` : '');
+      form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend><span${help(`settings-${group}`, t(groupKey(group)))}>${escapeHtml(t(groupKey(group)))}</span></legend>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
           `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
-          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
+          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f), t(groupKey(f.group)))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
         ).join('') + '</fieldset>').join('');
     }
     updateState();

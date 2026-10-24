@@ -32,7 +32,8 @@
     throw new Error('not found');
   }
 
-  async function show(urls, label) {
+  // pageTitle: modal title for the "Show the whole page" link of a section view.
+  async function show(urls, label, pageTitle = label) {
     title.textContent = label;
     body.textContent = '';
     modal.classList.add('show');
@@ -53,8 +54,22 @@
       for (const h of body.querySelectorAll('h2, h3')) h.id = slug(h.textContent);
       const anchor = decodeURIComponent(new URL(urls[0]).hash.slice(1));
       const target = anchor && body.querySelector(`#${CSS.escape(anchor)}`);
-      if (target) { target.classList.add('doc-target'); target.scrollIntoView({ block: 'start' }); }
-      else modal.querySelector('.modal-content').scrollTop = 0;
+      if (target) {
+        // "page#heading" shows only that section, up to the next heading of the same level.
+        // The heading becomes the modal title instead of repeating in the body.
+        title.textContent = target.textContent;
+        const section = [];
+        for (let n = target.nextElementSibling; n && !(/^H[1-3]$/.test(n.tagName) && n.tagName <= target.tagName); n = n.nextElementSibling) section.push(n);
+        const all = document.createElement('a');
+        all.href = new URL(url).pathname.split('/').pop();
+        all.dataset.title = pageTitle;
+        all.textContent = window.uvStudioI18n.t('helpShowAll');
+        const p = document.createElement('p');
+        p.className = 'doc-show-all';
+        p.append(all);
+        body.replaceChildren(...section, p);
+      }
+      modal.querySelector('.modal-content').scrollTop = 0;
     } catch {
       hide();
       window.open(urls[0], '_blank', 'noopener');
@@ -65,7 +80,7 @@
     const [topic, anchor] = el.dataset.help.split('#');
     const lang = document.documentElement.lang || 'en';
     const urls = [...new Set([lang, 'en'])].map(l => new URL(`docs/help/${l}/${topic}.md${anchor ? `#${anchor}` : ''}`, location.href).href);
-    show(urls, el.textContent.trim());
+    show(urls, el.textContent.trim(), el.dataset.helpTitle);
   }
 
   document.addEventListener('click', (e) => {
@@ -80,7 +95,7 @@
     }
     e.preventDefault();
     const url = new URL(href, a.closest('#docModalBody') ? current : location.href).href;
-    show([...new Set([url, url.replace(/\/docs\/help\/[^/]+\//, '/docs/help/en/')])], a.textContent.trim() || href);
+    show([...new Set([url, url.replace(/\/docs\/help\/[^/]+\//, '/docs/help/en/')])], a.dataset.title || a.textContent.trim() || href);
   });
   document.addEventListener('keydown', (e) => {
     const help = e.target.closest && e.target.closest('[data-help]');

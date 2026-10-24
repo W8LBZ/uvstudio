@@ -780,6 +780,7 @@ function updateActionButtons() {
 
 function beginToolsOperation(name, critical) {
   if (activeOperationToken) return null;
+  if (critical && window.uvStudioLicenseAck && !window.uvStudioLicenseAck()) return null;   // W8LBZ fork
   const token = toolsSerial.beginOperation(name, { critical });
   if (!token) return null;
   activeOperationToken = token;
