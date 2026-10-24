@@ -6,4 +6,4 @@
 - **Un code comme `D023N`** : DCS, un code numérique. **N** pour normal, **I** pour inversé. Suivez la fiche.
 - La plupart du temps, seule la tonalité TX est nécessaire. La [tonalité RX](rx-tone.md) est facultative.
 
-Pour aller plus loin : [CTCSS](https://fr.wikipedia.org/wiki/CTCSS) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Pour aller plus loin : [Squelch et tonalités](squelch-and-tones.md) · [CTCSS](https://fr.wikipedia.org/wiki/CTCSS) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

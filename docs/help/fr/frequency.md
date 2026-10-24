@@ -5,4 +5,4 @@
 - La valeur est arrondie au [Pas](step.md) du canal, pour afficher ce que la radio enregistrera.
 - Effacer la fréquence supprime le canal.
 
-Pour aller plus loin : [Plans de bandes IARU Région 1 (en anglais)](https://www.iaru-r1.org/on-the-air/band-plans/) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Pour aller plus loin : [Bandes et licence](bands-and-licensing.md) · [Plans de bandes IARU Région 1 (en anglais)](https://www.iaru-r1.org/on-the-air/band-plans/) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

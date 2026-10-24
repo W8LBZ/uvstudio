@@ -70,7 +70,7 @@
 
   document.addEventListener('click', (e) => {
     const help = e.target.closest('[data-help]');
-    if (help) { showHelp(help); return; }
+    if (help) { e.preventDefault(); showHelp(help); return; }
     const a = e.target.closest('.about-links a, #docModalBody a');
     if (!a) return;
     const href = a.getAttribute('href');

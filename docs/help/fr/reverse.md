@@ -4,4 +4,4 @@
 - Ne compte que si [Duplex](duplex.md) vaut + ou −.
 - Généralement décoché.
 
-Pour aller plus loin : [Relais radioamateur (en anglais)](https://en.wikipedia.org/wiki/Amateur_radio_repeater)
+Pour aller plus loin : [Les relais](repeaters.md) · [Relais radioamateur (en anglais)](https://en.wikipedia.org/wiki/Amateur_radio_repeater)

@@ -5,4 +5,4 @@
 - The value snaps to the channel's [Step](step.md), so the page shows what the radio will store.
 - Clearing the frequency deletes the channel.
 
-Read more: [ARRL band plan](https://www.arrl.org/band-plan) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Read more: [Bands and licensing](bands-and-licensing.md) · [ARRL band plan](https://www.arrl.org/band-plan) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

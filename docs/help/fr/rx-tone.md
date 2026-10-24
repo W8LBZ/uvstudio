@@ -7,4 +7,4 @@
 - Si un canal qui devrait être actif reste muet, essayez d’abord de vider la tonalité RX.
 - Mêmes formats que la tonalité TX : `88.5` pour le CTCSS, `D023N` / `D023I` pour le DCS.
 
-Pour aller plus loin : [CTCSS](https://fr.wikipedia.org/wiki/CTCSS) · [Squelch (en anglais)](https://en.wikipedia.org/wiki/Squelch) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Pour aller plus loin : [Squelch et tonalités](squelch-and-tones.md) · [CTCSS](https://fr.wikipedia.org/wiki/CTCSS) · [Squelch (en anglais)](https://en.wikipedia.org/wiki/Squelch) · [CHIRP : colonnes de l’éditeur de mémoires (en anglais)](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

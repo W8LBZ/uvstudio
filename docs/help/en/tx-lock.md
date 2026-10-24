@@ -4,4 +4,4 @@
 - **Unchecked**: this channel ignores F Lock and can transmit anywhere the hardware can.
 - Unchecking doesn't make transmitting legal. You're responsible for using only frequencies your license (or the service rules) allow.
 
-Read more: [ARRL band plan](https://www.arrl.org/band-plan)
+Read more: [Bands and licensing](bands-and-licensing.md) · [ARRL band plan](https://www.arrl.org/band-plan)

@@ -7,4 +7,4 @@
 - If you hear nothing on a channel that should be active, try clearing RX tone first.
 - Formats are the same as TX tone: `88.5` for CTCSS, `D023N` / `D023I` for DCS.
 
-Read more: [CTCSS](https://en.wikipedia.org/wiki/Continuous_Tone-Coded_Squelch_System) · [Squelch](https://en.wikipedia.org/wiki/Squelch) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Read more: [Squelch and tones overview](squelch-and-tones.md) · [CTCSS](https://en.wikipedia.org/wiki/Continuous_Tone-Coded_Squelch_System) · [Squelch](https://en.wikipedia.org/wiki/Squelch) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

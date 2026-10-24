@@ -4,4 +4,4 @@
 - Common US values: **0.6** on 2 m (144–148 MHz) and **5** on 70 cm (420–450 MHz).
 - Example: a repeater on 146.940 with − and 0.6 means you transmit on 146.340.
 
-Read more: [Amateur radio repeater](https://en.wikipedia.org/wiki/Amateur_radio_repeater) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)
+Read more: [Repeaters overview](repeaters.md) · [Amateur radio repeater](https://en.wikipedia.org/wiki/Amateur_radio_repeater) · [CHIRP: memory editor columns](https://chirpmyradio.com/projects/chirp/wiki/MemoryEditorColumns)

@@ -4,4 +4,4 @@
 - Only matters when [Duplex](duplex.md) is + or −.
 - Usually left off.
 
-Read more: [Amateur radio repeater](https://en.wikipedia.org/wiki/Amateur_radio_repeater)
+Read more: [Repeaters overview](repeaters.md) · [Amateur radio repeater](https://en.wikipedia.org/wiki/Amateur_radio_repeater)
