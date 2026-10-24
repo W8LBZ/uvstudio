@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "studio_operation_read_memories": "Odczyt pamięci…",
   "studio_operation_write_memories": "Zapis pamięci…",
   "calibRestoreWarning": "Przywracaj tylko kopię kalibracji z tego samego radia. Kalibracja innego radia zafałszowuje moc nadawania, częstotliwość i S-metr.",
-  "helpShowAll": "Pokaż całą stronę",
+  "helpShowAll": "Wszystkie ustawienia: {0}",
   "licenseTitle": "Zanim zapiszesz dane w radiu",
   "licenseBody": "UV Studio może ustawić to radio do nadawania na wielu częstotliwościach. Nadawanie zwykle wymaga pozwolenia: licencji krótkofalarskiej na pasmach amatorskich i certyfikowanego sprzętu w większości innych służb. Nadawanie bez uprawnień może być niezgodne z prawem w Twoim kraju.",
   "licenseStatement": "Mam licencję krótkofalarską albo będę nadawać tylko tam, gdzie pozwala mi prawo. Odpowiadam za sposób korzystania z tego radia.",

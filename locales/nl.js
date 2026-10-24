@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.nl = {
   "studio_operation_read_memories": "Geheugens lezen…",
   "studio_operation_write_memories": "Geheugens schrijven…",
   "calibRestoreWarning": "Zet alleen een kalibratieback-up van deze zelfde portofoon terug. De kalibratie van een ander toestel maakt zendvermogen, frequentie en S-meter onjuist.",
-  "helpShowAll": "Hele pagina tonen",
+  "helpShowAll": "Alle instellingen: {0}",
   "licenseTitle": "Voordat je naar de portofoon schrijft",
   "licenseBody": "UV Studio kan deze portofoon instellen om op veel frequenties te zenden. Zenden vereist meestal een vergunning: een zendamateurlicentie op de amateurbanden en gecertificeerde apparatuur voor de meeste andere diensten. Zenden zonder toestemming kan in jouw land strafbaar zijn.",
   "licenseStatement": "Ik heb een zendamateurlicentie, of ik zend alleen waar het wettelijk mag. Ik ben verantwoordelijk voor hoe ik deze portofoon gebruik.",

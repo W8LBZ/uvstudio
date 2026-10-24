@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "studio_operation_read_memories": "正在读取存储信道…",
   "studio_operation_write_memories": "正在写入存储信道…",
   "calibRestoreWarning": "只恢复来自同一台电台的校准备份。其他电台的校准会导致发射功率、频率和信号表不准确。",
-  "helpShowAll": "显示整页",
+  "helpShowAll": "全部设置：{0}",
   "licenseTitle": "写入电台之前",
   "licenseBody": "UV Studio 可以把这台电台设置为在许多频率上发射。发射通常需要许可：在业余波段需要业余无线电执照，大多数其他业务需要经认证的设备。未经授权发射可能违反您所在地的法律。",
   "licenseStatement": "我持有业余无线电执照，或者我只会在法律允许的地方发射。我对自己如何使用这台电台负责。",

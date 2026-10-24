@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.it = {
   "studio_operation_read_memories": "Lettura delle memorie…",
   "studio_operation_write_memories": "Scrittura delle memorie…",
   "calibRestoreWarning": "Ripristina solo un backup di calibrazione di questa stessa radio. La calibrazione di un'altra radio altera potenza di trasmissione, frequenza e S-meter.",
-  "helpShowAll": "Mostra tutta la pagina",
+  "helpShowAll": "Tutte le impostazioni: {0}",
   "licenseTitle": "Prima di scrivere nella radio",
   "licenseBody": "UV Studio può configurare questa radio per trasmettere su molte frequenze. Trasmettere di solito richiede una licenza: una licenza di radioamatore sulle bande amatoriali e apparati omologati per la maggior parte degli altri servizi. Trasmettere senza autorizzazione può essere illegale dove vivi.",
   "licenseStatement": "Sono titolare di una licenza di radioamatore, oppure trasmetterò solo dove la legge me lo consente. Sono responsabile dell'uso che faccio di questa radio.",

@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.fr = {
   "studio_operation_read_memories": "Lecture des mémoires…",
   "studio_operation_write_memories": "Écriture des mémoires…",
   "calibRestoreWarning": "Ne restaurez qu’une sauvegarde de calibration issue de cette même radio. La calibration d’une autre radio fausse la puissance d’émission, la fréquence et le S-mètre.",
-  "helpShowAll": "Afficher toute la page",
+  "helpShowAll": "Tous les réglages : {0}",
   "licenseTitle": "Avant d’écrire dans la radio",
   "licenseBody": "UV Studio peut configurer cette radio pour émettre sur de nombreuses fréquences. Émettre exige en général une licence : une licence radioamateur sur les bandes amateur, et du matériel homologué pour la plupart des autres services. Émettre sans y être autorisé peut être illégal là où vous vivez.",
   "licenseStatement": "Je suis titulaire d’une licence radioamateur, ou je n’émettrai que là où la loi me le permet. Je suis responsable de l’usage que je fais de cette radio.",

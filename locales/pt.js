@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.pt = {
   "studio_operation_read_memories": "A ler memórias…",
   "studio_operation_write_memories": "A escrever memórias…",
   "calibRestoreWarning": "Restaure apenas um backup de calibração deste mesmo rádio. A calibração de outro rádio altera a potência de transmissão, a frequência e o S-meter.",
-  "helpShowAll": "Mostrar a página inteira",
+  "helpShowAll": "Todas as definições: {0}",
   "licenseTitle": "Antes de escrever no rádio",
   "licenseBody": "O UV Studio pode configurar este rádio para transmitir em muitas frequências. Transmitir normalmente exige uma licença: uma licença de radioamador nas bandas de amador e equipamento homologado para a maioria dos outros serviços. Transmitir sem autorização pode ser ilegal onde vive.",
   "licenseStatement": "Tenho licença de radioamador, ou só transmitirei onde a lei o permitir. Sou responsável pelo uso que faço deste rádio.",

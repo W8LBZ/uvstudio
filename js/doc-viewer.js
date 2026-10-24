@@ -32,8 +32,7 @@
     throw new Error('not found');
   }
 
-  // pageTitle: modal title for the "Show the whole page" link of a section view.
-  async function show(urls, label, pageTitle = label) {
+  async function show(urls, label) {
     title.textContent = label;
     body.textContent = '';
     modal.classList.add('show');
@@ -62,8 +61,11 @@
         for (let n = target.nextElementSibling; n && !(/^H[1-3]$/.test(n.tagName) && n.tagName <= target.tagName); n = n.nextElementSibling) section.push(n);
         const all = document.createElement('a');
         all.href = new URL(url).pathname.split('/').pop();
-        all.dataset.title = pageTitle;
-        all.textContent = window.uvStudioI18n.t('helpShowAll');
+        // Section views come from the Radio settings group pages: name the group ("All Display settings").
+        const group = /settings-(\w+)\.md$/.exec(all.href);
+        const t = window.uvStudioI18n.t.bind(window.uvStudioI18n);
+        all.dataset.title = group ? t(`setGroup_${group[1]}`) : label;
+        all.textContent = group ? t('helpShowAll', all.dataset.title) : t('helpGuide');
         const p = document.createElement('p');
         p.className = 'doc-show-all';
         p.append(all);
@@ -80,7 +82,7 @@
     const [topic, anchor] = el.dataset.help.split('#');
     const lang = document.documentElement.lang || 'en';
     const urls = [...new Set([lang, 'en'])].map(l => new URL(`docs/help/${l}/${topic}.md${anchor ? `#${anchor}` : ''}`, location.href).href);
-    show(urls, el.textContent.trim(), el.dataset.helpTitle);
+    show(urls, el.textContent.trim());
   }
 
   document.addEventListener('click', (e) => {

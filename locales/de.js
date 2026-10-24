@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.de = {
   "studio_operation_read_memories": "Speicher werden gelesen…",
   "studio_operation_write_memories": "Speicher werden geschrieben…",
   "calibRestoreWarning": "Stellen Sie nur eine Kalibrierungssicherung dieses Funkgeräts wieder her. Die Kalibrierung eines anderen Geräts verfälscht Sendeleistung, Frequenz und S-Meter.",
-  "helpShowAll": "Ganze Seite anzeigen",
+  "helpShowAll": "Alle Einstellungen: {0}",
   "licenseTitle": "Bevor Sie auf das Funkgerät schreiben",
   "licenseBody": "UV Studio kann dieses Funkgerät für das Senden auf vielen Frequenzen einrichten. Senden erfordert in der Regel eine Genehmigung: eine Amateurfunklizenz auf den Amateurfunkbändern und zugelassene Geräte für die meisten anderen Funkdienste. Senden ohne Berechtigung kann an Ihrem Wohnort gesetzwidrig sein.",
   "licenseStatement": "Ich besitze eine Amateurfunklizenz oder sende nur dort, wo es mir gesetzlich erlaubt ist. Ich bin für die Nutzung dieses Funkgeräts verantwortlich.",

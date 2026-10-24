@@ -529,7 +529,7 @@ window.UVSTUDIO_LOCALES.en = {
   "studio_operation_read_memories": "Reading memories…",
   "studio_operation_write_memories": "Writing memories…",
   "calibRestoreWarning": "Only restore a calibration backup taken from this same radio. Another radio's calibration makes transmit power, frequency and the S-meter wrong.",
-  "helpShowAll": "Show the whole page",
+  "helpShowAll": "All {0} settings",
   "licenseTitle": "Before you write to the radio",
   "licenseBody": "UV Studio can set this radio up to transmit on many frequencies. Transmitting usually needs a license: an amateur radio license on ham bands, and certified equipment for most other services. Transmitting where you aren't authorized can break the law where you live.",
   "licenseStatement": "I hold an amateur radio license, or I will only transmit where I'm legally allowed to. I'm responsible for how I use this radio.",

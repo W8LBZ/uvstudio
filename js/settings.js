@@ -281,11 +281,11 @@
       form.innerHTML = '';
     } else {
       const dirty = new Set(dirtyIds());
-      const help = (topic, pageTitle) => (topic ? ` data-help="${topic}" data-help-title="${escapeHtml(pageTitle)}" tabindex="0" role="button"` : '');
+      const help = topic => (topic ? ` data-help="${topic}" tabindex="0" role="button"` : '');
       form.innerHTML = S.GROUPS.map(group => `<details class="set-group" data-group="${group}"${folded.has(group) ? '' : ' open'}><summary>${escapeHtml(t(groupKey(group)))}</summary>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
           `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
-          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f), t(groupKey(f.group)))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
+          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
         ).join('') + '</details>').join('');
     }
     updateState();
