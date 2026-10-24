@@ -1,14 +1,20 @@
-# UV Studio
+# UV Studio+
 
-UV Studio is a unified browser-based workspace for compatible Quansheng UV-K1
+UV Studio+ is [UV Studio](https://armel.github.io/uvstudio/) by Armel F4HWN, plus
+CHIRP-style memory channels and radio settings for Quansheng UV-K1 and UV-K5 V3
+radios on F4HWN firmware. It is an independent fork maintained by KO4CGQ for the
+W8LBZ club, and it follows every UV Studio release.
+
+[Open UV Studio+](https://w8lbz.github.io/uvstudio/)
+
+F4HWN doesn't support this fork: please report UV Studio+ problems here, not
+upstream. Original UV Studio: <https://armel.github.io/uvstudio/>
+
+UV Studio itself is a unified browser-based workspace for compatible Quansheng UV-K1
 and UV-K5 radios. It combines the live display and remote control features of
 K5Viewer with the firmware and maintenance tools of UVTools2 in one interface.
 Communication with the radio is performed directly through the Web Serial API.
 No installation, server, dependency, or build step is required.
-
-[Open UV Studio (W8LBZ fork, with Memories and Radio settings)](https://w8lbz.github.io/uvstudio/)
-
-Upstream original by F4HWN: <https://armel.github.io/uvstudio/>
 
 ## Features
 

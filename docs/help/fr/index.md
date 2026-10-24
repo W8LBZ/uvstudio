@@ -1,4 +1,4 @@
-> 💡 **En bref :** commencez par **Premiers pas**. Chaque page d’UV Studio a aussi un lien **Comment fonctionne cette page**, et les libellés soulignés ouvrent l’aide du champ.
+> 💡 **En bref :** commencez par **Premiers pas**. Chaque page d’UV Studio+ a aussi un lien **Comment fonctionne cette page**, et les libellés soulignés ouvrent l’aide du champ.
 
 ### Vue d’ensemble
 - [Premiers pas](getting-started.md) : une première séance sans risque, étape par étape.

@@ -446,6 +446,9 @@ body {
     letter-spacing: 0.08em; text-transform: uppercase;
 }
 .about-details dd { color: var(--text); font-size: 13px; font-weight: 650; }
+/* W8LBZ fork: odd last row spans both columns; "Based on" link uses the accent. */
+.about-details > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.about-details dd a { color: var(--accent); }
 .about-copy {
     grid-column: 1 / -1; max-width: 760px; color: var(--text-secondary);
     font-size: 13.5px; line-height: 1.7;

@@ -1,4 +1,4 @@
-> 💡 **TL;DR:** Start with **Getting started**. Every page in UV Studio also has a **How this page works** link, and underlined labels open help for that field.
+> 💡 **TL;DR:** Start with **Getting started**. Every page in UV Studio+ also has a **How this page works** link, and underlined labels open help for that field.
 
 ### Overviews
 - [Getting started](getting-started.md): a safe first session, step by step.

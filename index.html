@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>UV Studio by F4HWN</title>
-    <script src="js/studio-version.js?v=2.1.0-w8lbz.1"></script>
+<title>UV Studio+ by KO4CGQ</title>
+    <script src="js/studio-version.js?v=2.1.0-w8lbz.2"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=13" rel="stylesheet">
 <link href="css/tools.css?v=70" rel="stylesheet">
-<link href="css/studio.css?v=33" rel="stylesheet">
+<link href="css/studio.css?v=34" rel="stylesheet">
 </head>
 <body data-theme="light">
 
@@ -46,7 +46,7 @@
                 </g>
             </svg>
         </span>
-        <span class="sb-title"><span class="sb-name">UV <b>Studio</b></span><span class="sb-sub">by F4HWN</span></span>
+        <span class="sb-title"><span class="sb-name">UV <b>Studio+</b></span><span class="sb-sub" data-i18n="plus_brand_sub">by KO4CGQ, from F4HWN</span></span>
         <span class="topbar-divider"></span>
         <span class="section-name" id="sectionName" data-i18n="studio_nav_live">Live Viewer</span>
     </div>
@@ -166,7 +166,7 @@
             </button>
         </div>
         <div class="nav-group nav-group-studio">
-            <div class="nav-label">UV Studio</div>
+            <div class="nav-label">UV Studio+</div>
             <button class="nav-item" data-route="about" data-app="about"
                     data-name="About" data-section-i18n="studio_nav_about">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -178,7 +178,7 @@
                 <span class="nav-item-label" data-i18n="studio_nav_about">About</span>
             </button>
         </div>
-        <div class="sidebar-foot">UV Studio · <span id="studioVersion">v—</span></div>
+        <div class="sidebar-foot">UV Studio+ · <span id="studioVersion">v—</span></div>
     </aside>
 
     <!-- ═══════════ Stage ═══════════ -->
@@ -816,7 +816,7 @@
           </div>
         </section>
 
-        <!-- ── About UV Studio ── -->
+        <!-- ── About UV Studio+ (W8LBZ fork) ── -->
         <section class="pane" id="pane-about">
             <article class="about-card">
                 <div class="about-mark" aria-hidden="true">
@@ -840,10 +840,10 @@
                     </svg>
                 </div>
                 <div class="about-heading">
-                    <p class="about-kicker">UV Studio</p>
-                    <h1 data-i18n="studio_about_title">About UV Studio</h1>
-                    <p class="about-intro" data-i18n="studio_about_intro">
-                        K5Viewer and UVTools2, brought together in one consistent interface.
+                    <p class="about-kicker">UV Studio+</p>
+                    <h1 data-i18n="plus_about_title">About UV Studio+</h1>
+                    <p class="about-intro" data-i18n="plus_about_intro">
+                        F4HWN's UV Studio, plus CHIRP-style memory channels and radio settings.
                     </p>
                 </div>
                 <dl class="about-details">
@@ -853,7 +853,11 @@
                     </div>
                     <div>
                         <dt data-i18n="studio_about_author">Author</dt>
-                        <dd>F4HWN</dd>
+                        <dd>KO4CGQ</dd>
+                    </div>
+                    <div>
+                        <dt data-i18n="plus_about_based_on">Based on</dt>
+                        <dd><a href="https://armel.github.io/uvstudio/" target="_blank" rel="noopener">UV Studio</a> <span data-i18n="plus_about_by_f4hwn">by F4HWN</span></dd>
                     </div>
                     <div>
                         <dt data-i18n="studio_about_operation">Operation</dt>
@@ -864,14 +868,18 @@
                         <dd data-i18n="studio_about_devices">UV-K5 V3 and UV-K1 with PY32F071 MCU</dd>
                     </div>
                 </dl>
-                <p class="about-copy" data-i18n="studio_about_description">
-                    UV Studio communicates directly with compatible radios through the Web Serial API. No installation, server or account is required. UV Studio is open-source software licensed under the Apache License 2.0.
+                <p class="about-copy" data-i18n="plus_about_description">
+                    UV Studio+ is an independent fork of UV Studio, maintained by KO4CGQ for the W8LBZ club. It adds Memories (channels, VFOs, CHIRP CSV import and export, backups) and Radio settings for F4HWN firmware, and keeps up with every UV Studio release. Many thanks to Armel F4HWN for the firmware and for UV Studio itself.
+                </p>
+                <p class="about-copy" data-i18n="plus_about_support">
+                    F4HWN doesn't support this fork. Please report UV Studio+ problems on its GitHub page, not to F4HWN. UV Studio+ is open-source software licensed under the Apache License 2.0.
                 </p>
                 <nav class="about-links" data-i18n-aria-label="studio_about_documents" aria-label="Project documents">
                     <a href="docs/help/en/index.md" target="_blank" rel="noopener" data-help="index" data-i18n="help">Help</a>
                     <a href="README.md" target="_blank" rel="noopener">README</a>
                     <a href="LICENSE" target="_blank" rel="noopener">LICENSE</a>
                     <a href="NOTICE" target="_blank" rel="noopener">NOTICE</a>
+                    <a href="https://github.com/W8LBZ/uvstudio" target="_blank" rel="noopener">GitHub</a>
                 </nav>
             </article>
         </section>
@@ -1038,16 +1046,16 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=74"></script>
-<script src="locales/fr.js?v=74"></script>
-<script src="locales/it.js?v=74"></script>
-<script src="locales/es.js?v=74"></script>
-<script src="locales/de.js?v=74"></script>
-<script src="locales/pt.js?v=74"></script>
-<script src="locales/ru.js?v=74"></script>
-<script src="locales/pl.js?v=74"></script>
-<script src="locales/zh.js?v=74"></script>
-<script src="locales/nl.js?v=74"></script>
+<script src="locales/en.js?v=75"></script>
+<script src="locales/fr.js?v=75"></script>
+<script src="locales/it.js?v=75"></script>
+<script src="locales/es.js?v=75"></script>
+<script src="locales/de.js?v=75"></script>
+<script src="locales/pt.js?v=75"></script>
+<script src="locales/ru.js?v=75"></script>
+<script src="locales/pl.js?v=75"></script>
+<script src="locales/zh.js?v=75"></script>
+<script src="locales/nl.js?v=75"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/studio-serial.js?v=6"></script>
