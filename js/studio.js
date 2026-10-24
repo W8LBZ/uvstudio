@@ -372,9 +372,13 @@
     /* "Change port": pick now; the choice is reused by the next connect, viewer or tools. */
     if (serialChangePort && serialController) {
         serialChangePort.addEventListener("click", async () => {
+            const log = window.UVStudioFlash?.log || (() => {});
+            log(translate("requestingPort"), "info");
             try {
-                serialController.rememberPort(await navigator.serial.requestPort());
+                serialController.choosePort(await navigator.serial.requestPort());
+                log(translate("plus_port_changed"), "success");
             } catch (error) {
+                log(translate("plus_port_unchanged"), "info");
                 if (error?.name !== "NotFoundError") console.warn("Port selection failed:", error);   /* NotFoundError = picker cancelled */
             }
         });

@@ -541,6 +541,8 @@ window.UVSTUDIO_LOCALES.en = {
   "plus_about_by_f4hwn": "by F4HWN",
   "plus_about_description": "UV Studio+ is an independent fork of UV Studio, maintained by KO4CGQ for the W8LBZ club. It adds Memories (channels, VFOs, CHIRP CSV import and export, backups) and Radio settings for F4HWN firmware, and keeps up with every UV Studio release. Many thanks to Armel F4HWN for the firmware and for UV Studio itself.",
   "plus_about_support": "F4HWN doesn't support this fork. Please report UV Studio+ problems on its GitHub page, not to F4HWN. UV Studio+ is open-source software licensed under the Apache License 2.0.",
+  "plus_port_changed": "Port selected. The next connection will use it.",
+  "plus_port_unchanged": "Port selection cancelled. The current port is kept.",
   "licenseTitle": "Before you write to the radio",
   "licenseBody": "UV Studio+ can set this radio up to transmit on many frequencies. Transmitting usually needs a license: an amateur radio license on ham bands, and certified equipment for most other services. Transmitting where you aren't authorized can break the law where you live.",
   "licenseStatement": "I hold an amateur radio license, or I will only transmit where I'm legally allowed to. I'm responsible for how I use this radio.",

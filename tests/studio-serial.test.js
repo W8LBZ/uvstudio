@@ -289,3 +289,15 @@ test('discards a pending reconnect attempt when the expected radio changes', asy
 
   assert.deepEqual(attempts, []);
 });
+
+test('forgets the reusable port when it is unplugged while closed', async () => {
+  const { controller, emitSerial } = loadController();
+  const tools = controller.register('tools', {});
+  await tools.acquire();
+  const unplugged = {};
+  tools.rememberPort(unplugged);
+  emitSerial('disconnect', {});
+  assert.equal(tools.getReusablePort(), unplugged);
+  emitSerial('disconnect', unplugged);
+  assert.equal(tools.getReusablePort(), null);
+});

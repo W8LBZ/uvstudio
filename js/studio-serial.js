@@ -296,6 +296,14 @@
         return navigator.serial.requestPort();
     }
 
+    /* An unplugged port object is dead for good (the replugged radio comes back as a
+       new one), so drop it even when no client had it open. */
+    if (typeof navigator !== "undefined" && navigator.serial) {
+        navigator.serial.addEventListener("disconnect", event => {
+            if (event.target === reusablePort) reusablePort = null;
+        });
+    }
+
     const controller = Object.freeze({
         register,
         closeResources,
@@ -303,6 +311,12 @@
         portMatchesInfo,
         pickPort,
         rememberPort,
+
+        /* "Change port": the next connect, viewer or tools, opens exactly this port. */
+        choosePort(port) {
+            reusablePort = port;
+            rememberPort(port);
+        },
 
         releaseFor(nextOwner) {
             return enqueue(async () => {

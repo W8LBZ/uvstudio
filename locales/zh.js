@@ -541,6 +541,8 @@ window.UVSTUDIO_LOCALES.zh = {
   "plus_about_by_f4hwn": "F4HWN 制作",
   "plus_about_description": "UV Studio+ 是 UV Studio 的独立分支，由 KO4CGQ 为 W8LBZ 俱乐部维护。它为 F4HWN 固件增加了存储（信道、VFO、CHIRP CSV 导入导出、备份）和电台设置，并跟进 UV Studio 的每个版本。衷心感谢 Armel F4HWN 提供固件和 UV Studio。",
   "plus_about_support": "F4HWN 不为此分支提供支持。请在其 GitHub 页面报告 UV Studio+ 的问题，不要报告给 F4HWN。UV Studio+ 是基于 Apache 2.0 许可证的开源软件。",
+  "plus_port_changed": "已选择端口。下次连接将使用该端口。",
+  "plus_port_unchanged": "已取消选择端口。保留当前端口。",
   "licenseTitle": "写入电台之前",
   "licenseBody": "UV Studio+ 可以把这台电台设置为在许多频率上发射。发射通常需要许可：在业余波段需要业余无线电执照，大多数其他业务需要经认证的设备。未经授权发射可能违反您所在地的法律。",
   "licenseStatement": "我持有业余无线电执照，或者我只会在法律允许的地方发射。我对自己如何使用这台电台负责。",

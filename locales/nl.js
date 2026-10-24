@@ -541,6 +541,8 @@ window.UVSTUDIO_LOCALES.nl = {
   "plus_about_by_f4hwn": "door F4HWN",
   "plus_about_description": "UV Studio+ is een onafhankelijke fork van UV Studio, onderhouden door KO4CGQ voor de club W8LBZ. Hij voegt Geheugens (kanalen, VFO's, CHIRP-CSV importeren en exporteren, back-ups) en Portofooninstellingen voor de F4HWN-firmware toe en volgt elke UV Studio-release. Veel dank aan Armel F4HWN voor de firmware en voor UV Studio.",
   "plus_about_support": "F4HWN ondersteunt deze fork niet. Meld problemen met UV Studio+ op de GitHub-pagina ervan, niet bij F4HWN. UV Studio+ is opensourcesoftware onder de Apache-licentie 2.0.",
+  "plus_port_changed": "Poort geselecteerd. De volgende verbinding gebruikt deze.",
+  "plus_port_unchanged": "Poortkeuze geannuleerd. De huidige poort blijft behouden.",
   "licenseTitle": "Voordat je naar de portofoon schrijft",
   "licenseBody": "UV Studio+ kan deze portofoon instellen om op veel frequenties te zenden. Zenden vereist meestal een vergunning: een zendamateurlicentie op de amateurbanden en gecertificeerde apparatuur voor de meeste andere diensten. Zenden zonder toestemming kan in jouw land strafbaar zijn.",
   "licenseStatement": "Ik heb een zendamateurlicentie, of ik zend alleen waar het wettelijk mag. Ik ben verantwoordelijk voor hoe ik deze portofoon gebruik.",
