@@ -11,9 +11,10 @@
   const body = document.getElementById('docModalBody');
   const close = document.getElementById('docModalClose');
   let current = location.href;
+  const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // = UVSTUDIO_SETTINGS.helpSlug
 
+  // Static triggers; rendered ones (Radio settings) carry these attributes in their markup.
   for (const el of document.querySelectorAll('[data-help]')) {
-    el.classList.add('has-help');
     el.tabIndex = 0;
     el.setAttribute('role', 'button');
   }
@@ -48,7 +49,12 @@
         pre.textContent = text;
         body.append(pre);
       }
-      body.scrollTop = 0;
+      // Headings get ids from their text so help topics can point at "page#heading".
+      for (const h of body.querySelectorAll('h2, h3')) h.id = slug(h.textContent);
+      const anchor = decodeURIComponent(new URL(urls[0]).hash.slice(1));
+      const target = anchor && body.querySelector(`#${CSS.escape(anchor)}`);
+      if (target) { target.classList.add('doc-target'); target.scrollIntoView({ block: 'start' }); }
+      else modal.querySelector('.modal-content').scrollTop = 0;
     } catch {
       hide();
       window.open(urls[0], '_blank', 'noopener');
@@ -56,9 +62,9 @@
   }
 
   function showHelp(el) {
-    const topic = el.dataset.help;
+    const [topic, anchor] = el.dataset.help.split('#');
     const lang = document.documentElement.lang || 'en';
-    const urls = [...new Set([lang, 'en'])].map(l => new URL(`docs/help/${l}/${topic}.md`, location.href).href);
+    const urls = [...new Set([lang, 'en'])].map(l => new URL(`docs/help/${l}/${topic}.md${anchor ? `#${anchor}` : ''}`, location.href).href);
     show(urls, el.textContent.trim());
   }
 

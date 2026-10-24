@@ -214,7 +214,12 @@
     }
   }
 
-  return { BASE, SIZE, CHANNEL_NONE, MIX_ALL, FIELDS, GROUPS, TEXT_LENGTH, PROTECTED, getValue, setValue };
+  // Help page for a field: docs/help/<lang>/settings-<group>.md, at the heading named after the field.
+  // FM presets share one heading and no per-row link, so 48 rows don't each grow an underline.
+  const helpSlug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const helpTopic = f => (f.values === 'fm' ? null : `settings-${f.group}#${helpSlug(f.id)}`);
+
+  return { BASE, SIZE, CHANNEL_NONE, MIX_ALL, FIELDS, GROUPS, TEXT_LENGTH, PROTECTED, getValue, setValue, helpSlug, helpTopic };
 });
 
 // ---------- Settings panel (browser only; serial sessions run through flash.js) ----------
@@ -273,10 +278,11 @@
       form.innerHTML = '';
     } else {
       const dirty = new Set(dirtyIds());
-      form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend>${escapeHtml(t(groupKey(group)))}</legend>` +
+      const help = topic => (topic ? ` data-help="${topic}" tabindex="0" role="button"` : '');
+      form.innerHTML = S.GROUPS.map(group => `<fieldset class="set-group"><legend><span${help(`settings-${group}`)}>${escapeHtml(t(groupKey(group)))}</span></legend>` +
         S.FIELDS.filter(f => f.group === group).map(f =>
           `<div class="set-row${f.values === 'mask' ? ' set-row-mask' : ''}${dirty.has(f.id) ? ' set-dirty' : ''}">` +
-          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}">${escapeHtml(f.id)}</label>${control(f)}</div>`
+          `<label for="set-${escapeHtml(f.id).replace(/\W/g, '_')}"><span${help(S.helpTopic(f))}>${escapeHtml(f.id)}</span></label>${control(f)}</div>`
         ).join('') + '</fieldset>').join('');
     }
     updateState();

@@ -899,3 +899,17 @@ test('every field help topic has an English page', () => {
     assert.deepEqual(fs.readdirSync(path.join(helpDir, lang)).sort(), english, `docs/help/${lang}`);
   }
 });
+
+test('every Radio settings field has a heading on its group help page', () => {
+  const S = require(path.join(root, 'js', 'settings.js'));
+  for (const lang of fs.readdirSync(path.join(root, 'docs', 'help'))) {
+    for (const f of S.FIELDS) {
+      const topic = S.helpTopic(f);
+      if (!topic) continue;
+      const [page, anchor] = topic.split('#');
+      const md = fs.readFileSync(path.join(root, 'docs', 'help', lang, `${page}.md`), 'utf8');
+      const ids = [...md.matchAll(/^#{2,3} (.+)$/gm)].map(m => S.helpSlug(m[1]));
+      assert.ok(ids.includes(anchor), `docs/help/${lang}/${page}.md is missing ### ${f.id}`);
+    }
+  }
+});
