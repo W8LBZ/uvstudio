@@ -429,7 +429,8 @@ function refreshLocalizedToolsState() {
   const dumpDesc = document.getElementById('dumpDescription');
   const downloadText = document.getElementById('downloadText');
   if (dumpDesc) dumpDesc.textContent = t('dumpDescription');
-  if (downloadText) downloadText.textContent = t('downloadText');
+  // The locale strings name calibration.dat; show the real file name once a read set it.
+  if (downloadText) downloadText.textContent = t('downloadText').replace('calibration.dat', dumpLink?.download || 'calibration.dat');
 
   // Dump external flash labels
   const flashDumpDesc = document.getElementById('flashDumpDescription');
@@ -1541,6 +1542,7 @@ dumpBtn.addEventListener('click', async () => {
     const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', dumpedData)).slice(0, 4);
     const id = Array.from(hash, b => b.toString(16).padStart(2, '0')).join('');
     dumpLink.download = `calibration-${id}-${new Date().toISOString().slice(0, 10)}.dat`;
+    document.getElementById('downloadText').textContent = t('downloadText').replace('calibration.dat', dumpLink.download);
     dumpDownload.style.display = 'flex';
     log(t('dumpSaved'), 'success');
 
