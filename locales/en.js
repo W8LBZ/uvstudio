@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.en = {
   "studio_nav_memories": "Memories",
   "studio_operation_read_memories": "Reading memories…",
   "studio_operation_write_memories": "Writing memories…",
+  "helpGuide": "How this page works",
   "memDescription": "Read the 1024 memory channels from your radio, edit them, then write the changes back. Import and export use the CHIRP CSV format.",
   "memReadBtn": "Read from radio",
   "memWriteBtn": "Write changes to radio",

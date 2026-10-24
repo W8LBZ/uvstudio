@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.nl = {
   "studio_nav_memories": "Geheugens",
   "studio_operation_read_memories": "Geheugens lezen…",
   "studio_operation_write_memories": "Geheugens schrijven…",
+  "helpGuide": "Zo werkt deze pagina",
   "memDescription": "Leest de 1024 geheugenkanalen van de radio, laat ze bewerken en schrijft de wijzigingen terug. Importeren en exporteren gebruiken het CHIRP-CSV-formaat.",
   "memReadBtn": "Lezen van radio",
   "memWriteBtn": "Wijzigingen schrijven",

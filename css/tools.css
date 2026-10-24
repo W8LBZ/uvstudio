@@ -1651,3 +1651,13 @@
 #pane-tools .set-row.set-dirty {
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
 }
+#pane-tools .tab-help { margin: -14px 0 16px; font-size: 13px; color: var(--text-secondary); }
+/* Disclosure boxes (Scan list names, VFOs) look like buttons so they're easy to spot. */
+#pane-tools .mem-list-names-box summary {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text);
+}
+#pane-tools .mem-list-names-box summary:hover { border-color: var(--accent); }
+#pane-tools .mem-list-names-box summary::-webkit-details-marker { display: none; }
+#pane-tools .mem-list-names-box summary::before { content: '▸'; color: var(--text-muted); }
+#pane-tools .mem-list-names-box[open] summary::before { content: '▾'; }

@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "studio_nav_memories": "存储信道",
   "studio_operation_read_memories": "正在读取存储信道…",
   "studio_operation_write_memories": "正在写入存储信道…",
+  "helpGuide": "本页使用说明",
   "memDescription": "读取电台的 1024 个存储信道，编辑后再写回更改。导入和导出使用 CHIRP CSV 格式。",
   "memReadBtn": "从电台读取",
   "memWriteBtn": "写入更改",

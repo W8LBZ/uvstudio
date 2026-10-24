@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.de = {
   "studio_nav_memories": "Speicher",
   "studio_operation_read_memories": "Speicher werden gelesen…",
   "studio_operation_write_memories": "Speicher werden geschrieben…",
+  "helpGuide": "So funktioniert diese Seite",
   "memDescription": "Liest die 1024 Speicherkanäle des Funkgeräts, lässt sie bearbeiten und schreibt die Änderungen zurück. Import und Export verwenden das CHIRP-CSV-Format.",
   "memReadBtn": "Vom Funkgerät lesen",
   "memWriteBtn": "Änderungen schreiben",

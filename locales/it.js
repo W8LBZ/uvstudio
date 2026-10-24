@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.it = {
   "studio_nav_memories": "Memorie",
   "studio_operation_read_memories": "Lettura delle memorie…",
   "studio_operation_write_memories": "Scrittura delle memorie…",
+  "helpGuide": "Come funziona questa pagina",
   "memDescription": "Legge i 1024 canali di memoria della radio, permette di modificarli e poi riscrive le modifiche. Importazione ed esportazione usano il formato CSV di CHIRP.",
   "memReadBtn": "Leggi dalla radio",
   "memWriteBtn": "Scrivi le modifiche",

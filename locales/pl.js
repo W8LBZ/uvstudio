@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "studio_nav_memories": "Pamięci",
   "studio_operation_read_memories": "Odczyt pamięci…",
   "studio_operation_write_memories": "Zapis pamięci…",
+  "helpGuide": "Jak działa ta strona",
   "memDescription": "Odczytuje 1024 kanały pamięci radia, pozwala je edytować, a następnie zapisuje zmiany. Import i eksport używają formatu CSV programu CHIRP.",
   "memReadBtn": "Odczytaj z radia",
   "memWriteBtn": "Zapisz zmiany",

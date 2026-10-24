@@ -528,6 +528,7 @@ window.UVSTUDIO_LOCALES.ru = {
   "studio_nav_memories": "Память",
   "studio_operation_read_memories": "Чтение памяти…",
   "studio_operation_write_memories": "Запись памяти…",
+  "helpGuide": "Как работает эта страница",
   "memDescription": "Считывает 1024 канала памяти рации, позволяет их редактировать и записывает изменения обратно. Импорт и экспорт используют формат CSV CHIRP.",
   "memReadBtn": "Прочитать из рации",
   "memWriteBtn": "Записать изменения",
