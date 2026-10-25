@@ -8,11 +8,11 @@
 
 ### Backups (.bin)
 - **Save backup (.bin)** stores an exact copy of the radio's memory area: channels, names, scan lists and VFOs.
-- **Open backup (.bin)** loads one into the table. Press Write to put it on the radio.
+- **Open backup (.bin)** (under **Import and export**) loads one into the table. Press Write to put it on the radio.
 - Use backups to undo mistakes. They only fit UV-K1 / UV-K5 V3 radios on F4HWN firmware.
 
 ### Import and export CSV
-CSV files use the CHIRP format, so you can share channel lists with CHIRP users, spreadsheets, and sites like RepeaterBook.
+These buttons are under **Import and export**. CSV files use the CHIRP format, so you can share channel lists with CHIRP users, spreadsheets, and sites like RepeaterBook.
 - **Export CSV** saves the channels as a CSV file.
 - **Import CSV** reads one. The menu next to it decides where the rows go:
   - **At CSV locations**: each row goes to the channel number in its Location column. Other channels stay as they are.

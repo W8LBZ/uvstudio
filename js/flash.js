@@ -569,6 +569,15 @@ if (logToggle) {
   });
 }
 
+/* W8LBZ: selecting the log is hard on a phone. Works while the console is hidden too. */
+document.getElementById('logCopy')?.addEventListener('click', async event => {
+  const button = event.currentTarget;
+  const text = Array.from(logDiv.children, entry => entry.textContent).join('\n');
+  await navigator.clipboard.writeText(`${navigator.userAgent}\n${text}\n`);
+  button.textContent = t('plus_logCopied');
+  setTimeout(() => { button.textContent = t('plus_logCopy'); }, 1500);
+});
+
 // ========== FIRMWARE FILE INPUT ==========
 if (firmwareFileInput) {
   firmwareFileInput.addEventListener('change', (e) => {

@@ -3,6 +3,8 @@
 ### 1. Connect
 Use a USB programming cable that carries data. Switch the radio on normally, then press **Read from radio** on any page and pick the radio's serial port.
 
+**Android (experimental):** use Chrome and connect the radio to the phone (USB-C cable, or an OTG adapter for a USB-A cable). The radio shows up as **USB Serial**. On GrapheneOS, set *Settings → Security & privacy → Exploit protection → USB-C port* to **Charging-only when locked** (or search Settings for "USB"), then unlock the phone before plugging in.
+
 ### 2. Back up
 - **Calibration**: back it up once and keep the file forever. See [Calibration](calibration-guide.md).
 - **Memories** and **Radio settings**: after reading, press **Save backup (.bin)** on each page.

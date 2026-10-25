@@ -1,7 +1,8 @@
 // Headless smoke test of the Memories and Settings panels against a fake radio that speaks the
 // real framed/obfuscated serial protocol. Drives Chrome over CDP, no npm deps.
 // Usage: node tools/smoke.js index.html <out-dir>   (screenshots -> <out-dir>/memories.png, settings.png)
-// CHROME env var overrides the headless shell path.
+// CHROME env var overrides the headless shell path. MOBILE=1 runs at phone size (412 x 915, Pixel 9)
+// and adds vfos.png and live.png.
 const { spawn } = require('child_process');
 const fs = require('fs');
 const os = require('os');
@@ -42,7 +43,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   await send('Runtime.enable');
   await send('Page.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 1400, height: 1000, deviceScaleFactor: 1, mobile: false });
+  const mobile = Boolean(process.env.MOBILE);
+  await send('Emulation.setDeviceMetricsOverride', mobile
+    ? { width: 412, height: 915, deviceScaleFactor: 2, mobile: true }
+    : { width: 1400, height: 1000, deviceScaleFactor: 1, mobile: false });
   await send('Page.navigate', { url: page });
   await sleep(1500);
 
@@ -57,6 +61,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     M.encodeChannel(radio, 0, Object.assign(M.defaultChannel(), { name: 'CALLING', freq: 145500000 }));
     M.encodeChannel(radio, 1, Object.assign(M.defaultChannel(), { name: 'RPT', freq: 145600000, offset: 600000, duplex: '-', txTone: '88.5', mode: 'NFM' }));
     M.encodeChannel(radio, 9, Object.assign(M.defaultChannel(), { name: 'PMR1', freq: 446006250, mode: 'NFM', power: 1 }));
+    M.encodeChannel(radio, M.CHANNEL_COUNT + 4, Object.assign(M.defaultChannel(), { name: '', freq: 146520000 }));   // VFO A 137
     window.fakeRadio = radio;
     window.radioLog = [];
     window.fakeAesKey = false;
@@ -130,6 +135,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   console.log('before read', await state(), await evaluate("document.getElementById('memReadBtn').disabled"), errors);
   await evaluate(`document.getElementById('memReadBtn').click()`);
   await waitIdle();
+  if (mobile) {
+    await evaluate(`document.getElementById('memories-content').scrollIntoView()`);
+    const shotTop = await send('Page.captureScreenshot', { format: 'png' });
+    fs.writeFileSync(path.join(outDir, 'memories-top.png'), Buffer.from(shotTop.result.data, 'base64'));
+  }
   console.log('after read', await state(), await evaluate("document.getElementById('log').textContent.slice(-600)"), errors);
 
   // Edit RX tone + name on channel 2, add channel 5 with show-empty.
@@ -163,8 +173,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     return clipped;
   })()`));
 
+  if (mobile) await evaluate(`document.querySelector('tr[data-index="1"] .mem-card-summary').click(); document.querySelector('tr[data-index="0"]').scrollIntoView()`);
   const shot = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync(path.join(outDir, 'memories.png'), Buffer.from(shot.result.data, 'base64'));
+  if (mobile) {
+    await evaluate(`(() => { const box = document.getElementById('memVfoBox'); box.open = true; box.scrollIntoView(); document.querySelector('#memVfoBody .mem-card-summary').click(); })()`);
+    console.log('vfo card opens', await evaluate(`document.querySelector('#memVfoBody tr.mem-open') !== null`));
+    await sleep(300);
+    const shotVfo = await send('Page.captureScreenshot', { format: 'png' });
+    fs.writeFileSync(path.join(outDir, 'vfos.png'), Buffer.from(shotVfo.result.data, 'base64'));
+  }
 
   await evaluate(`document.getElementById('memWriteBtn').click()`);
   // First write: the one-time license acknowledgement opens; agreeing re-presses Write.
@@ -231,6 +249,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     document.getElementById('memBulkApply').click();
     document.querySelector('[data-edit="copy"]').click();
   })()`);
+  if (mobile) {   // phone: the edit menu stands in for the buttons
+    console.log('edit menu', await evaluate(`(() => {
+      const menu = document.getElementById('memEditMenu');
+      const shown = getComputedStyle(menu).display !== 'none' && getComputedStyle(document.querySelector('[data-edit="up"]')).display === 'none';
+      const bar = document.getElementById('memSelectionBar');
+      window.scrollBy(0, bar.getBoundingClientRect().top + 300);   // scroll the bar's spot off the top
+      const barTop = bar.getBoundingClientRect().top;
+      return { shown, pasteEnabled: !menu.querySelector('option[value="paste"]').disabled, barTop: Math.round(barTop) };
+    })()`));
+  }
   console.log('edited table', await evaluate(`({ selected: document.getElementById('memSelectionCount').textContent,
     rows: Array.from(document.querySelectorAll('#memTableBody tr')).map(tr => tr.dataset.index + ':' + (tr.querySelector('[data-field="name"]')?.value ?? '-')).join(' ') })`));
   const shot3 = await send('Page.captureScreenshot', { format: 'png' });
@@ -238,6 +266,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await evaluate("document.getElementById('memWriteBtn').click()");
   await waitIdle();
   console.log('table written', await evaluate(`JSON.stringify([0, 1, 2].map(i => { const c = UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, i); return c && (c.name + '/' + c.power); }))`));
+  if (mobile) {
+    await evaluate("location.hash = 'live'");
+    await sleep(800);
+    const shot4 = await send('Page.captureScreenshot', { format: 'png' });
+    fs.writeFileSync(path.join(outDir, 'live.png'), Buffer.from(shot4.result.data, 'base64'));
+  }
   console.log('page errors', errors);
   ws.close();
   proc.kill();

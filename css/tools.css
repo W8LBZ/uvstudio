@@ -1569,7 +1569,16 @@ display: none !important;
   align-items: center;
   gap: 6px;
   margin-bottom: 10px;
+  /* Stays in view while scrolling the channels it acts on. */
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 8px 0;
+  background: var(--surface);
 }
+#pane-tools .mem-selection-bar[hidden] { display: none; }
+#pane-tools .mem-list-names-box > .mem-toolbar:first-of-type { margin-top: 10px; }
+#pane-tools .mem-channels-box > summary { margin-bottom: 10px; }
 #pane-tools .mem-selection-bar .mem-summary { margin-left: 0; margin-right: 6px; }
 #pane-tools .mem-bulk {
   display: inline-flex;
@@ -1593,6 +1602,91 @@ display: none !important;
   box-shadow: none;
 }
 #pane-tools .mem-bulk input:not([type="checkbox"]) { width: 10ch; padding-right: 6px; }
+#pane-tools #memEditMenu {
+  display: none;
+  height: 28px;
+  padding: 2px 24px 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+#pane-tools .mem-card-summary { display: none; }
+
+/* Phone: each channel is a card. Collapsed it shows a one-line summary; tapping it shows the
+   fields as labelled pairs. Overrides the Firmware Slots card rules the table shares. */
+@media (max-width: 640px) {
+  #pane-tools .mem-table-wrap { max-height: none; overflow: visible; }
+  /* Two short rows, so the sticky bar doesn't cover half the screen: the edit buttons become
+     one native menu, and Set for selected gets its own row. */
+  #pane-tools .mem-selection-bar [data-edit] { display: none; }
+  #pane-tools #memEditMenu { display: block; flex: 1; }
+  #pane-tools .mem-bulk { flex-basis: 100%; flex-wrap: nowrap; margin-left: 0; }
+  #pane-tools .mem-bulk select { flex: 1; min-width: 0; }
+  #pane-tools .mem-bulk label {   /* no room on a phone; still read out */
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
+  }
+  #pane-tools .mem-bulk-value { display: contents; }
+  #pane-tools #memEditMenu, #pane-tools .mem-bulk select, #pane-tools .mem-bulk input:not([type="checkbox"]) { height: 36px; }
+  #pane-tools .mem-table tbody tr,
+  #pane-tools .mem-table tbody tr.mem-card {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-areas: none;
+    gap: 8px 10px;
+  }
+  #pane-tools .mem-table tbody td {
+    grid-column: span 3;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 0;
+  }
+  #pane-tools .mem-table tbody td:empty { display: none; }
+  #pane-tools .mem-table tbody td:has([data-select]),
+  #pane-tools .mem-table tbody td.slot-idx { grid-area: auto; grid-column: span 1; justify-content: center; }
+  #pane-tools .mem-table tbody tr.mem-dirty td,
+  #pane-tools .mem-table tbody tr.mem-selected td { background: none; }
+  #pane-tools .mem-table tbody tr.mem-dirty { background: color-mix(in oklab, var(--accent) 10%, var(--surface)); }
+  #pane-tools .mem-table tbody tr.mem-selected { background: color-mix(in oklab, var(--accent) 18%, var(--surface)); }
+  #pane-tools .mem-table tbody td:has([data-action="delete"]) { grid-column: 6; grid-row: 1; align-items: flex-end; }
+  #pane-tools .mem-table tbody td.mem-card-summary {
+    display: flex;
+    position: relative;
+    grid-column: span 3;
+    justify-content: center;
+    gap: 2px;
+    min-height: 36px;
+    padding-right: 22px;
+    cursor: pointer;
+  }
+  #pane-tools .mem-card-summary::after {
+    content: '▸';
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+  }
+  #pane-tools tr.mem-open .mem-card-summary::after { content: '▾'; }
+  #pane-tools tr.mem-open .mem-card-detail { display: none; }
+  #pane-tools .mem-card-name { color: var(--text); font-weight: 700; }
+  #pane-tools .mem-card-detail { font-family: var(--font-mono); font-size: 14px; }
+  #pane-tools .mem-card-extra { color: var(--text-muted); font-size: 12px; white-space: pre-wrap; }
+  #pane-tools .mem-table tbody tr:not(.mem-card) td.slot-idx { grid-column: span 2; }
+  #pane-tools .mem-table tbody tr:not(:has([data-select])) td.slot-idx { grid-column: span 2; justify-content: center; white-space: nowrap; }   /* VFO rows */
+  #pane-tools .mem-table tbody tr:not(:has([data-select])) td.mem-card-summary { grid-column: span 4; }
+  #pane-tools .mem-table tbody tr.mem-card:not(.mem-open) td[data-label] { display: none; }
+  #pane-tools .mem-table tbody td[data-label]::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  #pane-tools .mem-table tbody td input:not([type="checkbox"]),
+  #pane-tools .mem-table tbody td select { width: 100%; height: 36px; }
+  #pane-tools .mem-table tbody td input[type="checkbox"] { align-self: flex-start; width: 22px; height: 22px; }
+}
+
 #pane-tools .mem-table tr.mem-selected td {
   background: color-mix(in oklab, var(--accent) 18%, var(--surface));
 }

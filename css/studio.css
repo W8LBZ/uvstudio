@@ -481,6 +481,7 @@ body.sidebar-collapsed .sidebar {
     .topbar { flex-wrap: wrap; height: auto; padding: 10px 14px; }
     .section-name, .topbar-divider { display: none; }
     .shell { flex-direction: column; }
+    .stage { overflow-y: visible; }   /* W8LBZ: the page scrolls here; lets sticky bars stick */
     .sidebar {
         flex: 0 0 auto; flex-direction: row; flex-wrap: wrap; gap: 6px;
         border-right: none; border-bottom: 1px solid var(--border); padding: 10px;

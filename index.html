@@ -4,12 +4,12 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio+ by KO4CGQ</title>
-    <script src="js/studio-version.js?v=2.1.0-w8lbz.9"></script>
+    <script src="js/studio-version.js?v=2026.10.0"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
-<link href="css/viewer.css?v=13" rel="stylesheet">
-<link href="css/tools.css?v=70" rel="stylesheet">
-<link href="css/studio.css?v=35" rel="stylesheet">
+<link href="css/viewer.css?v=14" rel="stylesheet">
+<link href="css/tools.css?v=74" rel="stylesheet">
+<link href="css/studio.css?v=36" rel="stylesheet">
 </head>
 <body data-theme="light">
 
@@ -397,24 +397,31 @@
                     <div class="mem-toolbar">
                         <button type="button" id="memReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
                         <button type="button" id="memWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
-                        <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Import CSV</button>
-                        <select id="memImportMode" aria-label="Import mode" data-i18n-aria-label="memImportMode">
-                            <option value="location" data-i18n="memImportModeLocation">At CSV locations</option>
-                            <option value="append" data-i18n="memImportModeAppend">Append</option>
-                            <option value="prepend" data-i18n="memImportModePrepend">Prepend</option>
-                            <option value="replace" data-i18n="memImportModeReplace">Replace all</option>
-                        </select>
-                        <label class="mem-show-empty"><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip duplicates</span></label>
-                        <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
-                        <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
                         <button type="button" id="memSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
                         <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
                         <span class="mem-summary" id="memSummary" role="status" aria-live="polite"></span>
                     </div>
-                    <div class="mem-toolbar">
-                        <input type="url" id="memSourceUrl" class="mem-source-url" list="memSourceList" placeholder="CSV URL or pick a list" data-i18n-placeholder="memSourceUrl" aria-label="CSV URL" data-i18n-aria-label="memSourceUrl">
-                        <button type="button" id="memLoadUrlBtn" class="btn compact-toolbar-action" data-i18n="memLoadUrlBtn" disabled>Import from URL</button>
-                    </div>
+                    <details class="mem-list-names-box" id="memTransferBox">
+                        <summary data-i18n="memTransferBox">Import and export</summary>
+                        <div class="mem-toolbar">
+                            <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Import CSV</button>
+                            <select id="memImportMode" aria-label="Import mode" data-i18n-aria-label="memImportMode">
+                                <option value="location" data-i18n="memImportModeLocation">At CSV locations</option>
+                                <option value="append" data-i18n="memImportModeAppend">Append</option>
+                                <option value="prepend" data-i18n="memImportModePrepend">Prepend</option>
+                                <option value="replace" data-i18n="memImportModeReplace">Replace all</option>
+                            </select>
+                            <label class="mem-show-empty"><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip duplicates</span></label>
+                        </div>
+                        <div class="mem-toolbar">
+                            <input type="url" id="memSourceUrl" class="mem-source-url" list="memSourceList" placeholder="CSV URL or pick a list" data-i18n-placeholder="memSourceUrl" aria-label="CSV URL" data-i18n-aria-label="memSourceUrl">
+                            <button type="button" id="memLoadUrlBtn" class="btn compact-toolbar-action" data-i18n="memLoadUrlBtn" disabled>Import from URL</button>
+                        </div>
+                        <div class="mem-toolbar">
+                            <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
+                            <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
+                        </div>
+                    </details>
                     <datalist id="memSourceList"></datalist>
                     <input type="file" id="memCsvFile" accept=".csv,text/csv" hidden>
                     <input type="file" id="memBinFile" accept=".bin" hidden>
@@ -423,8 +430,19 @@
                         <summary data-i18n="memScanListNames">Scan list names</summary>
                         <div class="mem-list-names" id="memListNames"></div>
                     </details>
+                    <details class="mem-list-names-box mem-channels-box" id="memChannelsBox" open hidden>
+                    <summary data-i18n="memChannelsBox">Memory channels</summary>
                     <div class="mem-selection-bar" id="memSelectionBar" hidden>
                         <span class="mem-summary" id="memSelectionCount" aria-live="polite"></span>
+                        <select id="memEditMenu" aria-label="Edit selected" data-i18n-aria-label="memEditMenu">
+                            <option value="" data-i18n="memEditMenu">Edit selected…</option>
+                            <option value="up" data-i18n="memMoveUp">Move up</option>
+                            <option value="down" data-i18n="memMoveDown">Move down</option>
+                            <option value="insert" data-i18n="memInsert">Insert empty above</option>
+                            <option value="removeShift" data-i18n="memRemoveShift">Delete and shift up</option>
+                            <option value="copy" data-i18n="memCopy">Copy</option>
+                            <option value="paste" data-i18n="memPaste">Paste</option>
+                        </select>
                         <button type="button" class="btn compact-toolbar-action" data-edit="up" data-i18n="memMoveUp">Move up</button>
                         <button type="button" class="btn compact-toolbar-action" data-edit="down" data-i18n="memMoveDown">Move down</button>
                         <button type="button" class="btn compact-toolbar-action" data-edit="insert" data-i18n="memInsert">Insert empty above</button>
@@ -466,6 +484,7 @@
                             <tbody id="memTableBody"></tbody>
                         </table>
                     </div>
+                    </details>
                     <details class="mem-list-names-box mem-vfo-box" id="memVfoBox" hidden>
                         <summary data-i18n="memVfos">VFOs</summary>
                         <p class="tab-description" data-i18n="memVfoHint">The frequency each band's VFO A and VFO B starts on. A VFO frequency must stay inside its band.</p>
@@ -809,7 +828,7 @@
 
             <section class="log-container" aria-labelledby="logTitle">
                 <h2 class="sr-only" id="logTitle" data-i18n="logTitle">Console</h2>
-                <div class="log-header"><button class="log-toggle" id="logToggle" type="button" aria-expanded="false">Show Console</button></div>
+                <div class="log-header"><button class="log-toggle" id="logToggle" type="button" aria-expanded="false">Show Console</button><button class="log-toggle" id="logCopy" type="button" data-i18n="plus_logCopy">Copy log</button></div>
                 <div class="log" id="log" aria-live="polite"></div>
             </section>
 
@@ -858,7 +877,7 @@
                     </div>
                     <div>
                         <dt data-i18n="plus_about_based_on">Based on</dt>
-                        <dd><a href="https://armel.github.io/uvstudio/" target="_blank" rel="noopener">UV Studio</a> <span data-i18n="plus_about_by_f4hwn">by F4HWN</span></dd>
+                        <dd><a href="https://armel.github.io/uvstudio/" target="_blank" rel="noopener">UV Studio</a> <span id="aboutUpstreamVersion"></span> <span data-i18n="plus_about_by_f4hwn">by F4HWN</span></dd>
                     </div>
                     <div>
                         <dt data-i18n="studio_about_operation">Operation</dt>
@@ -1047,33 +1066,33 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=77"></script>
-<script src="locales/fr.js?v=77"></script>
-<script src="locales/it.js?v=77"></script>
-<script src="locales/es.js?v=77"></script>
-<script src="locales/de.js?v=77"></script>
-<script src="locales/pt.js?v=77"></script>
-<script src="locales/ru.js?v=77"></script>
-<script src="locales/pl.js?v=77"></script>
-<script src="locales/zh.js?v=77"></script>
-<script src="locales/nl.js?v=77"></script>
+<script src="locales/en.js?v=80"></script>
+<script src="locales/fr.js?v=80"></script>
+<script src="locales/it.js?v=80"></script>
+<script src="locales/es.js?v=80"></script>
+<script src="locales/de.js?v=80"></script>
+<script src="locales/pt.js?v=80"></script>
+<script src="locales/ru.js?v=80"></script>
+<script src="locales/pl.js?v=80"></script>
+<script src="locales/zh.js?v=80"></script>
+<script src="locales/nl.js?v=80"></script>
 <script src="js/studio-preferences.js?v=2"></script>
 <script src="js/studio-i18n.js?v=5"></script>
+<script src="js/webusb-serial.js?v=3"></script>
 <script src="js/studio-serial.js?v=7"></script>
 <script src="js/runtime-protocol.js?v=2"></script>
 <script src="js/rf-log.js?v=4"></script>
     <script src="js/k5viewer.js?v=38"></script>
 <script src="js/keypad-detach.js?v=1"></script>
-<script src="js/flash.js?v=103"></script>
-<script src="js/memories.js?v=7"></script>
+<script src="js/flash.js?v=104"></script>
+<script src="js/memories.js?v=12"></script>
 <script src="js/settings.js?v=9"></script>
 <script src="js/flash-catalog.js?v=19"></script>
 <script src="js/app-catalog.js?v=20"></script>
-<script src="js/studio.js?v=29"></script>
+<script src="js/studio.js?v=30"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 <script src="js/vendor/marked.min.js?v=12.0.2"></script>
 <script src="js/doc-viewer.js?v=9"></script>
 <script src="js/license-ack.js?v=2"></script>
-<script src="js/webusb-probe.js?v=1"></script>
 </body>
 </html>

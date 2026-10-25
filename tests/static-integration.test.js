@@ -261,8 +261,8 @@ test('reorders complete app slots through the existing raw flash protocol', () =
   assert.match(toolsCss, /\.app-renumber-button\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(toolsCss, /\.apps-table-wrap\s*\{[^}]*overflow-anchor:\s*none/s);
   assert.match(toolsCss, /tr\.app-order-drop-before td\s*\{[^}]*box-shadow/s);
-  assert.match(html, /css\/tools\.css\?v=70/);
-  assert.match(html, /js\/flash\.js\?v=103/);
+  assert.match(html, /css\/tools\.css\?v=74/);
+  assert.match(html, /js\/flash\.js\?v=104/);
   assert.doesNotMatch(flashSource, /app-order-(?:up|down)/);
   assert.doesNotMatch(flashSource, /function appMoveInOrder/);
 
@@ -484,7 +484,7 @@ test('keeps Labs-only tools together in the sidebar', () => {
   assert.match(studioCss, /\.nav-item-labs \.tag\s*\{[^}]*margin-right:\s*0/);
   assert.match(studioCss, /\.nav-item:disabled > svg,\s*\.nav-item:disabled \.nav-item-label\s*\{[^}]*opacity:\s*0\.5/s);
   assert.match(studioCss, /\.nav-item:disabled \.tag\s*\{[^}]*opacity:\s*1[^}]*filter:\s*none/s);
-  assert.match(html, /css\/studio\.css\?v=35/);
+  assert.match(html, /css\/studio\.css\?v=36/);
 });
 
 test('adapts tool badges to the connected firmware generation', () => {

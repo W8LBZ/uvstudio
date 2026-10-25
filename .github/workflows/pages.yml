@@ -34,6 +34,10 @@ jobs:
           if git rev-parse -q --verify origin/test >/dev/null; then
             mkdir _site/test
             git archive origin/test | tar -x -C _site/test
+            # Tell test builds apart without bumping the release version: <version>+test.<commit>.
+            stamp="+test.$(git rev-parse --short origin/test)"
+            sed -i -E "s/(UVSTUDIO_VERSION = \"[^\"]+)\"/\1$stamp\"/" _site/test/js/studio-version.js
+            sed -i -E "s/(studio-version\.js\?v=[^\"]+)\"/\1$stamp\"/" _site/test/index.html
           fi
           rm -rf _site/.github _site/test/.github
       - uses: actions/configure-pages@v5

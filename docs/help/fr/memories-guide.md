@@ -8,11 +8,11 @@
 
 ### Sauvegardes (.bin)
 - **Enregistrer une sauvegarde (.bin)** conserve une copie exacte de la zone mémoire de la radio : canaux, noms, listes de scan et VFO.
-- **Ouvrir une sauvegarde (.bin)** la charge dans le tableau. Appuyez sur Écrire pour la mettre dans la radio.
+- **Ouvrir une sauvegarde (.bin)** (sous **Importer et exporter**) la charge dans le tableau. Appuyez sur Écrire pour la mettre dans la radio.
 - Les sauvegardes servent à annuler une erreur. Elles ne conviennent qu’aux UV-K1 / UV-K5 V3 sous firmware F4HWN.
 
 ### Importer et exporter en CSV
-Les fichiers CSV suivent le format CHIRP : vous pouvez échanger des listes de canaux avec CHIRP, un tableur ou des sites comme RepeaterBook.
+Ces boutons sont sous **Importer et exporter**. Les fichiers CSV suivent le format CHIRP : vous pouvez échanger des listes de canaux avec CHIRP, un tableur ou des sites comme RepeaterBook.
 - **Exporter en CSV** enregistre les canaux dans un fichier CSV.
 - **Importer un CSV** en lit un. Le menu à côté décide où vont les lignes :
   - **Aux emplacements du CSV** : chaque ligne va au numéro de canal de sa colonne Location. Les autres canaux ne bougent pas.

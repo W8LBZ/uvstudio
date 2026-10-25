@@ -121,6 +121,8 @@
         document.title = `UV Studio v${version} by F4HWN`;
         if (versionLabel) versionLabel.textContent = `v${version}`;
         if (aboutVersion) aboutVersion.textContent = `v${version}`;
+        const upstreamVersion = document.getElementById("aboutUpstreamVersion");
+        if (upstreamVersion && window.UVSTUDIO_UPSTREAM_VERSION) upstreamVersion.textContent = `v${window.UVSTUDIO_UPSTREAM_VERSION}`;
     }
 
     function readStoredRoute() {

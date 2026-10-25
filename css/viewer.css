@@ -51,6 +51,7 @@
 
 #pane-viewer .display-container {
     position: relative;
+    max-width: 100%;
 }
 
 #pane-viewer #display {
@@ -59,6 +60,14 @@
     background: #fff;
     image-rendering: pixelated;
     box-shadow: var(--shadow-lg);
+    /* W8LBZ: shrink to fit narrow screens; the zoom setting sets the canvas's own size. */
+    box-sizing: border-box;
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 640px) {
+    #pane-viewer .main { padding: 12px; }
 }
 
 /* ─── UV-K1 Virtual Keyboard ──────────────────────────────── */

@@ -681,6 +681,8 @@
   const vfoBox = $('memVfoBox');
 
   const selectionBar = $('memSelectionBar');
+  const channelsBox = $('memChannelsBox');
+  const editMenu = $('memEditMenu');   // phone stand-in for the edit buttons
   const selectionCount = $('memSelectionCount');
   const selectAll = $('memSelectAll');
   const bulkField = $('memBulkField');
@@ -690,6 +692,7 @@
   let image = null;        // working copy edited by the table
   let busy = false;
   const selected = new Set();
+  const openCards = new Set();   // phone layout: channels expanded from their summary line
   let lastClicked = null;
   let clipboard = null;    // copied channel slots
 
@@ -748,31 +751,44 @@
     return input.value;
   }
 
+  /* Phone layout only (hidden on wide screens): name, then frequency with offset, tones and a
+     non-FM mode. Tapping it expands the card; once open only the name stays. */
+  function summaryCell(i, ch) {
+    const extra = [ch.duplex && `${ch.duplex}${M.formatMHz(ch.offset)}`, ch.txTone && `T ${ch.txTone}`,
+      ch.rxTone && `R ${ch.rxTone}`, ch.mode !== 'FM' && ch.mode].filter(Boolean).join('  ');
+    return `<td class="mem-card-summary" role="button" tabindex="0" aria-expanded="${openCards.has(i)}">` +
+      (ch.name ? `<span class="mem-card-name">${escapeHtml(ch.name)}</span>` : '') +
+      `<span class="mem-card-detail">${M.formatMHz(ch.freq)}` +
+      (extra ? ` <span class="mem-card-extra">${escapeHtml(extra)}</span>` : '') + '</span></td>';
+  }
+
   function vfoRowHtml(i) {
     const v = i - M.CHANNEL_COUNT;
     const name = `${'AB'[v & 1]} ${M.BAND_LOWER_HZ[v >> 1] / 1e6}`;
     const ch = M.decodeChannel(image, i);
     const dirty = radioImage && M.channelDirty(radioImage, image, i);
     const label = field => `${t(FIELD_LABELS[field])} ${name}`;
-    const cells = ch ? VFO_FIELDS.map(field => `<td>${cellHtml(field, ch, label(field))}</td>`).join('')
-      : `<td>${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td><td colspan="${VFO_FIELDS.length - 1}"></td>`;
-    return `<tr data-index="${i}"${dirty ? ' class="mem-dirty"' : ''}><td class="slot-idx">${name}</td>${cells}</tr>`;
+    const cells = ch ? summaryCell(i, ch) + VFO_FIELDS.map(field => `<td data-label="${escapeHtml(t(FIELD_LABELS[field]))}">${cellHtml(field, ch, label(field))}</td>`).join('')
+      : `<td data-label="${escapeHtml(t(FIELD_LABELS.freq))}">${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td><td colspan="${VFO_FIELDS.length - 1}"></td>`;
+    const classes = [dirty && 'mem-dirty', ch && 'mem-card', openCards.has(i) && 'mem-open'].filter(Boolean).join(' ');
+    return `<tr data-index="${i}"${classes ? ` class="${classes}"` : ''}><td class="slot-idx">${name}</td>${cells}</tr>`;
   }
 
   function rowHtml(i) {
     if (i >= M.CHANNEL_COUNT) return vfoRowHtml(i);
     const ch = M.decodeChannel(image, i);
     const dirty = radioImage && M.channelDirty(radioImage, image, i);
-    const classes = [dirty && 'mem-dirty', selected.has(i) && 'mem-selected'].filter(Boolean).join(' ');
+    const classes = [dirty && 'mem-dirty', selected.has(i) && 'mem-selected', ch && 'mem-card',
+      openCards.has(i) && 'mem-open'].filter(Boolean).join(' ');
     const head = `<tr data-index="${i}"${classes ? ` class="${classes}"` : ''}>` +
       `<td><input type="checkbox" data-select${selected.has(i) ? ' checked' : ''} aria-label="${escapeHtml(t('memSelectRow', i + 1))}"></td>` +
       `<td class="slot-idx">${i + 1}</td>`;
     const label = field => `${t(FIELD_LABELS[field])} ${i + 1}`;
     if (!ch) {
-      return `${head}<td></td><td>${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td>` +
+      return `${head}<td></td><td data-label="${escapeHtml(t(FIELD_LABELS.freq))}">${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td>` +
         `<td colspan="${CELL_FIELDS.length - 1}"></td></tr>`;
     }
-    return head + CELL_FIELDS.map(field => `<td>${cellHtml(field, ch, label(field))}</td>`).join('') +
+    return head + summaryCell(i, ch) + CELL_FIELDS.map(field => `<td data-label="${escapeHtml(t(FIELD_LABELS[field]))}">${cellHtml(field, ch, label(field))}</td>`).join('') +
       `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" aria-label="${escapeHtml(`${t('memDelete')} ${i + 1}`)}">✕</button></td></tr>`;
   }
 
@@ -819,7 +835,8 @@
     body.innerHTML = rows.join('');
     vfoBody.innerHTML = image ? Array.from({ length: M.VFO_COUNT }, (_, v) => vfoRowHtml(M.CHANNEL_COUNT + v)).join('') : '';
     vfoBox.hidden = !image;
-    selectionBar.hidden = !image;
+    channelsBox.hidden = !image;
+    selectionBar.hidden = !image || selected.size === 0;
     if (image) {
       updateSelection();
       renderBulkValue();
@@ -924,8 +941,10 @@
     selectAll.checked = visible.length > 0 && visible.every(i => selected.has(i));
     selectionCount.textContent = t('memSelected', selected.size);
     const none = selected.size === 0;
+    selectionBar.hidden = none || !image;   /* only when something is ticked */
     selectionBar.querySelectorAll('[data-edit]').forEach(button => {
       button.disabled = none || (button.dataset.edit === 'paste' && !clipboard);
+      editMenu.querySelector(`option[value="${button.dataset.edit}"]`).disabled = button.disabled;
     });
     $('memBulkApply').disabled = none;
   }
@@ -937,6 +956,24 @@
 
   bulkField.innerHTML = BULK_FIELDS.map(field => `<option value="${field}" data-i18n="${FIELD_LABELS[field]}">${escapeHtml(t(FIELD_LABELS[field]))}</option>`).join('');
   bulkField.addEventListener('change', renderBulkValue);
+
+  function toggleCard(cell) {
+    const tr = cell.closest('tr');
+    const i = Number(tr.dataset.index);
+    if (!openCards.delete(i)) openCards.add(i);
+    tr.classList.toggle('mem-open', openCards.has(i));
+    cell.setAttribute('aria-expanded', openCards.has(i));
+  }
+  for (const tbody of [body, vfoBody]) {
+    tbody.addEventListener('click', event => {
+      const cell = event.target.closest('.mem-card-summary');
+      if (cell) toggleCard(cell);
+    });
+    tbody.addEventListener('keydown', event => {
+      const cell = event.target.closest('.mem-card-summary');
+      if (cell && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); toggleCard(cell); }
+    });
+  }
 
   body.addEventListener('click', event => {
     const box = event.target.closest('[data-select]');
@@ -996,6 +1033,12 @@
     selected.clear();
     moved.forEach(i => selected.add(i));
   }
+
+  editMenu.addEventListener('change', () => {
+    const action = editMenu.value;
+    editMenu.value = '';
+    selectionBar.querySelector(`[data-edit="${action}"]`)?.click();
+  });
 
   selectionBar.addEventListener('click', event => {
     const button = event.target.closest('[data-edit]');
