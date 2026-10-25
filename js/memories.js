@@ -292,8 +292,9 @@
   // ---------- Whole-channel operations (raw bytes, so nothing is lost) ----------
   const slotRanges = index => [[index * 16, 16], [NAME_BASE + index * 16, 16], [ATTR_BASE + index * 2, 2]];
 
+  // Empty slots too: radios keep leftover bytes in deleted slots, and shifting must not rewrite them.
   function copyChannel(image, index) {
-    return isEmpty(image, index) ? null : slotRanges(index).map(([start, len]) => image.slice(start, start + len));
+    return slotRanges(index).map(([start, len]) => image.slice(start, start + len));
   }
 
   function pasteChannel(image, index, slot) {
@@ -316,7 +317,7 @@
   // Delete `at` and shift the channels after it up one place.
   function removeChannel(image, at) {
     for (let i = at; i < CHANNEL_COUNT - 1; i++) pasteChannel(image, i, copyChannel(image, i + 1));
-    encodeChannel(image, CHANNEL_COUNT - 1, null);
+    if (!isEmpty(image, CHANNEL_COUNT - 1)) encodeChannel(image, CHANNEL_COUNT - 1, null);   // an empty last slot is already right
   }
 
   // Move the selected channels one place up (delta -1) or down (+1); returns their new indices.
@@ -1001,6 +1002,14 @@
     return [...selected].sort((a, b) => a - b);
   }
 
+  // Keep expanded cards on their channel when edits move channels between slots.
+  // `to(i)` gives a channel's new slot, or -1 when it is gone; VFO cards never move.
+  function remapOpenCards(to) {
+    const next = [...openCards].map(i => (i < M.CHANNEL_COUNT ? to(i) : i)).filter(i => i >= 0);
+    openCards.clear();
+    next.forEach(i => openCards.add(i));
+  }
+
   const edits = {
     up: () => moveSelection(-1),
     down: () => moveSelection(1),
@@ -1008,11 +1017,15 @@
       const at = sortedSelection()[0];
       if (!M.isEmpty(image, M.CHANNEL_COUNT - 1)) throw new Error(t('memLastInUse', M.CHANNEL_COUNT));
       M.insertChannel(image, at);
+      remapOpenCards(i => (i < at ? i : i + 1));
       selected.clear();
       selected.add(at);
     },
     removeShift: () => {
-      sortedSelection().reverse().forEach(i => M.removeChannel(image, i));
+      sortedSelection().reverse().forEach(i => {
+        M.removeChannel(image, i);
+        remapOpenCards(j => (j < i ? j : j === i ? -1 : j - 1));
+      });
       selected.clear();
     },
     copy: () => {
@@ -1023,13 +1036,18 @@
       const at = sortedSelection()[0];
       if (at + clipboard.length > M.CHANNEL_COUNT) throw new Error(t('memPasteOverflow', at + 1, clipboard.length));
       M.pasteChannels(image, at, clipboard);
+      remapOpenCards(i => (i >= at && i < at + clipboard.length ? -1 : i));
       selected.clear();
       clipboard.forEach((_, k) => selected.add(at + k));
     }
   };
 
   function moveSelection(delta) {
-    const moved = M.moveChannels(image, sortedSelection(), delta);
+    const from = sortedSelection();
+    const moved = M.moveChannels(image, from, delta);
+    // Same swap order as moveChannels: each selected channel trades places with its neighbour.
+    [...from].sort((a, b) => (a - b) * -delta)
+      .forEach(i => remapOpenCards(j => (j === i ? i + delta : j === i + delta ? i : j)));
     selected.clear();
     moved.forEach(i => selected.add(i));
   }
@@ -1101,6 +1119,7 @@
       radioImage = data;
       image = data.slice();
       selected.clear();
+      openCards.clear();
       render();
       log(t('memReadComplete', counts().used), 'success');
     });
@@ -1154,6 +1173,7 @@
     } catch (e) {
       log(t('error', e?.message ?? String(e)), 'error');
     }
+    openCards.clear();
     render();
   }
 
@@ -1198,6 +1218,7 @@
     const next = image.slice();
     next.set(data);
     image = next;
+    openCards.clear();
     render();
     log(t('memBackupLoaded', file.name), 'success');
   });

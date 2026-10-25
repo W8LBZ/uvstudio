@@ -116,8 +116,8 @@
               try {
                 while (this.stream === stream) {
                   const result = await (this.rx ||= this.device.transferIn(this.epIn, this.packetIn));
+                  if (this.stream !== stream) return;   /* cancelled: this.rx keeps the data for the next reader */
                   this.rx = null;
-                  if (this.stream !== stream) return;
                   if (result.status === 'stall') await this.device.clearHalt('in', this.epIn);
                   else if (result.data.byteLength) {
                     controller.enqueue(new Uint8Array(result.data.buffer, result.data.byteOffset, result.data.byteLength));

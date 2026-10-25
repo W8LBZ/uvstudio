@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio+ by KO4CGQ</title>
-    <script src="js/studio-version.js?v=2026.10.0"></script>
+    <script src="js/studio-version.js?v=2026.10.1"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link href="css/core.css?v=5" rel="stylesheet">
 <link href="css/viewer.css?v=14" rel="stylesheet">
-<link href="css/tools.css?v=74" rel="stylesheet">
+<link href="css/tools.css?v=76" rel="stylesheet">
 <link href="css/studio.css?v=36" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -351,6 +351,39 @@
                     </div>
                 </section>
                 <button id="flashBtn" disabled aria-live="polite">Flash firmware</button>
+                <div class="flash-steps" id="flashSteps" role="status" aria-live="polite" hidden>
+                    <div class="flash-steps-header">
+                        <span class="flash-steps-title" data-i18n="flash_steps_title">Installation in 3 steps</span>
+                        <span class="flash-steps-hint"><svg class="flash-steps-icon flash-steps-icon-cable" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1"/><path d="M19 15V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V9"/><path d="M21 21v-2h-4"/><path d="M3 5h4V3"/><path d="M7 5a1 1 0 0 1 1 1v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1V3"/></svg><svg class="flash-steps-icon flash-steps-icon-done" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span id="flashStepsHint" data-i18n="flash_unplug_warning">Keep the cable plugged in until the end</span></span>
+                    </div>
+                    <ol class="flash-steps-list">
+                        <li class="flash-step" data-step="image">
+                            <div class="flash-step-head">
+                                <span class="flash-step-mark" aria-hidden="true">1</span>
+                                <span class="flash-step-text"><span data-i18n="flash_step_image">Flash the firmware</span><small class="flash-step-note" data-i18n="flash_step_image_hint">DFU mode</small></span>
+                                <span class="flash-step-pct"></span>
+                            </div>
+                            <div class="flash-step-bar"><div class="flash-step-fill"></div></div>
+                        </li>
+                        <li class="flash-step" data-step="restart">
+                            <div class="flash-step-head">
+                                <span class="flash-step-mark" aria-hidden="true">2</span>
+                                <span class="flash-step-text"><span data-i18n="flash_step_restart">Radio restart</span><small class="flash-step-note" data-i18n="flash_step_restart_hint">Automatic</small></span>
+                                <span class="flash-step-pct"></span>
+                            </div>
+                            <div class="flash-step-bar"><div class="flash-step-fill"></div></div>
+                        </li>
+                        <li class="flash-step" data-step="assets">
+                            <div class="flash-step-head">
+                                <span class="flash-step-mark" aria-hidden="true">3</span>
+                                <span class="flash-step-text"><span data-i18n="flash_step_assets">Write the assets</span><small class="flash-step-note" data-i18n="flash_step_assets_hint">Fonts, menus</small></span>
+                                <span class="flash-step-pct"></span>
+                            </div>
+                            <div class="flash-step-bar"><div class="flash-step-fill"></div></div>
+                        </li>
+                    </ol>
+                </div>
+                <button id="flashAssetsBtn" disabled hidden>Install firmware assets</button>
                 <div class="download-link" id="chirpDriverDownload">
                     <a href="#" id="chirpDriverLink" rel="noopener"><svg class="dl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span id="chirpDriverText" data-i18n="flash_chirp_driver_download">Download CHIRP driver</span></a>
                 </div>
@@ -431,59 +464,59 @@
                         <div class="mem-list-names" id="memListNames"></div>
                     </details>
                     <details class="mem-list-names-box mem-channels-box" id="memChannelsBox" open hidden>
-                    <summary data-i18n="memChannelsBox">Memory channels</summary>
-                    <div class="mem-selection-bar" id="memSelectionBar" hidden>
-                        <span class="mem-summary" id="memSelectionCount" aria-live="polite"></span>
-                        <select id="memEditMenu" aria-label="Edit selected" data-i18n-aria-label="memEditMenu">
-                            <option value="" data-i18n="memEditMenu">Edit selected…</option>
-                            <option value="up" data-i18n="memMoveUp">Move up</option>
-                            <option value="down" data-i18n="memMoveDown">Move down</option>
-                            <option value="insert" data-i18n="memInsert">Insert empty above</option>
-                            <option value="removeShift" data-i18n="memRemoveShift">Delete and shift up</option>
-                            <option value="copy" data-i18n="memCopy">Copy</option>
-                            <option value="paste" data-i18n="memPaste">Paste</option>
-                        </select>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="up" data-i18n="memMoveUp">Move up</button>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="down" data-i18n="memMoveDown">Move down</button>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="insert" data-i18n="memInsert">Insert empty above</button>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="removeShift" data-i18n="memRemoveShift">Delete and shift up</button>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="copy" data-i18n="memCopy">Copy</button>
-                        <button type="button" class="btn compact-toolbar-action" data-edit="paste" data-i18n="memPaste">Paste</button>
-                        <span class="mem-bulk">
-                            <label for="memBulkField" data-i18n="memBulkField">Set for selected:</label>
-                            <select id="memBulkField"></select>
-                            <span id="memBulkValue" class="mem-bulk-value"></span>
-                            <button type="button" class="btn compact-toolbar-action" id="memBulkApply" data-i18n="memBulkApply">Apply</button>
-                        </span>
-                    </div>
-                    <div class="slots-table-wrap mem-table-wrap">
-                        <table class="slots-table mem-table">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" id="memSelectAll" aria-label="Select all shown" data-i18n-aria-label="memSelectAll"></th>
-                                    <th class="slot-col-idx">#</th>
-                                    <th data-help="name" data-i18n="memColName">Name</th>
-                                    <th data-help="frequency" data-i18n="memColFreq">Frequency (MHz)</th>
-                                    <th data-help="duplex" data-i18n="memColDuplex">Duplex</th>
-                                    <th data-help="offset" data-i18n="memColOffset">Offset (MHz)</th>
-                                    <th data-help="mode" data-i18n="memColMode">Mode</th>
-                                    <th data-help="tx-tone" data-i18n="memColTxTone">TX tone</th>
-                                    <th data-help="rx-tone" data-i18n="memColRxTone">RX tone</th>
-                                    <th data-help="power" data-i18n="memColPower">Power</th>
-                                    <th data-help="step" data-i18n="memColStep">Step (kHz)</th>
-                                    <th data-help="scan-list" data-i18n="memColScanList">Scan list</th>
-                                    <th data-help="skip" data-i18n="memColSkip">Skip</th>
-                                    <th data-help="tx-lock" data-i18n="memColTxLock" data-i18n-title="memTxLockHint" title="Apply the F Lock band plan to this channel">TX lock</th>
-                                    <th data-help="busy-lock" data-i18n="memColBusy">Busy lock</th>
-                                    <th data-help="reverse" data-i18n="memColReverse">Reverse</th>
-                                    <th data-help="compander" data-i18n="memColCompander">Compander</th>
-                                    <th data-help="ptt-id" data-i18n="memColPttId">PTT ID</th>
-                                    <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
-                                </tr>
-                            </thead>
-                            <tbody id="memTableBody"></tbody>
-                        </table>
-                    </div>
+                        <summary data-i18n="memChannelsBox">Memory channels</summary>
+                        <div class="mem-selection-bar" id="memSelectionBar" hidden>
+                            <span class="mem-summary" id="memSelectionCount" aria-live="polite"></span>
+                            <select id="memEditMenu" aria-label="Edit selected" data-i18n-aria-label="memEditMenu">
+                                <option value="" data-i18n="memEditMenu">Edit selected…</option>
+                                <option value="up" data-i18n="memMoveUp">Move up</option>
+                                <option value="down" data-i18n="memMoveDown">Move down</option>
+                                <option value="insert" data-i18n="memInsert">Insert empty above</option>
+                                <option value="removeShift" data-i18n="memRemoveShift">Delete and shift up</option>
+                                <option value="copy" data-i18n="memCopy">Copy</option>
+                                <option value="paste" data-i18n="memPaste">Paste</option>
+                            </select>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="up" data-i18n="memMoveUp">Move up</button>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="down" data-i18n="memMoveDown">Move down</button>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="insert" data-i18n="memInsert">Insert empty above</button>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="removeShift" data-i18n="memRemoveShift">Delete and shift up</button>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="copy" data-i18n="memCopy">Copy</button>
+                            <button type="button" class="btn compact-toolbar-action" data-edit="paste" data-i18n="memPaste">Paste</button>
+                            <span class="mem-bulk">
+                                <label for="memBulkField" data-i18n="memBulkField">Set for selected:</label>
+                                <select id="memBulkField"></select>
+                                <span id="memBulkValue" class="mem-bulk-value"></span>
+                                <button type="button" class="btn compact-toolbar-action" id="memBulkApply" data-i18n="memBulkApply">Apply</button>
+                            </span>
+                        </div>
+                        <div class="slots-table-wrap mem-table-wrap">
+                            <table class="slots-table mem-table">
+                                <thead>
+                                    <tr>
+                                        <th><label class="mem-select-all"><input type="checkbox" id="memSelectAll" aria-label="Select all shown" data-i18n-aria-label="memSelectAll"><span data-i18n="memSelectAll">Select all shown</span></label></th>
+                                        <th class="slot-col-idx">#</th>
+                                        <th data-help="name" data-i18n="memColName">Name</th>
+                                        <th data-help="frequency" data-i18n="memColFreq">Frequency (MHz)</th>
+                                        <th data-help="duplex" data-i18n="memColDuplex">Duplex</th>
+                                        <th data-help="offset" data-i18n="memColOffset">Offset (MHz)</th>
+                                        <th data-help="mode" data-i18n="memColMode">Mode</th>
+                                        <th data-help="tx-tone" data-i18n="memColTxTone">TX tone</th>
+                                        <th data-help="rx-tone" data-i18n="memColRxTone">RX tone</th>
+                                        <th data-help="power" data-i18n="memColPower">Power</th>
+                                        <th data-help="step" data-i18n="memColStep">Step (kHz)</th>
+                                        <th data-help="scan-list" data-i18n="memColScanList">Scan list</th>
+                                        <th data-help="skip" data-i18n="memColSkip">Skip</th>
+                                        <th data-help="tx-lock" data-i18n="memColTxLock" data-i18n-title="memTxLockHint" title="Apply the F Lock band plan to this channel">TX lock</th>
+                                        <th data-help="busy-lock" data-i18n="memColBusy">Busy lock</th>
+                                        <th data-help="reverse" data-i18n="memColReverse">Reverse</th>
+                                        <th data-help="compander" data-i18n="memColCompander">Compander</th>
+                                        <th data-help="ptt-id" data-i18n="memColPttId">PTT ID</th>
+                                        <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="memTableBody"></tbody>
+                            </table>
+                        </div>
                     </details>
                     <details class="mem-list-names-box mem-vfo-box" id="memVfoBox" hidden>
                         <summary data-i18n="memVfos">VFOs</summary>
@@ -1066,30 +1099,31 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=80"></script>
-<script src="locales/fr.js?v=80"></script>
-<script src="locales/it.js?v=80"></script>
-<script src="locales/es.js?v=80"></script>
-<script src="locales/de.js?v=80"></script>
-<script src="locales/pt.js?v=80"></script>
-<script src="locales/ru.js?v=80"></script>
-<script src="locales/pl.js?v=80"></script>
-<script src="locales/zh.js?v=80"></script>
-<script src="locales/nl.js?v=80"></script>
-<script src="js/studio-preferences.js?v=2"></script>
+<script src="locales/en.js?v=82"></script>
+<script src="locales/fr.js?v=82"></script>
+<script src="locales/it.js?v=82"></script>
+<script src="locales/es.js?v=82"></script>
+<script src="locales/de.js?v=82"></script>
+<script src="locales/pt.js?v=82"></script>
+<script src="locales/ru.js?v=82"></script>
+<script src="locales/pl.js?v=82"></script>
+<script src="locales/zh.js?v=82"></script>
+<script src="locales/nl.js?v=82"></script>
+<script src="js/studio-preferences.js?v=3"></script>
 <script src="js/studio-i18n.js?v=5"></script>
-<script src="js/webusb-serial.js?v=3"></script>
+<script src="js/webusb-serial.js?v=4"></script>
 <script src="js/studio-serial.js?v=7"></script>
 <script src="js/runtime-protocol.js?v=2"></script>
 <script src="js/rf-log.js?v=4"></script>
     <script src="js/k5viewer.js?v=38"></script>
 <script src="js/keypad-detach.js?v=1"></script>
-<script src="js/flash.js?v=104"></script>
-<script src="js/memories.js?v=12"></script>
+<script src="js/firmware-package.js?v=1"></script>
+<script src="js/flash.js?v=106"></script>
+<script src="js/memories.js?v=14"></script>
 <script src="js/settings.js?v=9"></script>
-<script src="js/flash-catalog.js?v=19"></script>
-<script src="js/app-catalog.js?v=20"></script>
-<script src="js/studio.js?v=30"></script>
+<script src="js/flash-catalog.js?v=20"></script>
+<script src="js/app-catalog.js?v=21"></script>
+<script src="js/studio.js?v=32"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>
 <script src="js/vendor/marked.min.js?v=12.0.2"></script>
 <script src="js/doc-viewer.js?v=9"></script>

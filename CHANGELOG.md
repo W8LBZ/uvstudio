@@ -7,6 +7,31 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.1 (2026-10-25)
+
+Based on UV Studio 2.2.0.
+
+Merged UV Studio 2.2.0:
+
+- Firmware packages that carry an asset pack (fonts, menus) are flashed in three steps:
+  firmware image, radio restart, then the assets are written over serial. "Install firmware
+  assets" retries the last step if it didn't finish.
+- New apps in the catalog: Sonde MRZ (MRZ-N1 / MP3-H1 radiosondes) and Geo Nav.
+
+Fixes:
+
+- Memories on a phone: an expanded card now stays with its channel when channels are moved,
+  inserted, deleted or pasted over, and cards fold up after Read, CSV import or opening a backup.
+- Memories on a phone: a Select all shown checkbox above the channel cards.
+- Read clicked while the page was still connecting could do nothing; it now waits for the connection.
+- Copy log says when copying fails instead of failing silently.
+- Android: bytes the radio sent while a reader was being replaced are no longer lost.
+- Memories: moving, inserting or deleting channels no longer marks untouched empty slots as
+  changed (radios keep leftover bytes in deleted slots; they are now carried along as they are).
+- On phones and narrow windows, picking a page folds the menu away, so the page starts at the
+  top of the screen (the menu button brings it back).
+- The browser tab is titled UV Studio+ again instead of reverting to UV Studio.
+
 ## 2026.10.0 (2026-10-25)
 
 Based on UV Studio 2.1.0.

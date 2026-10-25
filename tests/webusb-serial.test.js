@@ -12,7 +12,8 @@ test('installs navigator.serial over a fake CH340 and moves bytes both ways', as
   const { install } = require('../js/webusb-serial.js');
   const controls = [];
   const sent = [];
-  const incoming = [[0x01, 0x02], [], [0x03]];
+  let release;
+  const incoming = [[0x01, 0x02], [], [0x03], new Promise(resolve => { release = resolve; })];
   const device = {
     vendorId: 0x1a86, productId: 0x7523, opened: false, configuration: null,
     async open() { this.opened = true; },
@@ -30,7 +31,7 @@ test('installs navigator.serial over a fake CH340 and moves bytes both ways', as
     async transferIn(ep, length) {
       assert.strictEqual(ep, 2);
       assert.strictEqual(length, 32);
-      const bytes = incoming.shift();
+      const bytes = await incoming.shift();
       if (!bytes) return new Promise(() => {});
       return { status: 'ok', data: new DataView(new Uint8Array(bytes).buffer) };
     },
@@ -56,13 +57,23 @@ test('installs navigator.serial over a fake CH340 and moves bytes both ways', as
     await writer.write(new Uint8Array([9, 8]));
     assert.deepStrictEqual(sent, [2, 9, 8]);
 
+    // Bytes that arrive after a reader cancels go to the next reader.
+    const pending = reader.read();
+    await reader.cancel();
+    assert.ok((await pending).done);
+    reader.releaseLock();
+    release([0x04]);
+    await new Promise(resolve => setTimeout(resolve));   // lands before the next reader exists
+    const next = port.readable.getReader();
+    assert.deepStrictEqual([...(await next.read()).value], [4]);
+
     let unplugged = null;
     navigator.serial.addEventListener('disconnect', event => { unplugged = event.target; });
     const event = new Event('disconnect');
     event.device = device;
     usb.dispatchEvent(event);
     assert.strictEqual(unplugged, port);
-    await reader.cancel();
+    await next.cancel();
     await port.close();
     assert.strictEqual(port.readable, null);
   } finally {

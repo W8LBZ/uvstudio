@@ -267,6 +267,16 @@ test('inserts and removes with shifting, like CHIRP', () => {
   assert.throws(() => mem.insertChannel(image, 0), /last channel/);
 });
 
+test('insert then delete leaves empty slots with leftover bytes untouched', () => {
+  const image = named(['A', 'B']);
+  image[5 * 16] = 0x42;                         // stale record byte in an empty slot
+  image[0x8000 + 5 * 2] = 0x07;                 // attribute band 7: empty
+  const before = image.slice();
+  mem.insertChannel(image, 0);
+  mem.removeChannel(image, 0);
+  assert.deepEqual(mem.dirtyRuns(before, image), []);
+});
+
 test('copies and pastes channels, including empty ones', () => {
   const image = named(['A', null, 'C']);
   const clip = [0, 1, 2].map(i => mem.copyChannel(image, i));

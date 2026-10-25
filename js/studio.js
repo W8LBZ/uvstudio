@@ -118,7 +118,7 @@
     }
 
     function applyBranding() {
-        document.title = `UV Studio v${version} by F4HWN`;
+        document.title = `UV Studio+ v${version} by KO4CGQ`;   // W8LBZ fork
         if (versionLabel) versionLabel.textContent = `v${version}`;
         if (aboutVersion) aboutVersion.textContent = `v${version}`;
         const upstreamVersion = document.getElementById("aboutUpstreamVersion");
@@ -328,7 +328,12 @@
         if (settings.updateHash) replaceHash(route);
     }
 
+    const stackedLayout = window.matchMedia("(max-width: 860px)");   /* W8LBZ fork: sidebar sits above the page */
     items.forEach(item => item.addEventListener("click", () => {
+        if (stackedLayout.matches) {   /* W8LBZ fork: give the page the screen back */
+            document.body.classList.add("sidebar-collapsed");
+            hamburgerBtn.setAttribute("aria-expanded", "false");
+        }
         void activate(item, { ensureSerial: true });
     }));
 
