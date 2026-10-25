@@ -1,0 +1,42 @@
+# Publishes main at the site root and the test branch (when it exists) under /test/,
+# so builds can be tried on hardware before they reach main.
+name: Pages
+
+on:
+  push:
+    branches: [main, test]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Assemble site
+        run: |
+          mkdir _site
+          git archive HEAD | tar -x -C _site
+          if git rev-parse -q --verify origin/test >/dev/null; then
+            mkdir _site/test
+            git archive origin/test | tar -x -C _site/test
+          fi
+          rm -rf _site/.github _site/test/.github
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+      - id: deployment
+        uses: actions/deploy-pages@v4
