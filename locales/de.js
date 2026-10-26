@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.de = {
   "plus_port_changed": "Port ausgewählt. Die nächste Verbindung verwendet ihn.",
   "plus_logCopy": "Log kopieren",
   "plus_logCopied": "Kopiert",
+  "plus_update_ready": "Eine neuere Version von UV Studio+ (v{0}) ist verfügbar. Jetzt neu laden, um sie zu verwenden?",
   "plus_logCopyFailed": "Kopieren fehlgeschlagen",
   "plus_port_unchanged": "Portauswahl abgebrochen. Der aktuelle Port bleibt erhalten.",
   "plus_service_shown": "Die Service-Einstellungen werden jetzt unten in den Funkgeräteeinstellungen angezeigt.",

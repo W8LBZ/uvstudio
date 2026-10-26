@@ -40,6 +40,14 @@ jobs:
             sed -i -E "s/(studio-version\.js\?v=[^\"]+)\"/\1$stamp\"/" _site/test/index.html
           fi
           rm -rf _site/.github _site/test/.github
+          # Offline copy: give each site's sw.js its file list and build, so a deploy refreshes it.
+          for dir in _site _site/test; do
+            [ -f "$dir/sw.js" ] || continue
+            files=$(cd "$dir" && find . -type f ! -path './test/*' ! -path './tests/*' ! -path './tools/*' \
+              ! -path './assets/factory/*' ! -name sw.js | sed 's|^\./||' | sort | jq -R . | jq -sc .)
+            build=$(git rev-parse --short "$([ "$dir" = _site ] && echo HEAD || echo origin/test)")
+            sed -i -e "s|^const FILES = \[\];|const FILES = $files;|" -e "s|^const BUILD = '';|const BUILD = '$build';|" "$dir/sw.js"
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - id: deployment

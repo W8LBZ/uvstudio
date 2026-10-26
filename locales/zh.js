@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.zh = {
   "plus_port_changed": "已选择端口。下次连接将使用该端口。",
   "plus_logCopy": "复制日志",
   "plus_logCopied": "已复制",
+  "plus_update_ready": "UV Studio+ 有更新版本 (v{0})。现在重新加载以使用它吗？",
   "plus_logCopyFailed": "复制失败",
   "plus_port_unchanged": "已取消选择端口。保留当前端口。",
   "plus_service_shown": "服务设置现在显示在电台设置底部。",

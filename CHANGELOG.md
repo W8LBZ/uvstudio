@@ -7,6 +7,15 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.3 (2026-10-25)
+
+- Works offline: after one visit with a connection, UV Studio+ opens and talks to the radio
+  without one, help pages included, for field use. Online it always loads the latest version;
+  after starting offline, it offers to reload once a newer version is online. Firmware and app
+  catalogs and imports from a URL still need a connection.
+- Installable: Chrome can install UV Studio+ as an app with its own window and icon
+  (Install app, or Add to home screen on Android).
+
 ## 2026.10.2 (2026-10-25)
 
 - Radio settings: Main VFO and the channel VFO A and VFO B start on (a memory channel or a

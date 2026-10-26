@@ -19,11 +19,17 @@ Everything UV Studio does (listed below) works the same here. On top of that:
   duplicate skipping, from a file or a URL) and export, raw backups, multi-row editing
   (move, insert, delete and shift, copy and paste, set a field on every selected row),
   scan list names.
-- **Radio settings**: the radio's menu settings, including FM broadcast presets and ScMix.
+- **Radio settings**: the radio's menu settings, including FM broadcast presets and ScMix,
+  plus what CHIRP sets that the menu doesn't show: the channel VFO A and VFO B start on,
+  Main VFO, and DTMF tone timings. Everything CHIRP sets on these radios is covered.
 - **Android support**: Chrome on Android works through a built-in WebUSB driver for the
   cable's CH340 chip, with a layout that fits a phone screen. iOS and iPadOS aren't
   supported: as of iOS 27, Safari (and every iOS browser, which all use WebKit) has
   neither Web Serial nor WebUSB. If WebKit adds Web Serial, iOS support will be looked at.
+- **Works offline, installs as an app**: after one visit with a connection it opens and
+  talks to the radio without one, help included, for field use. Online it always loads the
+  latest version, and after an offline start it offers to reload once a newer one is online.
+  Chrome can install it with its own window and icon (Install app, or Add to home screen).
 - **Help for beginners**: column headers and setting labels open plain-language help
   (English and French), plus a guide for every tool panel.
 - **Safer writes**: only changed bytes are written and verified; a one-time
@@ -113,13 +119,16 @@ call channel numbers in Radio settings.
 Open Radio settings, select Read from radio, change settings, then select Write
 changes to radio. Settings use the radio's own menu names and values. ScMix picks which
 scan lists the MIX scan list setting combines. Battery calibration and the volume gain
-stored in the calibration area are not shown. Opening a
+stored in the calibration area are not shown. VFO A and VFO B set the channel each side
+starts on (the radio updates them itself as you change channels); the DTMF group adds tone
+timings the radio's menu doesn't show. Opening a
 settings backup never restores its AES key or firmware version bytes.
 
 ## Run locally
 
 UV Studio is a static HTML, CSS, and JavaScript application. Open index.html
-directly in a compatible browser. A local web server is not required.
+directly in a compatible browser. A local web server is not required. The offline copy
+(sw.js) needs http(s), so it is off when opened as a file.
 
 ## Project structure
 
@@ -138,6 +147,7 @@ directly in a compatible browser. A local web server is not required.
 - js/memories.js — memory channel codec, CHIRP CSV, and the Memories panel
 - js/settings.js — radio settings field table and the Radio settings panel
 - js/webusb-serial.js — Web Serial over WebUSB for the CH340 (Android)
+- sw.js, js/offline.js, manifest.webmanifest — offline copy, update offer, and app install
 - js/studio-i18n.js — shared translation engine and language preference
 - locales/ — unified dictionaries for Studio, K5Viewer, and UVTools2
 - tests/ — Node.js protocol, controller, locale, and static integration tests
@@ -167,12 +177,14 @@ are retained in [NOTICE](NOTICE).
 
 UV Studio+ changes are listed in [CHANGELOG.md](CHANGELOG.md). The main fork-only files
 are js/memories.js, js/settings.js, js/webusb-serial.js, js/license-ack.js,
-js/doc-viewer.js and docs/help/; other changes are spread through index.html,
-js/flash.js, js/studio.js, the CSS, locales/ and tests/.
+js/doc-viewer.js, sw.js, js/offline.js, manifest.webmanifest and docs/help/; other
+changes are spread through index.html, js/flash.js, js/studio.js, the CSS, locales/
+and tests/.
 
 ## License
 
 Copyright 2026 Armel FAUVEAU.
+UV Studio+ modifications Copyright 2026 KO4CGQ.
 
-UV Studio is licensed under the [Apache License 2.0](LICENSE). See
+UV Studio and UV Studio+ are licensed under the [Apache License 2.0](LICENSE). See
 [NOTICE](NOTICE) for attribution information.

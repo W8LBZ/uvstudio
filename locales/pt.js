@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.pt = {
   "plus_port_changed": "Porta selecionada. A próxima ligação vai usá-la.",
   "plus_logCopy": "Copiar registo",
   "plus_logCopied": "Copiado",
+  "plus_update_ready": "Há uma versão mais recente do UV Studio+ (v{0}). Recarregar agora para usá-la?",
   "plus_logCopyFailed": "Falha ao copiar",
   "plus_port_unchanged": "Seleção de porta cancelada. A porta atual mantém-se.",
   "plus_service_shown": "As definições de serviço aparecem agora no fim das definições do rádio.",

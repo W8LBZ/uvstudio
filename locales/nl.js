@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.nl = {
   "plus_port_changed": "Poort geselecteerd. De volgende verbinding gebruikt deze.",
   "plus_logCopy": "Log kopiëren",
   "plus_logCopied": "Gekopieerd",
+  "plus_update_ready": "Er is een nieuwere versie van UV Studio+ (v{0}) beschikbaar. Nu herladen om die te gebruiken?",
   "plus_logCopyFailed": "Kopiëren mislukt",
   "plus_port_unchanged": "Poortkeuze geannuleerd. De huidige poort blijft behouden.",
   "plus_service_shown": "De service-instellingen staan nu onderaan de radio-instellingen.",

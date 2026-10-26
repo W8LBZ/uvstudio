@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.pl = {
   "plus_port_changed": "Wybrano port. Następne połączenie go użyje.",
   "plus_logCopy": "Kopiuj dziennik",
   "plus_logCopied": "Skopiowano",
+  "plus_update_ready": "Dostępna jest nowsza wersja UV Studio+ (v{0}). Przeładować teraz, aby jej użyć?",
   "plus_logCopyFailed": "Kopiowanie nie powiodło się",
   "plus_port_unchanged": "Anulowano wybór portu. Bieżący port pozostaje.",
   "plus_service_shown": "Ustawienia serwisowe są teraz widoczne na dole ustawień radia.",

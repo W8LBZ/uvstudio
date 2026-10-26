@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.en = {
   "plus_port_changed": "Port selected. The next connection will use it.",
   "plus_logCopy": "Copy log",
   "plus_logCopied": "Copied",
+  "plus_update_ready": "A newer UV Studio+ (v{0}) is available. Reload now to use it?",
   "plus_logCopyFailed": "Copy failed",
   "plus_port_unchanged": "Port selection cancelled. The current port is kept.",
   "plus_service_shown": "Service settings are now shown at the bottom of Radio settings.",

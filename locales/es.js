@@ -571,6 +571,7 @@ window.UVSTUDIO_LOCALES.es = {
   "plus_port_changed": "Puerto seleccionado. La próxima conexión lo usará.",
   "plus_logCopy": "Copiar registro",
   "plus_logCopied": "Copiado",
+  "plus_update_ready": "Hay una versión más reciente de UV Studio+ (v{0}). ¿Recargar ahora para usarla?",
   "plus_logCopyFailed": "Error al copiar",
   "plus_port_unchanged": "Selección de puerto cancelada. Se mantiene el puerto actual.",
   "plus_service_shown": "Los ajustes de servicio se muestran ahora al final de los ajustes de la radio.",
