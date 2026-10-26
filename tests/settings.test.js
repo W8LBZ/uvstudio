@@ -135,3 +135,17 @@ test('F Lock follows TxLockModes_t of the release editions', () => {
   set.setValue(img, '350 En', 1);
   assert.deepEqual([img[0x150], img[0x155]], [1, 1]);
 });
+
+test('sets VFO A/B indices and Main VFO like the firmware', () => {
+  const img = new Uint8Array(set.SIZE);
+  set.setValue(img, 'VFO A', 300);                  // memory: shown + last memory
+  set.setValue(img, 'VFO B', set.CHANNEL_NONE + 2); // 137 MHz band VFO: shown + last band VFO
+  assert.deepEqual([...img.subarray(0x010, 0x01C)], [44, 1, 44, 1, 0, 0, 2, 4, 0, 0, 2, 4]);
+  img[0x00C] = 1;                                   // dual watch on A
+  img[0x00A] = 1;                                   // cross band on A
+  set.setValue(img, 'Main VFO', 1);
+  assert.deepEqual([img[0x0C3], img[0x00C], img[0x00A]], [1, 2, 2]);
+  img[0x00C] = 3;                                   // full watch is not tied to a side
+  set.setValue(img, 'Main VFO', 0);
+  assert.equal(img[0x00C], 3);
+});

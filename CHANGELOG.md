@@ -7,6 +7,13 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.2 (2026-10-25)
+
+- Radio settings: Main VFO and the channel VFO A and VFO B start on (a memory channel or a
+  band VFO), as in CHIRP.
+- Radio settings: four DTMF timings the radio's menu doesn't show: first code, `*` and `#`,
+  other codes, and the gap between codes (30 to 1000 ms, as in CHIRP).
+
 ## 2026.10.1 (2026-10-25)
 
 Based on UV Studio 2.2.0.

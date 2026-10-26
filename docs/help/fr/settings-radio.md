@@ -27,6 +27,16 @@ Comment la radio écoute avec ses deux VFO (A et B) :
 - **MAIN TX FULL RX** : surveille tout cela, émet toujours sur le VFO sélectionné.
 - Les deux modes FULL ne sont pas présents dans toutes les éditions du firmware.
 
+### Main VFO
+Le VFO (**A** ou **B**) sélectionné au démarrage de la radio : celui sur lequel vous émettez. Comme un appui sur la touche VFO A/B. La double veille et le cross band suivent le nouveau côté.
+
+### VFO A
+Ce que le VFO A affiche au démarrage : un canal mémoire (**CH 1** à **CH 1024**) ou un VFO de bande. La radio le modifie elle-même à chaque changement de canal ; ce n’est donc qu’un point de départ, par exemple après la restauration d’une sauvegarde.
+- Sur un canal mémoire vide, la radio passe au suivant qui contient une fréquence.
+
+### VFO B
+Comme **VFO A**, pour le VFO B.
+
 ### BatSav
 Économiseur de batterie. Quand la radio reste inactive sur l’écran principal une dizaine de secondes, le récepteur fait de petites siestes : il se réveille brièvement pour chercher un signal, se rendort, et recommence.
 

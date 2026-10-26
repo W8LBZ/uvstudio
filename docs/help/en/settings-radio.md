@@ -27,6 +27,16 @@ How the radio listens with its two VFOs (A and B):
 - **MAIN TX FULL RX**: watch all of those, always transmit on the selected VFO.
 - The two FULL modes aren't in every firmware edition.
 
+### Main VFO
+Which VFO (**A** or **B**) is selected when the radio starts: the one you transmit on. The same as pressing the VFO A/B key. Dual watch and cross band follow the new side.
+
+### VFO A
+What VFO A shows when the radio starts: a memory channel (**CH 1** to **CH 1024**) or a band VFO (**VFO 137-174 MHz** etc.). The radio changes this itself every time you switch channels, so it only matters as a starting point, for example after restoring a backup.
+- An empty memory channel makes the radio step to the next one that holds a frequency.
+
+### VFO B
+The same as **VFO A**, for VFO B.
+
 ### BatSav
 Battery saver. When the radio sits idle on its main screen for about 10 seconds, the receiver starts napping: it wakes briefly to check for a signal, sleeps, and repeats.
 

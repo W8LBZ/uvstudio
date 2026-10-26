@@ -57,6 +57,29 @@
     img.set([mask & 0xFF, (mask >> 8) & 0xFF, mask >> 16, 0x4D, 0x49, 0x58, 1], 0x170);
   }
 
+  // VFO A/B indices at 0xA010: u16 per side (shown channel, last memory, last band VFO).
+  // 0-1023 memory channels, 1024-1030 band VFOs. Setting the shown channel also sets the
+  // matching "last" entry, as CHIRP does; an empty memory makes the radio step to the next one.
+  const BAND_MHZ = [18, 108, 137, 174, 350, 400, 470, 1300];
+  const SCREEN_VALUES = [
+    ...BAND_MHZ.slice(0, 7).map((lo, b) => [CHANNEL_NONE + b, `VFO ${lo}-${BAND_MHZ[b + 1]} MHz`]),
+    ...range(0, CHANNEL_NONE - 1, v => `CH ${v + 1}`)
+  ];
+  const u16 = (img, at) => img[at] | (img[at + 1] << 8);
+  const putU16 = (img, at, v) => { img[at] = v & 0xFF; img[at + 1] = v >> 8; };
+  const vfoChannel = (id, at) => ({
+    id, group: 'radio', values: SCREEN_VALUES,
+    get: img => u16(img, at),
+    set: (img, v) => { putU16(img, at, v); putU16(img, at + (v < CHANNEL_NONE ? 2 : 4), v); }
+  });
+
+  // TX_VFO at 0xA0C3. Like COMMON_SwitchVFOs, dual watch and cross band follow the new side.
+  function mainVfoSet(img, v) {
+    img[0x0C3] = v;
+    if (img[0x00A]) img[0x00A] = v + 1;
+    if (img[0x00C] && img[0x00C] !== 3) img[0x00C] = v + 1;
+  }
+
   // FM broadcast (BK1080): band at 0xA023 bits 1-2, 48 presets at 0xA028 as u16 in 100 kHz
   // units (0xFFFF empty). The firmware skips presets outside lo <= f < hi of the current band.
   const FM_BANDS = [[875, 1080], [760, 1080], [760, 900], [640, 760]];
@@ -87,6 +110,9 @@
     field('SetNFM', 'radio', 0xA00E, list(['NARROW', 'NARROWER']), 1, 1),
     field('SetRxA FM', 'radio', 0xA000, list(['FLAT', 'CLEAN', 'MID', 'BOOST', 'MAX']), 0, 4),
     field('SetRxA AM', 'radio', 0xA000, list(['SHARP', 'STOCK', 'OPEN']), 4, 4),
+    { id: 'Main VFO', group: 'radio', values: list(['A', 'B']), get: img => img[0x0C3], set: mainVfoSet },
+    vfoChannel('VFO A', 0x010),
+    vfoChannel('VFO B', 0x016),
 
     // Display
     field('ChDisp', 'display', 0xA009, list(['FREQ', 'CHANNEL NUMBER', 'NAME', 'NAME + FREQ'])),
@@ -139,6 +165,11 @@
     // DTMF
     field('D ST', 'dtmf', 0xA0E8, list(ON_OFF)),
     field('D Prel', 'dtmf', 0xA0ED, range(3, 99, v => `${v}*10ms`)),
+    // Not in the radio menu; CHIRP's 30-1000 ms. The firmware uses 100 ms for bytes over 100.
+    field('D 1st', 'dtmf', 0xA0EE, range(3, 100, v => `${v}*10ms`)),
+    field('D *#', 'dtmf', 0xA0EF, range(3, 100, v => `${v}*10ms`)),
+    field('D Code', 'dtmf', 0xA0F0, range(3, 100, v => `${v}*10ms`)),
+    field('D Gap', 'dtmf', 0xA0F1, range(3, 100, v => `${v}*10ms`)),
     field('D Live', 'dtmf', 0xA157, list(ON_OFF), 1, 1),
     field('UPCode', 'dtmf', 0xA110, 'dtmf'),
     field('DWCode', 'dtmf', 0xA120, 'dtmf'),
