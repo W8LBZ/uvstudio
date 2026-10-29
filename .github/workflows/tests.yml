@@ -1,0 +1,32 @@
+# Unit tests plus the fake-radio smoke test (desktop and phone size) on every push.
+# Screenshots are kept as a run artifact for a look at the layout.
+name: Tests
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test tests/*.test.js
+      - name: Smoke test
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: |
+          mkdir -p smoke/desktop smoke/phone
+          node tools/smoke.js index.html smoke/desktop
+          MOBILE=1 node tools/smoke.js index.html smoke/phone
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: smoke/*/*.png

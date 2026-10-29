@@ -7,6 +7,26 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.4 (2026-10-28)
+
+Based on UV Studio 2.3.0.
+
+Merged UV Studio 2.3.0:
+
+- Apps: a Community tab lists apps shared by their authors (not reviewed by F4HWN), with a
+  warning before installing one. Propose an app checks a .app file, captures the radio
+  screen as its screenshot, and opens the submission on GitHub.
+- Apps: catalog entries can show screenshots.
+
+Other changes:
+
+- Clearer help for the VFO rows and TX lock in Memories: a VFO row is where that band was
+  left, not a rule for the band, and TX lock picks whether to follow the F Lock band plan.
+- Fuller help for SetRxA FM and SetRxA AM: what each profile does and when to change it.
+- Help pages: links between pages now have a Back button.
+- Radio settings: the ScMix scan list checkboxes no longer spill out of their row at some
+  window widths.
+
 ## 2026.10.3 (2026-10-25)
 
 - Works offline: after one visit with a connection, UV Studio+ opens and talks to the radio

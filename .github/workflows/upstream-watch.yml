@@ -1,0 +1,83 @@
+# Daily check for armel commits touching uvstudio/ that the upstream branch doesn't have yet.
+# Keeps one open "Upstream changes" issue: the commit list plus a trial merge into test
+# (tools/upstream-trial.sh: shape of the change, conflicts, tests, smoke tests). It comments
+# only when new commits arrive (that's the notification), refreshes the report silently, and
+# closes the issue once caught up. Finds the last sync by matching the upstream branch's tree
+# to armel's uvstudio/ tree.
+name: Upstream watch
+
+on:
+  schedule:
+    - cron: '17 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compare with armel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHROME: /usr/bin/google-chrome
+        run: |
+          synced=$(git rev-parse 'origin/upstream^{tree}')
+          armel="$RUNNER_TEMP/armel"
+          git clone -q https://github.com/armel/armel.github.io.git "$armel"
+          list=""
+          for b in $(git -C "$armel" branch -r --format='%(refname:short)' | grep -v -e HEAD -e '^origin$'); do
+            base=""
+            for c in $(git -C "$armel" log --format=%H "$b" -- uvstudio); do
+              [ "$(git -C "$armel" rev-parse "$c:uvstudio")" = "$synced" ] && base=$c && break
+            done
+            if [ -n "$base" ]; then
+              log=$(git -C "$armel" log --format='- %h %s (%as)' "$base..$b" -- uvstudio/)
+            else
+              log="- last sync not found on this branch; recent uvstudio/ commits:
+          $(git -C "$armel" log -10 --format='- %h %s (%as)' "$b" -- uvstudio/)"
+            fi
+            [ -n "$log" ] && list="$list### $b
+          $log
+
+          "
+          done
+          title="Upstream changes"
+          num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
+          if [ -z "$list" ]; then
+            [ -n "$num" ] && gh issue close "$num" -c "Caught up with armel."
+            exit 0
+          fi
+          git checkout -q test 2>/dev/null || true
+          report=$(tools/upstream-trial.sh "$armel" 2>&1)
+          marker="<!-- commits $(echo "$list" | sha1sum | cut -c1-12) -->"
+          body="$marker
+          Armel commits touching uvstudio/ not yet on the upstream branch (sync steps in CLAUDE.md).
+          Try them on the radio at https://armel.github.io/uvstudio/ (armel master, live).
+
+          $list## Trial merge of armel master
+
+          $report
+
+          Screenshots: [latest run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID) artifacts."
+          if [ -z "$num" ]; then
+            gh issue create -t "$title" -b "$body"
+          else
+            old=$(gh issue view "$num" --json body -q .body)
+            gh issue edit "$num" -b "$body"
+            case "$old" in "$marker"*) ;; *) gh issue comment "$num" -b "New upstream commits; list and trial merge updated." ;; esac
+          fi
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trial-merge-screenshots
+          path: ${{ runner.temp }}/upstream-trial/*/*.png
+          if-no-files-found: ignore

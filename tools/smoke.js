@@ -13,7 +13,7 @@ const page = 'file://' + path.resolve(process.argv[2]) + '#memories';
 const outDir = process.argv[3];
 const port = 9333;
 
-const proc = spawn(shell, [`--remote-debugging-port=${port}`, '--no-sandbox', '--window-size=1400,1000',
+const proc = spawn(shell, [`--remote-debugging-port=${port}`, '--headless', '--no-sandbox', '--window-size=1400,1000',
   `--user-data-dir=${path.join(outDir, 'profile')}`, 'about:blank'], { stdio: 'ignore' });
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -213,6 +213,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     sql: document.querySelector('[data-id="Sql"]').value, msg: document.querySelector('[data-id="Message 1"]').value,
     pwr: document.querySelector('[data-id="SetPwr"]').selectedOptions[0].textContent,
     summary: document.getElementById('setSummary').textContent })`));
+  // ScMix's 24 checkboxes must stay inside their row at every width.
+  const overflows = [];
+  for (let width = 320; width <= 1400; width += 10) {
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 915, deviceScaleFactor: 1, mobile: width < 700 });
+    await sleep(50);
+    if (await evaluate(`(() => { const m = document.querySelector('[data-id="ScMix"]'), r = m.closest('details').getBoundingClientRect();
+      return m.scrollWidth > m.clientWidth + 1 || m.getBoundingClientRect().right > r.right + 1; })()`)) overflows.push(width);
+  }
+  await send('Emulation.setDeviceMetricsOverride', mobile
+    ? { width: 412, height: 915, deviceScaleFactor: 2, mobile: true }
+    : { width: 1400, height: 1000, deviceScaleFactor: 1, mobile: false });
+  console.log('ScMix overflow widths', overflows);
+  if (overflows.length) throw new Error(`ScMix overflows at ${overflows.join(', ')} px`);
   const service = () => evaluate(`Boolean(document.querySelector('[data-id="F Lock"]'))`);
   const hiddenBefore = !(await service());
   await evaluate(`(() => { const v = document.getElementById('studioVersion'); for (let i = 0; i < 5; i++) v.click(); })()`);
@@ -273,6 +286,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     fs.writeFileSync(path.join(outDir, 'live.png'), Buffer.from(shot4.result.data, 'base64'));
   }
   console.log('page errors', errors);
+  if (errors.length) process.exitCode = 1;
   ws.close();
   proc.kill();
 })().catch(e => { console.error(e); proc.kill(); process.exit(1); });

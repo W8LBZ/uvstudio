@@ -41,4 +41,11 @@ Tick the boxes on the left to select channels. A bar appears with:
 - The names help you on the radio's screen. Which list a channel belongs to is set in the [Scan list](scan-list.md) column.
 
 ### VFOs
-The **VFOs** section below the table holds the radio's free-tuning frequencies, one pair per band. See [VFO](vfo.md).
+The **VFOs** section, after **Memory channels**, is the radio's own record of where you left each band when tuning by frequency (VFO mode) rather than using memory channels.
+- The radio has 7 fixed bands and two VFOs (A and B), so there are 14 rows, one per band per VFO.
+- Each row holds what that VFO had set in that band: frequency, offset, tones, power, TX lock and so on. Switch back to the band and the radio picks up from that row.
+- **The radio fills this table itself.** Every time you tune or change a setting in VFO mode, it saves the change to the matching row. **Read from radio** shows what it saved.
+- **You can edit it too.** Edit a row, press **Write changes to radio**, and the radio starts from your values, until you change them on the radio again.
+- A row is a saved spot, not a rule for the whole band. To keep a frequency for good, put it in a memory channel.
+
+See [VFO](vfo.md).

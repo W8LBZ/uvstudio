@@ -35,7 +35,8 @@ What VFO A shows when the radio starts: a memory channel (**CH 1** to **CH 1024*
 - An empty memory channel makes the radio step to the next one that holds a frequency.
 
 ### VFO B
-The same as **VFO A**, for VFO B.
+What VFO B shows when the radio starts: a memory channel (**CH 1** to **CH 1024**) or a band VFO (**VFO 137-174 MHz** etc.). The radio changes this itself every time you switch channels, so it only matters as a starting point, for example after restoring a backup.
+- An empty memory channel makes the radio step to the next one that holds a frequency.
 
 ### BatSav
 Battery saver. When the radio sits idle on its main screen for about 10 seconds, the receiver starts napping: it wakes briefly to check for a signal, sleeps, and repeats.
@@ -74,7 +75,16 @@ Repeater squelch tail elimination: after you release PTT, the radio keeps transm
 How narrow NFM channels are: **NARROW** (standard 12.5 kHz) or **NARROWER** (tighter still). Leave on NARROW unless you know you need it.
 
 ### SetRxA FM
-Receive audio shaping for FM: from **FLAT** (unchanged) to **MAX** (louder, more processed). Pick what sounds clearest to you.
+How the radio's receiver is tuned for [FM](mode.md) and NFM stations: how hard it amplifies the signal before you hear it. It changes what you hear, not what you transmit.
+- **FLAT** (default): the least boost. Quiet background, and strong nearby stations stay clean.
+- **CLEAN**, **MID**: a little and then more boost, so weak stations come up louder.
+- **BOOST**, **MAX**: the most boost, with a wider filter. Weak stations get easier to hear, but so does hiss, and a busy band can bleed in from next door.
+- Start on **FLAT**. If a far-off repeater is hard to make out, step up one at a time and stop where it sounds best.
+- You can also cycle it on the radio with the **RxA** key shortcut (see **Keys**). While receiving, the screen shows the profile name.
 
 ### SetRxA AM
-Receive audio filter for AM: **SHARP** cuts more noise, **OPEN** lets more audio through, **STOCK** is in between.
+How the radio's receiver is tuned for [AM](mode.md) stations, such as aircraft on the airband (118–137 MHz): how wide its filter is and how hard it amplifies the signal before you hear it. It changes what you hear, not what you transmit.
+- **SHARP** (default): a narrow filter. Rejects stations on the next channel best, but can sound harsh on strong signals.
+- **STOCK**: the same narrow filter with a little more boost. A good middle ground.
+- **OPEN**: a wider filter with the most boost. Pleasant and better on weak signals, but a station next door can bleed in.
+- Try **STOCK** or **OPEN** if distant aircraft are hard to hear; go back to **SHARP** if you hear two stations at once.

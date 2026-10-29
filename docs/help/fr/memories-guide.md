@@ -41,4 +41,11 @@ Cochez les cases à gauche pour sélectionner des canaux. Une barre apparaît av
 - Ces noms vous aident sur l’écran de la radio. La liste d’un canal se choisit dans la colonne [Liste de scan](scan-list.md).
 
 ### VFO
-La section **VFO** sous le tableau contient les fréquences libres de la radio, une paire par bande. Voir [VFO](vfo.md).
+La section **VFO**, après **Canaux mémoire**, est le relevé que tient la radio de l’endroit où vous avez laissé chaque bande en accord libre (mode VFO), par opposition aux canaux mémoire.
+- La radio a 7 bandes fixes et deux VFO (A et B) : d’où 14 lignes, une par bande et par VFO.
+- Chaque ligne contient ce que ce VFO avait réglé dans cette bande : fréquence, décalage, tonalités, puissance, verrou TX, etc. En revenant sur la bande, la radio repart de cette ligne.
+- **La radio remplit ce tableau elle-même.** Chaque fois que vous accordez ou changez un réglage en mode VFO, elle l’enregistre dans la ligne correspondante. **Lire depuis la radio** montre ce qu’elle a enregistré.
+- **Vous pouvez aussi le modifier.** Modifiez une ligne, appuyez sur **Écrire les changements**, et la radio repart de vos valeurs, jusqu’à ce que vous les changiez sur la radio.
+- Une ligne est une position mémorisée, pas une règle pour toute la bande. Pour garder une fréquence durablement, enregistrez-la dans un canal mémoire.
+
+Voir [VFO](vfo.md).

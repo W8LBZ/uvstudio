@@ -547,5 +547,10 @@ body.sidebar-collapsed .sidebar {
 [data-help] { cursor: help; text-decoration: underline dotted; text-decoration-color: var(--text-muted); text-underline-offset: 3px; }
 [data-help]:hover, [data-help]:focus-visible { color: var(--accent); text-decoration-color: var(--accent); }
 .doc-body .doc-show-all { margin: 1.2em 0 0; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; }
+/* Back appears once a link inside the viewer opened another page. */
+.doc-back { margin-right: 8px; padding: 2px 10px 2px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; }
+.doc-back::before { content: "‹ "; }
+.doc-back:hover { color: var(--accent); border-color: var(--accent); }
+.doc-back[hidden] { display: none; }
 /* Help can open from another modal (license acknowledgement), so it stacks on top. */
 #docModal { z-index: 1001; }

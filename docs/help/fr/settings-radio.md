@@ -35,7 +35,8 @@ Ce que le VFO A affiche au démarrage : un canal mémoire (**CH 1** à **CH 1024
 - Sur un canal mémoire vide, la radio passe au suivant qui contient une fréquence.
 
 ### VFO B
-Comme **VFO A**, pour le VFO B.
+Ce que le VFO B affiche au démarrage : un canal mémoire (**CH 1** à **CH 1024**) ou un VFO de bande. La radio le modifie elle-même à chaque changement de canal ; ce n’est donc qu’un point de départ, par exemple après la restauration d’une sauvegarde.
+- Sur un canal mémoire vide, la radio passe au suivant qui contient une fréquence.
 
 ### BatSav
 Économiseur de batterie. Quand la radio reste inactive sur l’écran principal une dizaine de secondes, le récepteur fait de petites siestes : il se réveille brièvement pour chercher un signal, se rendort, et recommence.
@@ -74,7 +75,16 @@ Suppression de la queue de squelch du relais : après le relâchement de PTT, la
 Largeur des canaux NFM : **NARROW** (12,5 kHz standard) ou **NARROWER** (encore plus étroit). Gardez NARROW sauf besoin précis.
 
 ### SetRxA FM
-Profil audio en réception FM : de **FLAT** (sans traitement) à **MAX** (plus fort, plus traité). Choisissez ce qui vous semble le plus clair.
+Réglage du récepteur pour les stations [FM](mode.md) et NFM : combien il amplifie le signal avant que vous l’entendiez. Ça change ce que vous entendez, pas ce que vous émettez.
+- **FLAT** (par défaut) : le moins d’amplification. Fond silencieux, et les stations fortes proches restent propres.
+- **CLEAN**, **MID** : un peu, puis davantage d’amplification ; les stations faibles ressortent mieux.
+- **BOOST**, **MAX** : le plus d’amplification, avec un filtre plus large. Les stations faibles s’entendent mieux, mais le souffle aussi, et une bande chargée peut déborder du canal voisin.
+- Commencez sur **FLAT**. Si un relais lointain est difficile à comprendre, montez d’un cran à la fois et arrêtez-vous là où c’est le plus clair.
+- Vous pouvez aussi le faire défiler sur la radio avec le raccourci **RxA** (voir **Touches**). En réception, l’écran affiche le nom du profil.
 
 ### SetRxA AM
-Filtre audio en réception AM : **SHARP** coupe plus de bruit, **OPEN** laisse passer plus d’audio, **STOCK** est entre les deux.
+Réglage du récepteur pour les stations [AM](mode.md), comme l’aviation sur la bande aéro (118–137 MHz) : la largeur de son filtre et combien il amplifie le signal avant que vous l’entendiez. Ça change ce que vous entendez, pas ce que vous émettez.
+- **SHARP** (par défaut) : filtre étroit. Rejette le mieux le canal voisin, mais peut sonner dur sur les signaux forts.
+- **STOCK** : le même filtre étroit avec un peu plus d’amplification. Un bon compromis.
+- **OPEN** : filtre plus large et le plus d’amplification. Agréable et meilleur sur les signaux faibles, mais une station voisine peut déborder.
+- Essayez **STOCK** ou **OPEN** si les avions lointains sont difficiles à entendre ; revenez à **SHARP** si vous entendez deux stations à la fois.

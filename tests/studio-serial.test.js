@@ -260,7 +260,8 @@ test('shares port matching and retry orchestration between serial clients', asyn
     }
   });
   reconnect.start({ usbVendorId: 0x1209, usbProductId: 0x0001 });
-  await new Promise(resolve => setTimeout(resolve, 15));
+  // Wait for the attempt rather than a fixed time: CI runners can be slow to fire timers.
+  for (let i = 0; i < 200 && reconnect.isActive(); i++) await new Promise(resolve => setTimeout(resolve, 5));
 
   assert.deepEqual(attempts, [matching]);
   assert.equal(reconnect.isActive(), false);

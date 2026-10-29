@@ -10,7 +10,11 @@
   const title = document.getElementById('docModalTitle');
   const body = document.getElementById('docModalBody');
   const close = document.getElementById('docModalClose');
+  const back = document.getElementById('docModalBack');
   let current = location.href;
+  let shown = null;   // { urls, label } on screen
+  let trail = [];     // pages to go Back to; links inside the viewer add to it
+
   const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // = UVSTUDIO_SETTINGS.helpSlug
 
   // Static triggers; rendered ones (Radio settings) carry these attributes in their markup.
@@ -20,6 +24,7 @@
   }
 
   function hide() {
+    trail = [];
     modal.classList.remove('show');
     modal.setAttribute('aria-hidden', 'true');
   }
@@ -33,6 +38,8 @@
   }
 
   async function show(urls, label) {
+    shown = { urls, label };
+    back.hidden = !trail.length;
     title.textContent = label;
     body.textContent = '';
     modal.classList.add('show');
@@ -79,6 +86,7 @@
   }
 
   function showHelp(el) {
+    trail = [];
     const [topic, anchor] = el.dataset.help.split('#');
     const lang = document.documentElement.lang || 'en';
     const urls = [...new Set([lang, 'en'])].map(l => new URL(`docs/help/${l}/${topic}.md${anchor ? `#${anchor}` : ''}`, location.href).href);
@@ -96,7 +104,9 @@
       return;
     }
     e.preventDefault();
-    const url = new URL(href, a.closest('#docModalBody') ? current : location.href).href;
+    const inViewer = Boolean(a.closest('#docModalBody'));
+    trail = inViewer ? trail.concat([shown]) : [];
+    const url = new URL(href, inViewer ? current : location.href).href;
     show([...new Set([url, url.replace(/\/docs\/help\/[^/]+\//, '/docs/help/en/')])], a.dataset.title || a.textContent.trim() || href);
   });
   document.addEventListener('keydown', (e) => {
@@ -105,5 +115,6 @@
     if (e.key === 'Escape' && modal.classList.contains('show')) hide();
   });
   close.addEventListener('click', hide);
+  back.addEventListener('click', () => { const prev = trail.pop(); show(prev.urls, prev.label); });
   modal.addEventListener('click', (e) => { if (e.target === modal) hide(); });
 })();
