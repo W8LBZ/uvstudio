@@ -1,10 +1,11 @@
-# Daily check for armel commits touching uvstudio/ that the upstream branch doesn't have yet.
+# Daily check for commits on armel's master touching uvstudio/ that the upstream branch doesn't
+# have yet (his other branches are untested work and may never reach master, so they're ignored).
 # Keeps one open "Upstream changes" issue: the commit list plus a trial merge into test
 # (tools/upstream-trial.sh: shape of the change, conflicts, tests, smoke tests). It comments
 # only when new commits arrive (that's the notification), refreshes the report silently, and
 # closes the issue once caught up and on main. Finds the last sync by matching the upstream
-# branch's tree to armel's uvstudio/ tree. An armel branch whose uvstudio/ history (subtree split) is already
-# in one of our branches counts as work in progress: it doesn't open an issue, but an open one
+# branch's tree to armel's uvstudio/ tree. If master's uvstudio/ history (subtree split) is already
+# in one of our branches, that's work in progress: it doesn't open an issue, but an open one
 # stays open until that work is on main.
 name: Upstream watch
 
@@ -38,7 +39,7 @@ jobs:
           git -C "$armel" fetch -q "$PWD" 'refs/remotes/origin/*:refs/ours/*'
           list=""
           pending=""
-          for b in $(git -C "$armel" branch -r --format='%(refname:short)' | grep -v -e HEAD -e '^origin$'); do
+          for b in origin/master; do
             tip=$(git -C "$armel" subtree split -q --prefix=uvstudio "$b")
             in=$(git -C "$armel" for-each-ref --contains "$tip" --format='%(refname:lstrip=2)' refs/ours/ | grep -vx -e upstream -e HEAD | tr '\n' ' ')
             if [ -n "$in" ]; then
@@ -64,14 +65,14 @@ jobs:
           num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
           if [ -z "$list" ]; then
             [ -n "$pending" ] && exit 0
-            [ -n "$num" ] && gh issue close "$num" -c "Caught up: all of Armel's changes are on main."
+            [ -n "$num" ] && gh issue close "$num" -c "Caught up: everything on Armel's master branch is on main."
             exit 0
           fi
           git checkout -q test 2>/dev/null || true
           report=$(tools/upstream-trial.sh "$armel" 2>&1)
           marker="<!-- commits $(echo "$list" | sha1sum | cut -c1-12) -->"
           body="$marker
-          Armel commits touching uvstudio/ not yet on the upstream branch or any of our branches.
+          Commits on Armel's master touching uvstudio/ not yet on the upstream branch or any of our branches.
           The trial merge below checks them against our changes for conflicts and breakage.
 
           $list## Trial merge of armel master
