@@ -7,6 +7,12 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.6 (2026-10-30)
+
+Merged UV Studio upstream:
+
+- Apps: Scan 406 scans the Cospas-Sarsat 406 MHz channels and hands beacon bursts to EPIRB 406.
+
 ## 2026.10.5 (2026-10-30)
 
 - Memories: CSV import is now step by step. Choose a file or load a URL, pick where the

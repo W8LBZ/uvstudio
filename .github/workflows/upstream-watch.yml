@@ -2,9 +2,10 @@
 # Keeps one open "Upstream changes" issue: the commit list plus a trial merge into test
 # (tools/upstream-trial.sh: shape of the change, conflicts, tests, smoke tests). It comments
 # only when new commits arrive (that's the notification), refreshes the report silently, and
-# closes the issue once caught up. Finds the last sync by matching the upstream branch's tree
-# to armel's uvstudio/ tree. An armel branch whose uvstudio/ history (subtree split) is already
-# in one of our branches counts as work in progress and is left out.
+# closes the issue once caught up and on main. Finds the last sync by matching the upstream
+# branch's tree to armel's uvstudio/ tree. An armel branch whose uvstudio/ history (subtree split) is already
+# in one of our branches counts as work in progress: it doesn't open an issue, but an open one
+# stays open until that work is on main.
 name: Upstream watch
 
 on:
@@ -20,10 +21,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Compare with armel
@@ -37,10 +38,12 @@ jobs:
           git -C "$armel" fetch -q "$PWD" 'refs/remotes/origin/*:refs/ours/*'
           list=""
           wip=""
+          pending=""
           for b in $(git -C "$armel" branch -r --format='%(refname:short)' | grep -v -e HEAD -e '^origin$'); do
             tip=$(git -C "$armel" subtree split -q --prefix=uvstudio "$b")
             in=$(git -C "$armel" for-each-ref --contains "$tip" --format='%(refname:lstrip=2)' refs/ours/ | grep -vx -e upstream -e HEAD | tr '\n' ' ')
             if [ -n "$in" ]; then
+              case " $in" in *" main "*) ;; *) pending=1 ;; esac
               wip="$wip- $b: in ${in% }
           "
               continue
@@ -63,8 +66,9 @@ jobs:
           title="Upstream changes"
           num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
           if [ -z "$list" ]; then
+            [ -n "$pending" ] && exit 0
             msg="Caught up with armel."
-            [ -n "$wip" ] && msg="Armel's changes are already merged on our branches, in progress:
+            [ -n "$wip" ] && msg="Armel's changes are merged and on main:
           $wip"
             [ -n "$num" ] && gh issue close "$num" -c "$msg"
             exit 0
@@ -89,7 +93,7 @@ jobs:
             case "$old" in "$marker"*) ;; *) gh issue comment "$num" -b "New upstream commits; list and trial merge updated." ;; esac
           fi
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: trial-merge-screenshots
           path: ${{ runner.temp }}/upstream-trial/*/*.png

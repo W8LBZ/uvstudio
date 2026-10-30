@@ -23,7 +23,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
@@ -48,7 +48,7 @@ jobs:
             build=$(git rev-parse --short "$([ "$dir" = _site ] && echo HEAD || echo origin/test)")
             sed -i -e "s|^const FILES = \[\];|const FILES = $files;|" -e "s|^const BUILD = '';|const BUILD = '$build';|" "$dir/sw.js"
           done
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
