@@ -37,15 +37,12 @@ jobs:
           git clone -q https://github.com/armel/armel.github.io.git "$armel"
           git -C "$armel" fetch -q "$PWD" 'refs/remotes/origin/*:refs/ours/*'
           list=""
-          wip=""
           pending=""
           for b in $(git -C "$armel" branch -r --format='%(refname:short)' | grep -v -e HEAD -e '^origin$'); do
             tip=$(git -C "$armel" subtree split -q --prefix=uvstudio "$b")
             in=$(git -C "$armel" for-each-ref --contains "$tip" --format='%(refname:lstrip=2)' refs/ours/ | grep -vx -e upstream -e HEAD | tr '\n' ' ')
             if [ -n "$in" ]; then
               case " $in" in *" main "*) ;; *) pending=1 ;; esac
-              wip="$wip- $b: in ${in% }
-          "
               continue
             fi
             base=""
@@ -67,10 +64,7 @@ jobs:
           num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
           if [ -z "$list" ]; then
             [ -n "$pending" ] && exit 0
-            msg="Caught up with armel."
-            [ -n "$wip" ] && msg="Armel's changes are merged and on main:
-          $wip"
-            [ -n "$num" ] && gh issue close "$num" -c "$msg"
+            [ -n "$num" ] && gh issue close "$num" -c "Caught up: all of armel's changes are on main."
             exit 0
           fi
           git checkout -q test 2>/dev/null || true
