@@ -1941,6 +1941,26 @@ display: none !important;
   font-size: 13px;
   color: var(--text-secondary);
 }
+#pane-tools .mem-show-empty select { height: 30px; }
+/* Same frequency or name as another channel (tooltip names it). */
+#pane-tools .mem-table tr.mem-dup-freq [data-field="freq"],
+#pane-tools .mem-table tr.mem-dup-name [data-field="name"] {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+#pane-tools tr.mem-dup-freq .mem-card-detail,
+#pane-tools tr.mem-dup-name .mem-card-name { color: #d97706; }
+#pane-tools .mem-import-status {
+  margin: 0;
+  overflow-wrap: anywhere;   /* long URLs */
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+/* Unwritten import or backup: draw the eye to Write changes to radio. */
+#pane-tools .mem-write-reminder { animation: memWriteReminder 1.6s ease-in-out infinite; }
+@keyframes memWriteReminder {
+  50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 35%, transparent); }
+}
 #pane-tools .mem-summary {
   margin-left: auto;
   font-size: 13px;
@@ -1995,7 +2015,7 @@ display: none !important;
 }
 #pane-tools .mem-selection-bar[hidden] { display: none; }
 #pane-tools .mem-list-names-box > .mem-toolbar:first-of-type { margin-top: 10px; }
-#pane-tools .mem-channels-box > summary { margin-bottom: 10px; }
+#pane-tools .mem-list-names-box > .mem-box-help + .mem-toolbar { margin-top: 0; }
 #pane-tools .mem-selection-bar .mem-summary { margin-left: 0; margin-right: 6px; }
 #pane-tools .mem-bulk {
   display: inline-flex;
@@ -2225,15 +2245,19 @@ display: none !important;
   background: color-mix(in oklab, var(--accent) 10%, var(--surface));
 }
 #pane-tools .tab-help { margin: -14px 0 16px; font-size: 13px; color: var(--text-secondary); }
-/* Disclosure boxes (Scan list names, VFOs) look like buttons so they're easy to spot. */
-#pane-tools .mem-list-names-box summary {
-  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-  border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text);
+/* Memories sections are bordered boxes like the Radio settings groups. */
+#pane-tools .mem-list-names-box {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
-#pane-tools .mem-list-names-box summary:hover { border-color: var(--accent); }
+#pane-tools .mem-list-names-box summary { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+#pane-tools .mem-list-names-box summary:hover { color: var(--text); }
 #pane-tools .mem-list-names-box summary::-webkit-details-marker { display: none; }
 #pane-tools .mem-list-names-box summary::before { content: '▸'; color: var(--text-muted); }
 #pane-tools .mem-list-names-box[open] summary::before { content: '▾'; }
+/* "About this section" link under a box title. */
+#pane-tools .tab-help.mem-box-help { margin: 2px 0 6px; font-size: 12px; }
 #pane-tools .tab-help-top { margin: 0 0 12px; }
 #pane-tools .calib-warning {
   margin: 0 0 16px; padding: 10px 12px; border-left: 3px solid #d97706; border-radius: var(--radius);

@@ -7,6 +7,23 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.10.5 (2026-10-30)
+
+- Memories: CSV import is now step by step. Choose a file or load a URL, pick where the
+  channels go, then press Import into table. Write changes to radio pulses until the
+  imported channels (or an opened backup) are written.
+- Memories: Sort by channel number, frequency or name (view only; channel numbers
+  stay the same on the radio).
+- Memories: channels sharing a frequency or a name are outlined, with a tooltip naming
+  the other channels. Highlight duplicates turns this off.
+- Memories: Scan list names moved below the VFOs, out of the way between import and
+  the channel table (they are not part of CSV files).
+- Memories and Radio settings: Undo (one change at a time) and Discard changes (back to
+  what the radio has; Undo brings them back).
+- Memories and Radio settings: sections are framed boxes, each with an "About this
+  section" help link under its title.
+- Dropdown lists no longer look greyed out in the dark theme.
+
 ## 2026.10.4 (2026-10-28)
 
 Based on UV Studio 2.3.0.

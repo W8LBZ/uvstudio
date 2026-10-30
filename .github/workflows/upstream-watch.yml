@@ -3,7 +3,8 @@
 # (tools/upstream-trial.sh: shape of the change, conflicts, tests, smoke tests). It comments
 # only when new commits arrive (that's the notification), refreshes the report silently, and
 # closes the issue once caught up. Finds the last sync by matching the upstream branch's tree
-# to armel's uvstudio/ tree.
+# to armel's uvstudio/ tree. An armel branch whose uvstudio/ history (subtree split) is already
+# in one of our branches counts as work in progress and is left out.
 name: Upstream watch
 
 on:
@@ -33,8 +34,17 @@ jobs:
           synced=$(git rev-parse 'origin/upstream^{tree}')
           armel="$RUNNER_TEMP/armel"
           git clone -q https://github.com/armel/armel.github.io.git "$armel"
+          git -C "$armel" fetch -q "$PWD" 'refs/remotes/origin/*:refs/ours/*'
           list=""
+          wip=""
           for b in $(git -C "$armel" branch -r --format='%(refname:short)' | grep -v -e HEAD -e '^origin$'); do
+            tip=$(git -C "$armel" subtree split -q --prefix=uvstudio "$b")
+            in=$(git -C "$armel" for-each-ref --contains "$tip" --format='%(refname:lstrip=2)' refs/ours/ | grep -vx -e upstream -e HEAD | tr '\n' ' ')
+            if [ -n "$in" ]; then
+              wip="$wip- $b: in ${in% }
+          "
+              continue
+            fi
             base=""
             for c in $(git -C "$armel" log --format=%H "$b" -- uvstudio); do
               [ "$(git -C "$armel" rev-parse "$c:uvstudio")" = "$synced" ] && base=$c && break
@@ -53,15 +63,18 @@ jobs:
           title="Upstream changes"
           num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
           if [ -z "$list" ]; then
-            [ -n "$num" ] && gh issue close "$num" -c "Caught up with armel."
+            msg="Caught up with armel."
+            [ -n "$wip" ] && msg="Armel's changes are already merged on our branches, in progress:
+          $wip"
+            [ -n "$num" ] && gh issue close "$num" -c "$msg"
             exit 0
           fi
           git checkout -q test 2>/dev/null || true
           report=$(tools/upstream-trial.sh "$armel" 2>&1)
           marker="<!-- commits $(echo "$list" | sha1sum | cut -c1-12) -->"
           body="$marker
-          Armel commits touching uvstudio/ not yet on the upstream branch (sync steps in CLAUDE.md).
-          Try them on the radio at https://armel.github.io/uvstudio/ (armel master, live).
+          Armel commits touching uvstudio/ not yet on the upstream branch or any of our branches.
+          The trial merge below checks them against our changes for conflicts and breakage.
 
           $list## Trial merge of armel master
 

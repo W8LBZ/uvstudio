@@ -429,6 +429,18 @@
     ];
   }
 
+  // Short label for a CSV loaded from a URL: the last path segment without the query,
+  // else the host. data: URLs carry the whole file, so they show only their type.
+  function csvNameFromUrl(url) {
+    if (/^data:/i.test(url)) return url.slice(0, url.search(/[,;]|$/));
+    try {
+      const u = new URL(url);
+      return decodeURIComponent(u.pathname.split('/').filter(Boolean).pop() || '') || u.host;
+    } catch {
+      return url;
+    }
+  }
+
   function exportChirpCsv(image) {
     const lines = [CHIRP_HEADER.join(',')];
     for (let i = 0; i < CHANNEL_COUNT; i++) {
@@ -607,6 +619,38 @@
     return { imported, errors, warnings, duplicates };
   }
 
+  // Undo for an edited image: call note(image) after every change; it keeps the state
+  // before each change. undo() returns a copy of the previous state, or null.
+  function createHistory(limit = 100) {
+    const stack = [];
+    let last = null;
+    const same = (a, b) => {
+      if (a.length !== b.length) return false;
+      for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return false;
+      return true;
+    };
+    return {
+      note(image) {
+        if (!image || (last && same(last, image))) return;
+        if (last) {
+          stack.push(last);
+          if (stack.length > limit) stack.shift();
+        }
+        last = image.slice();
+      },
+      undo() {
+        if (!stack.length) return null;
+        last = stack.pop();
+        return last.slice();
+      },
+      reset() {
+        stack.length = 0;
+        last = null;
+      },
+      get canUndo() { return stack.length > 0; }
+    };
+  }
+
   return {
     CHANNEL_COUNT,
     IMAGE_SIZE,
@@ -645,8 +689,10 @@
     dirtyRuns,
     parseCsv,
     exportChirpCsv,
+    csvNameFromUrl,
     importChirpCsv,
-    roundToStep
+    roundToStep,
+    createHistory
   };
 });
 
@@ -663,6 +709,9 @@
 
   const readBtn = $('memReadBtn');
   const writeBtn = $('memWriteBtn');
+  const undoBtn = $('memUndoBtn');
+  const discardBtn = $('memDiscardBtn');
+  const history = M.createHistory();
   const importBtn = $('memImportBtn');
   const exportBtn = $('memExportBtn');
   const openBtn = $('memOpenBackupBtn');
@@ -672,8 +721,14 @@
   const skipDuplicates = $('memSkipDuplicates');
   const sourceUrl = $('memSourceUrl');
   const loadUrlBtn = $('memLoadUrlBtn');
+  const importApplyBtn = $('memImportApplyBtn');
+  const importStatus = $('memImportStatus');
   const binInput = $('memBinFile');
   const showEmpty = $('memShowEmpty');
+  const sortBy = $('memSort');
+  const showDups = $('memShowDups');
+  const prefs = window.UVStudioPreferences;
+  showDups.checked = prefs.get('uvstudio.memShowDups', 'true') === 'true';
   const summary = $('memSummary');
   const toneList = $('memToneList');
   const listNames = $('memListNames');
@@ -696,6 +751,9 @@
   const openCards = new Set();   // phone layout: channels expanded from their summary line
   let lastClicked = null;
   let clipboard = null;    // copied channel slots
+  let pendingCsv = null;   // { name, text } chosen but not imported yet
+  let writeReminder = false;   // pulse Write after an import or backup until the changes are written
+  let discardedReminder = false;   // the pulse Discard turned off, back on Undo
 
   toneList.innerHTML = M.CTCSS.map((_, i) => `<option value="${M.toneText(1, i)}">`).join('') +
     M.DCS.map((_, i) => `<option value="${M.toneText(2, i)}"><option value="${M.toneText(3, i)}">`).join('');
@@ -803,14 +861,51 @@
     return { used, dirty };
   }
 
+  // Channels sharing a frequency or a name: outline those cells and name the others.
+  function markDuplicates() {
+    if (!image) return;
+    const keys = [];
+    const groups = { freq: new Map(), name: new Map() };
+    for (let i = 0; i < M.CHANNEL_COUNT; i++) {
+      const ch = M.decodeChannel(image, i);
+      if (!ch) continue;
+      keys[i] = { freq: ch.freq, name: ch.name.trim().toUpperCase() };
+      for (const field of ['freq', 'name']) {
+        if (!keys[i][field]) continue;
+        const list = groups[field].get(keys[i][field]) || [];
+        list.push(i);
+        groups[field].set(keys[i][field], list);
+      }
+    }
+    body.querySelectorAll('tr[data-index]').forEach(tr => {
+      const i = Number(tr.dataset.index);
+      for (const field of ['freq', 'name']) {
+        const others = showDups.checked && keys[i]?.[field] ? groups[field].get(keys[i][field]).filter(n => n !== i) : [];
+        tr.classList.toggle(`mem-dup-${field}`, others.length > 0);
+        const input = tr.querySelector(`[data-field="${field}"]`);
+        if (!input) continue;
+        if (others.length) input.title = t(field === 'freq' ? 'memDupFreq' : 'memDupName', others.map(n => n + 1).join(', '));
+        else input.removeAttribute('title');
+      }
+    });
+  }
+
   function updateState() {
+    history.note(image);
+    markDuplicates();
     const { used, dirty } = image ? counts() : { used: 0, dirty: 0 };
     summary.textContent = image ? t('memSummary', used, dirty) : '';
     const serial = 'serial' in navigator;
     const changed = Boolean(radioImage && image && M.dirtyRuns(radioImage, image).length);
     readBtn.disabled = busy || !serial;
     writeBtn.disabled = busy || !serial || !changed;
+    if (!changed) writeReminder = false;
+    undoBtn.disabled = busy || !history.canUndo;
+    discardBtn.disabled = busy || !changed;
+    writeBtn.classList.toggle('mem-write-reminder', writeReminder && !writeBtn.disabled);
     importBtn.disabled = loadUrlBtn.disabled = openBtn.disabled = busy || !image;
+    importApplyBtn.disabled = busy || !image || !pendingCsv;
+    importStatus.textContent = pendingCsv ? t('memImportReady', pendingCsv.name) : t('memImportNone');
     exportBtn.disabled = saveBtn.disabled = !image;
   }
 
@@ -829,9 +924,24 @@
     renderListNames();
     const rows = [];
     if (image) {
+      const shown = [];
       for (let i = 0; i < M.CHANNEL_COUNT; i++) {
-        if (showEmpty.checked || !M.isEmpty(image, i)) rows.push(rowHtml(i));
+        if (showEmpty.checked || !M.isEmpty(image, i)) shown.push(i);
       }
+      // View order only; channel numbers on the radio stay as they are. Empty slots go last.
+      if (sortBy.value !== 'channel') {
+        const key = i => {
+          const ch = M.decodeChannel(image, i);
+          return ch ? (sortBy.value === 'freq' ? ch.freq : ch.name.trim().toUpperCase() || '\uffff') : null;
+        };
+        const keys = new Map(shown.map(i => [i, key(i)]));
+        shown.sort((a, b) => {
+          const x = keys.get(a), y = keys.get(b);
+          if (x === null || y === null) return (x === null) - (y === null) || a - b;
+          return (x < y ? -1 : x > y ? 1 : 0) || a - b;
+        });
+      }
+      shown.forEach(i => rows.push(rowHtml(i)));
     }
     body.innerHTML = rows.join('');
     vfoBody.innerHTML = image ? Array.from({ length: M.VFO_COUNT }, (_, v) => vfoRowHtml(M.CHANNEL_COUNT + v)).join('') : '';
@@ -944,7 +1054,8 @@
     const none = selected.size === 0;
     selectionBar.hidden = none || !image;   /* only when something is ticked */
     selectionBar.querySelectorAll('[data-edit]').forEach(button => {
-      button.disabled = none || (button.dataset.edit === 'paste' && !clipboard);
+      button.disabled = none || (button.dataset.edit === 'paste' && !clipboard) ||
+        (sortBy.value !== 'channel' && ['up', 'down', 'insert'].includes(button.dataset.edit));   // slot order is hidden while sorted
       editMenu.querySelector(`option[value="${button.dataset.edit}"]`).disabled = button.disabled;
     });
     $('memBulkApply').disabled = none;
@@ -1104,6 +1215,11 @@
   });
 
   showEmpty.addEventListener('change', render);
+  sortBy.addEventListener('change', render);
+  showDups.addEventListener('change', () => {
+    prefs.set('uvstudio.memShowDups', showDups.checked);
+    updateState();
+  });
 
   readBtn.addEventListener('click', () => {
     if (radioImage && counts().dirty > 0 && !window.confirm(t('memDiscardConfirm'))) return;
@@ -1118,11 +1234,27 @@
         done => radio.progress(Math.round(((M.CHANNELS_END + done) / total) * 100))), M.VFO_BASE);
       radioImage = data;
       image = data.slice();
+      history.reset();
+      discardedReminder = false;
       selected.clear();
       openCards.clear();
       render();
       log(t('memReadComplete', counts().used), 'success');
     });
+  });
+
+  undoBtn.addEventListener('click', () => {
+    image = history.undo() || image;
+    if (discardedReminder) writeReminder = true;   // cleared again below if nothing is unwritten
+    render();
+  });
+
+  // Discarding is itself undoable, so no confirmation.
+  discardBtn.addEventListener('click', () => {
+    discardedReminder = writeReminder;
+    image = radioImage.slice();
+    render();
+    log(t('memDiscarded'), 'info');
   });
 
   writeBtn.addEventListener('click', () => {
@@ -1142,6 +1274,7 @@
         radio.progress(Math.round((done / total) * 100));
       }
       radioImage = target;
+      discardedReminder = false;
       render();
       log(t('memWriteComplete', total), 'success');
       await radio.reboot();
@@ -1161,7 +1294,14 @@
     sourceList.append(option);
   });
 
-  function importCsvText(text) {
+  function setPendingCsv(name, text) {
+    pendingCsv = { name, text };
+    updateState();
+  }
+
+  importApplyBtn.addEventListener('click', () => {
+    const { text } = pendingCsv;
+    pendingCsv = null;   // importing the same file twice would duplicate it
     try {
       const { imported, errors, warnings, duplicates } = M.importChirpCsv(image, text, {
         mode: importMode.value, dedupe: skipDuplicates.checked
@@ -1170,18 +1310,19 @@
       warnings.forEach(w => log(t('memImportRowWarning', w.line, w.message), 'info'));
       if (duplicates) log(t('memImportDuplicates', duplicates), 'info');
       log(t('memImportComplete', imported, errors.length), imported ? 'success' : 'error');
+      if (imported) writeReminder = true;
     } catch (e) {
       log(t('error', e?.message ?? String(e)), 'error');
     }
     openCards.clear();
     render();
-  }
+  });
 
   importBtn.addEventListener('click', () => csvInput.click());
   csvInput.addEventListener('change', async () => {
     const file = csvInput.files[0];
     csvInput.value = '';
-    if (file) importCsvText(await file.text());
+    if (file) setPendingCsv(file.name, await file.text());
   });
 
   loadUrlBtn.addEventListener('click', async () => {
@@ -1190,8 +1331,10 @@
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      importCsvText(await response.text());
+      setPendingCsv(M.csvNameFromUrl(url), await response.text());
     } catch (e) {
+      pendingCsv = null;
+      updateState();
       log(t('memUrlFailed', url, e?.message ?? String(e)), 'error');
     }
   });
@@ -1218,6 +1361,7 @@
     const next = image.slice();
     next.set(data);
     image = next;
+    writeReminder = true;
     openCards.clear();
     render();
     log(t('memBackupLoaded', file.name), 'success');

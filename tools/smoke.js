@@ -142,6 +142,24 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   }
   console.log('after read', await state(), await evaluate("document.getElementById('log').textContent.slice(-600)"), errors);
 
+  // Staged import pulses Write; Discard stops the pulse and Undo brings it back. Discard again after.
+  const pulse = () => evaluate(`document.getElementById('memWriteBtn').classList.contains('mem-write-reminder')`);
+  const click = id => evaluate(`document.getElementById('${id}').click()`);
+  await evaluate(`document.getElementById('memSourceUrl').value = 'data:text/csv,Location%2CName%2CFrequency%0A1%2CSMOKE%2C146.430000'`);
+  await click('memLoadUrlBtn');
+  await sleep(300);
+  const ready = await evaluate(`document.getElementById('memImportStatus').textContent`);
+  await evaluate(`document.getElementById('memImportMode').value = 'append'`);
+  await click('memImportApplyBtn');
+  const pulses = [await pulse()];
+  await click('memDiscardBtn');
+  pulses.push(await pulse());
+  await click('memUndoBtn');
+  pulses.push(await pulse());
+  await click('memDiscardBtn');
+  console.log('import pulse (import, discard, undo)', ready, pulses);
+  if (ready !== 'Ready to import: data:text/csv' || pulses.join() !== 'true,false,true') throw new Error('staged import / pulse broken');
+
   // Edit RX tone + name on channel 2, add channel 5 with show-empty.
   await evaluate(`(() => {
     const set = (sel, v) => { const el = document.querySelector(sel); el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
@@ -173,6 +191,41 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     return clipped;
   })()`));
 
+  // CSV import: choosing a file only stages it; Import into table applies it and Write pulses.
+  const imp = await evaluate(`(async () => {
+    const input = document.getElementById('memCsvFile');
+    const dt = new DataTransfer();
+    dt.items.add(new File(['Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,Mode,TStep,Skip,Comment\\n1,SMOKE,145.500000,,0.000000,,88.5,88.5,023,NN,FM,5.00,,\\n'], 'smoke.csv'));
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change'));
+    await new Promise(r => setTimeout(r, 100));
+    const apply = document.getElementById('memImportApplyBtn');
+    const staged = { status: document.getElementById('memImportStatus').textContent, applyEnabled: !apply.disabled,
+      rows: document.querySelectorAll('#memTableBody tr').length };
+    document.getElementById('memImportMode').value = 'append';
+    apply.click();
+    return { staged, rows: document.querySelectorAll('#memTableBody tr').length, applyEnabled: !apply.disabled,
+      pulse: document.getElementById('memWriteBtn').classList.contains('mem-write-reminder') };
+  })()`);
+  console.log('csv import', JSON.stringify(imp));
+  if (!imp.staged.applyEnabled || imp.rows !== imp.staged.rows + 1 || imp.applyEnabled || !imp.pulse) throw new Error('CSV import flow broken');
+  const view = await evaluate(`(() => {
+    const order = () => [...document.querySelectorAll('#memTableBody tr')].map(tr => tr.dataset.index).join(',');
+    const sort = document.getElementById('memSort');
+    const byChannel = order();
+    sort.value = 'freq'; sort.dispatchEvent(new Event('change'));
+    const byFreq = [...document.querySelectorAll('#memTableBody [data-field="freq"]')].map(el => parseFloat(el.value));
+    sort.value = 'channel'; sort.dispatchEvent(new Event('change'));
+    const dupBox = document.getElementById('memShowDups');
+    dupBox.checked = false; dupBox.dispatchEvent(new Event('change'));
+    const dupsOff = document.querySelectorAll('#memTableBody tr.mem-dup-freq, #memTableBody tr.mem-dup-name').length;
+    dupBox.checked = true; dupBox.dispatchEvent(new Event('change'));
+    return { byChannel, back: order(), byFreq, dupsOff, dups: [...document.querySelectorAll('#memTableBody tr.mem-dup-freq, #memTableBody tr.mem-dup-name')]
+      .map(tr => tr.dataset.index + ':' + tr.className.match(/mem-dup-\\w+/g).join('+')) };
+  })()`);
+  console.log('sort/dups', JSON.stringify(view));
+  if (view.dups.length < 2 || view.dupsOff || view.back !== view.byChannel || view.byFreq.some((f, k) => k && f < view.byFreq[k - 1])) throw new Error('sort broken');
+
   if (mobile) await evaluate(`document.querySelector('tr[data-index="1"] .mem-card-summary').click(); document.querySelector('tr[data-index="0"]').scrollIntoView()`);
   const shot = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync(path.join(outDir, 'memories.png'), Buffer.from(shot.result.data, 'base64'));
@@ -191,11 +244,27 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await evaluate(`document.getElementById('licenseAckAgree').click()`);
   await waitIdle();
   console.log('after write', await state(), await evaluate("JSON.stringify(radioLog.reduce((m, k) => (m[k] = (m[k] || 0) + 1, m), {}))"));
+  if (await evaluate(`document.getElementById('memWriteBtn').classList.contains('mem-write-reminder')`)) throw new Error('Write still pulses after writing');
   console.log('radio ch2', await evaluate('JSON.stringify(UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, 1))'));
   console.log('list 2 name', await evaluate("UVSTUDIO_MEMORIES.getListName(fakeRadio, 2)"),
     await evaluate("document.querySelector('tr[data-index=\"0\"] [data-field=\"scanlist\"]').options[2].textContent"));
   console.log('radio ch5', await evaluate('JSON.stringify(UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, 4))'));
   console.log('csv', JSON.stringify(await evaluate('UVSTUDIO_MEMORIES.exportChirpCsv(fakeRadio)')));
+  const undo = await evaluate(`(() => {
+    const name = () => document.querySelector('tr[data-index="0"] [data-field="name"]').value;
+    const before = name();
+    const el = document.querySelector('tr[data-index="0"] [data-field="name"]');
+    el.value = 'UNDOME'; el.dispatchEvent(new Event('change', { bubbles: true }));
+    const edited = name();
+    document.getElementById('memDiscardBtn').click();
+    const discarded = name();
+    document.getElementById('memUndoBtn').click();
+    const undone = name();
+    document.getElementById('memDiscardBtn').click();
+    return { before, edited, discarded, undone, discardOff: document.getElementById('memDiscardBtn').disabled };
+  })()`);
+  console.log('undo/discard', JSON.stringify(undo));
+  if (undo.discarded !== undo.before || undo.undone !== 'UNDOME' || !undo.discardOff) throw new Error('undo/discard broken');
   console.log('log tail', await evaluate(`Array.from(document.querySelectorAll('#log *')).slice(-6).map(e => e.textContent).join(' | ')`));
   await evaluate("radioLog.length = 0; fakeAesKey = true; document.getElementById('memReadBtn').click()");
   await waitIdle();

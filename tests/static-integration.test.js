@@ -261,7 +261,7 @@ test('reorders complete app slots through the existing raw flash protocol', () =
   assert.match(toolsCss, /\.app-renumber-button\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(toolsCss, /\.apps-table-wrap\s*\{[^}]*overflow-anchor:\s*none/s);
   assert.match(toolsCss, /tr\.app-order-drop-before td\s*\{[^}]*box-shadow/s);
-  assert.match(html, /css\/tools\.css\?v=78/);
+  assert.match(html, /css\/tools\.css\?v=82/);
   assert.match(html, /js\/flash\.js\?v=107/);
   assert.doesNotMatch(flashSource, /app-order-(?:up|down)/);
   assert.doesNotMatch(flashSource, /function appMoveInOrder/);
@@ -1290,8 +1290,16 @@ test('opens project documents in the in-page viewer', () => {
 test('every field help topic has an English page', () => {
   const topics = [...new Set([...html.matchAll(/data-help="([^"]+)"/g)].map(m => m[1]))];
   assert.ok(topics.length >= 16);
-  for (const topic of topics) {
-    assert.ok(fs.existsSync(path.join(root, 'docs', 'help', 'en', `${topic}.md`)), `docs/help/en/${topic}.md`);
+  for (const target of topics) {
+    const [topic, anchor] = target.split('#');
+    const file = path.join(root, 'docs', 'help', 'en', `${topic}.md`);
+    assert.ok(fs.existsSync(file), `docs/help/en/${topic}.md`);
+    // "page#heading" needs a heading whose slug matches (doc-viewer.js slug()).
+    if (anchor) {
+      const slugs = [...fs.readFileSync(file, 'utf8').matchAll(/^#{2,3} (.+)$/gm)]
+        .map(m => m[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+      assert.ok(slugs.includes(anchor), target);
+    }
   }
   // A translated help folder is all or nothing, so one language never mixes in English pages.
   const helpDir = path.join(root, 'docs', 'help');

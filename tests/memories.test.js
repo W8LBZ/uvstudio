@@ -284,3 +284,32 @@ test('copies and pastes channels, including empty ones', () => {
   assert.deepEqual(namesOf(image, 13).slice(10), ['A', null, 'C']);
   assert.throws(() => mem.pasteChannels(image, mem.CHANNEL_COUNT - 1, clip), /fit/);
 });
+
+test('history undoes back through noted states and resets', () => {
+  const h = mem.createHistory(2);
+  const image = new Uint8Array(4);
+  h.note(image);
+  assert.equal(h.canUndo, false);
+  image[0] = 1; h.note(image);
+  h.note(image);   // unchanged: no new step
+  image[1] = 2; h.note(image);
+  image[2] = 3; h.note(image);   // limit 2 drops the oldest step
+  assert.deepEqual([...h.undo()], [1, 2, 0, 0]);
+  const back = h.undo();
+  assert.deepEqual([...back], [1, 0, 0, 0]);
+  assert.equal(h.undo(), null);
+  h.note(back);   // re-rendering the undone state adds nothing
+  assert.equal(h.canUndo, false);
+  h.reset();
+  assert.equal(h.canUndo, false);
+});
+
+test('csvNameFromUrl gives a short label for the loaded CSV', () => {
+  assert.equal(mem.csvNameFromUrl('https://raw.githubusercontent.com/a/b/main/repeaters.csv'), 'repeaters.csv');
+  assert.equal(mem.csvNameFromUrl('https://www.repeaterbook.com/api/export.php?state_id=39&county=Lorain'), 'export.php');
+  assert.equal(mem.csvNameFromUrl('https://example.com/lists/'), 'lists');
+  assert.equal(mem.csvNameFromUrl('https://example.com/'), 'example.com');
+  assert.equal(mem.csvNameFromUrl('https://example.com/my%20list.csv'), 'my list.csv');
+  assert.equal(mem.csvNameFromUrl('data:text/csv,Location%2CName%0A1%2CX'), 'data:text/csv');
+  assert.equal(mem.csvNameFromUrl('data:text/csv;charset=utf-8,a'), 'data:text/csv');
+});

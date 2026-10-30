@@ -3,6 +3,8 @@
 ### Lire et écrire
 - **Lire depuis la radio** charge les réglages. Les groupes n’apparaissent qu’après une lecture.
 - Les réglages modifiés sont mis en évidence et comptés. **Écrire les changements** n’envoie que ceux-là, puis redémarre la radio.
+- **Annuler** revient en arrière d’un changement à la fois.
+- **Abandonner les changements** remet tout comme dans la radio. Aucune confirmation n’est demandée : en cas d’erreur, Annuler rétablit les changements.
 - Les noms sont ceux du menu de la radio : ce que vous voyez ici correspond au MENU de la radio.
 
 ### Sauvegardes (.bin)

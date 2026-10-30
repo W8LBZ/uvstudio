@@ -3,6 +3,8 @@
 ### Read and write
 - **Read from radio** loads the settings. The groups appear only after a read.
 - Changed settings are highlighted and counted. **Write changes to radio** sends only those, then restarts the radio.
+- **Undo** steps back one change at a time.
+- **Discard changes** puts everything back the way it is on the radio. It doesn't ask first: if you discarded by mistake, Undo brings the changes back.
 - The names are the radio's own menu names, so what you see here matches the radio's MENU.
 
 ### Backups (.bin)

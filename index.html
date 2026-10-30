@@ -4,13 +4,13 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio+ by KO4CGQ</title>
-    <script src="js/studio-version.js?v=2026.10.4"></script>
+    <script src="js/studio-version.js?v=2026.10.5"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2563eb">
-<link href="css/core.css?v=5" rel="stylesheet">
+<link href="css/core.css?v=6" rel="stylesheet">
 <link href="css/viewer.css?v=14" rel="stylesheet">
-<link href="css/tools.css?v=78" rel="stylesheet">
+<link href="css/tools.css?v=82" rel="stylesheet">
 <link href="css/studio.css?v=37" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -432,14 +432,23 @@
                     <div class="mem-toolbar">
                         <button type="button" id="memReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
                         <button type="button" id="memWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
+                        <button type="button" id="memUndoBtn" class="btn compact-toolbar-action" data-i18n="memUndoBtn" disabled>Undo</button>
+                        <button type="button" id="memDiscardBtn" class="btn compact-toolbar-action" data-i18n="memDiscardBtn" disabled>Discard changes</button>
                         <button type="button" id="memSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
-                        <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
                         <span class="mem-summary" id="memSummary" role="status" aria-live="polite"></span>
                     </div>
                     <details class="mem-list-names-box" id="memTransferBox">
                         <summary data-i18n="memTransferBox">Import and export</summary>
+                        <p class="tab-help mem-box-help"><span data-help="memories-guide#import-and-export-csv" data-i18n="helpSection">About this section</span></p>
                         <div class="mem-toolbar">
-                            <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Import CSV</button>
+                            <button type="button" id="memImportBtn" class="btn compact-toolbar-action" data-i18n="memImportBtn" disabled>Choose CSV file</button>
+                        </div>
+                        <div class="mem-toolbar">
+                            <input type="url" id="memSourceUrl" class="mem-source-url" list="memSourceList" placeholder="CSV URL or pick a list" data-i18n-placeholder="memSourceUrl" aria-label="CSV URL" data-i18n-aria-label="memSourceUrl">
+                            <button type="button" id="memLoadUrlBtn" class="btn compact-toolbar-action" data-i18n="memLoadUrlBtn" disabled>Load from URL</button>
+                        </div>
+                        <p class="mem-import-status" id="memImportStatus" role="status" aria-live="polite"></p>
+                        <div class="mem-toolbar">
                             <select id="memImportMode" aria-label="Import mode" data-i18n-aria-label="memImportMode">
                                 <option value="location" data-i18n="memImportModeLocation">At CSV locations</option>
                                 <option value="append" data-i18n="memImportModeAppend">Append</option>
@@ -447,11 +456,9 @@
                                 <option value="replace" data-i18n="memImportModeReplace">Replace all</option>
                             </select>
                             <label class="mem-show-empty"><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip duplicates</span></label>
+                            <button type="button" id="memImportApplyBtn" class="btn primary compact-toolbar-action" data-i18n="memImportApply" disabled>Import into table</button>
                         </div>
-                        <div class="mem-toolbar">
-                            <input type="url" id="memSourceUrl" class="mem-source-url" list="memSourceList" placeholder="CSV URL or pick a list" data-i18n-placeholder="memSourceUrl" aria-label="CSV URL" data-i18n-aria-label="memSourceUrl">
-                            <button type="button" id="memLoadUrlBtn" class="btn compact-toolbar-action" data-i18n="memLoadUrlBtn" disabled>Import from URL</button>
-                        </div>
+                        <p class="mem-import-status" data-i18n="memImportHint">Importing changes only this page. Press Write changes to radio to send the channels to the radio.</p>
                         <div class="mem-toolbar">
                             <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
                             <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
@@ -461,12 +468,20 @@
                     <input type="file" id="memCsvFile" accept=".csv,text/csv" hidden>
                     <input type="file" id="memBinFile" accept=".bin" hidden>
                     <datalist id="memToneList"></datalist>
-                    <details class="mem-list-names-box" id="memListNamesBox" hidden>
-                        <summary data-i18n="memScanListNames">Scan list names</summary>
-                        <div class="mem-list-names" id="memListNames"></div>
-                    </details>
                     <details class="mem-list-names-box mem-channels-box" id="memChannelsBox" open hidden>
                         <summary data-i18n="memChannelsBox">Memory channels</summary>
+                        <p class="tab-help mem-box-help"><span data-help="memories-guide#editing-several-channels" data-i18n="helpSection">About this section</span></p>
+                        <div class="mem-toolbar">
+                            <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
+                            <label class="mem-show-empty"><input type="checkbox" id="memShowDups" checked> <span data-i18n="memShowDups">Highlight duplicates</span></label>
+                            <label class="mem-show-empty"><span data-i18n="memSortBy">Sort by</span>
+                                <select id="memSort">
+                                    <option value="channel" data-i18n="memSortChannel">Channel number</option>
+                                    <option value="freq" data-i18n="memSortFreq">Frequency</option>
+                                    <option value="name" data-i18n="memSortName">Name</option>
+                                </select>
+                            </label>
+                        </div>
                         <div class="mem-selection-bar" id="memSelectionBar" hidden>
                             <span class="mem-summary" id="memSelectionCount" aria-live="polite"></span>
                             <select id="memEditMenu" aria-label="Edit selected" data-i18n-aria-label="memEditMenu">
@@ -522,6 +537,7 @@
                     </details>
                     <details class="mem-list-names-box mem-vfo-box" id="memVfoBox" hidden>
                         <summary data-i18n="memVfos">VFOs</summary>
+                        <p class="tab-help mem-box-help"><span data-help="memories-guide#vfos" data-i18n="helpSection">About this section</span></p>
                         <p class="tab-description" data-i18n="memVfoHint">The frequency each band's VFO A and VFO B starts on. A VFO frequency must stay inside its band.</p>
                         <div class="slots-table-wrap mem-table-wrap">
                             <table class="slots-table mem-table">
@@ -546,6 +562,11 @@
                             </table>
                         </div>
                     </details>
+                    <details class="mem-list-names-box" id="memListNamesBox" hidden>
+                        <summary data-i18n="memScanListNames">Scan list names</summary>
+                        <p class="tab-help mem-box-help"><span data-help="memories-guide#scan-list-names" data-i18n="helpSection">About this section</span></p>
+                        <div class="mem-list-names" id="memListNames"></div>
+                    </details>
                 </section>
             </div>
 
@@ -556,6 +577,8 @@
                     <div class="mem-toolbar">
                         <button type="button" id="setReadBtn" class="btn primary compact-toolbar-action" data-i18n="memReadBtn">Read from radio</button>
                         <button type="button" id="setWriteBtn" class="btn primary compact-toolbar-action" data-i18n="memWriteBtn" disabled>Write changes to radio</button>
+                        <button type="button" id="setUndoBtn" class="btn compact-toolbar-action" data-i18n="memUndoBtn" disabled>Undo</button>
+                        <button type="button" id="setDiscardBtn" class="btn compact-toolbar-action" data-i18n="memDiscardBtn" disabled>Discard changes</button>
                         <button type="button" id="setOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
                         <button type="button" id="setSaveBackupBtn" class="btn compact-toolbar-action" data-i18n="memSaveBackupBtn" disabled>Save backup (.bin)</button>
                         <span class="mem-summary" id="setSummary" role="status" aria-live="polite"></span>
@@ -1243,8 +1266,8 @@
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/firmware-package.js?v=1"></script>
 <script src="js/flash.js?v=107"></script>
-<script src="js/memories.js?v=14"></script>
-<script src="js/settings.js?v=10"></script>
+<script src="js/memories.js?v=17"></script>
+<script src="js/settings.js?v=12"></script>
 <script src="js/flash-catalog.js?v=20"></script>
 <script src="js/app-screens.js?v=8"></script>
 <script src="js/app-catalog.js?v=27"></script>

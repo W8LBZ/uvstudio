@@ -4,6 +4,8 @@
 - **Lire depuis la radio** charge les 1024 canaux, les VFO et les noms des listes de scan dans la page.
 - Modifiez autant que vous voulez. Le résumé compte vos changements, et les cellules modifiées sont mises en évidence.
 - **Écrire les changements** n’envoie que ce qui a changé, puis redémarre la radio pour qu’elle les prenne en compte.
+- **Annuler** revient en arrière d’un changement à la fois.
+- **Abandonner les changements** remet tout comme dans la radio. Aucune confirmation n’est demandée : en cas d’erreur, Annuler rétablit les changements.
 - Faites d’abord une sauvegarde (ci-dessous), surtout avant une grosse importation.
 
 ### Sauvegardes (.bin)
@@ -14,15 +16,22 @@
 ### Importer et exporter en CSV
 Ces boutons sont sous **Importer et exporter**. Les fichiers CSV suivent le format CHIRP : vous pouvez échanger des listes de canaux avec CHIRP, un tableur ou des sites comme RepeaterBook.
 - **Exporter en CSV** enregistre les canaux dans un fichier CSV.
-- **Importer un CSV** en lit un. Le menu à côté décide où vont les lignes :
+- L’import se fait en trois étapes :
+  1. **Choisir un fichier CSV**, ou collez une adresse web (ou choisissez une liste proposée) et appuyez sur **Charger depuis l'URL**. La ligne en dessous indique quel CSV est prêt. Rien ne change encore.
+  2. Choisissez dans le menu où vont les lignes, et cochez **Ignorer les doublons** si besoin.
+  3. Appuyez sur **Importer dans le tableau**. Les canaux apparaissent dans le tableau, et **Écrire les changements** pulse jusqu’à ce que vous les écriviez. La radio n’est pas touchée avant.
+- Où vont les lignes :
   - **Aux emplacements du CSV** : chaque ligne va au numéro de canal de sa colonne Location. Les autres canaux ne bougent pas.
   - **Ajouter à la fin** : les lignes vont après votre dernier canal utilisé, dans l’ordre du fichier.
   - **Ajouter au début** : les lignes vont en tête (à partir du canal 1) et vos canaux existants descendent.
   - **Tout remplacer** : tous les canaux sont effacés, puis les lignes vont à leurs emplacements.
 - **Ignorer les doublons** écarte les lignes ayant la même fréquence, le même duplex, décalage, mode et les mêmes tonalités qu’un canal existant. Les noms ne sont pas comparés.
 
-### Importer depuis une URL
-Collez l’adresse web d’un fichier CSV, ou choisissez une liste proposée, puis appuyez sur **Importer depuis l’URL**. Le mode d’importation et Ignorer les doublons s’appliquent comme pour Importer un CSV.
+### Trier par
+Affiche les canaux par numéro, fréquence ou nom. Seul l’ordre de cette page change : les numéros de canaux dans la radio restent les mêmes. Monter, Descendre et Insérer un vide au-dessus agissent sur les numéros de canaux, ils sont donc désactivés pendant un autre tri.
+
+### Doublons
+Une fréquence ou un nom utilisé par plusieurs canaux est entouré d’orange. Survolez-le pour voir quels autres canaux l’utilisent. Les doublons sont permis (par exemple un relais avec deux tonalités) : le contour n’est qu’un rappel. Décochez **Signaler les doublons** pour le masquer.
 
 ### Afficher les canaux vides
 Affiche aussi les numéros de canal inutilisés, pour saisir un nouveau canal à un emplacement précis.
