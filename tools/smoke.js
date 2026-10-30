@@ -19,11 +19,14 @@ const proc = spawn(shell, [`--remote-debugging-port=${port}`, '--headless', '--n
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 (async () => {
-  let targets;
-  for (let i = 0; i < 50; i++) {
-    try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); break; } catch { await sleep(200); }
+  // CI runners can take well over 10 s to start Chrome; wait up to 60 s for its page.
+  let target;
+  for (let i = 0; i < 300 && !target; i++) {
+    try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find(t => t.type === 'page'); } catch {}
+    if (!target) await sleep(200);
   }
-  const ws = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);
+  if (!target) throw new Error('Chrome did not start within 60 s');
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise(r => ws.addEventListener('open', r));
   let id = 0;
   const pending = new Map();
