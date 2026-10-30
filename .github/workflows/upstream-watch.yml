@@ -64,7 +64,7 @@ jobs:
           num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
           if [ -z "$list" ]; then
             [ -n "$pending" ] && exit 0
-            [ -n "$num" ] && gh issue close "$num" -c "Caught up: all of armel's changes are on main."
+            [ -n "$num" ] && gh issue close "$num" -c "Caught up: all of Armel's changes are on main."
             exit 0
           fi
           git checkout -q test 2>/dev/null || true
