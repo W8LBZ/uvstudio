@@ -156,7 +156,7 @@ Run the local test suite with `node --test tests/*.test.js`.
 
 ### Browser smoke test
 
-`tools/smoke.js` drives the Memories and Radio settings panels in headless
+`tools/smoke.js` drives the Memories, Radio settings and Calibration panels in headless
 Chrome against a fake radio that speaks the real serial protocol (handshake,
 EEPROM read/write, reboot, and a locked-radio case). No radio or npm packages
 are needed, only Node.js and a Chrome or Chromium binary:
@@ -169,6 +169,9 @@ It prints what was read, edited, and written to the fake radio, and saves
 `memories.png` and `settings.png` in the output folder. Without `CHROME` it
 looks for Playwright's headless shell in `~/.cache/ms-playwright`. It uses the
 DevTools port 9333 and is not part of `node --test`.
+
+The fake radio itself is `tools/fake-radio.js`. To try it by hand in desktop Chrome,
+paste that file into the DevTools console on the UV Studio page, then press Connect.
 
 ## Origin and attribution
 
