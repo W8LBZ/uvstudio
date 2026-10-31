@@ -7,7 +7,7 @@ How memory channels appear: frequency, channel number, name, or name with freque
 What happens at power-on: a sound, your messages, the battery voltage, the boot logo, everything (**ALL**), or nothing.
 
 ### Message 1
-First line of the power-on message (up to 16 characters). Your call sign is a popular choice.
+First line of the power-on message (up to 16 characters). Your call sign is a popular choice. Apps that transmit (Beacon, APRS Digi, KISS TNC, and APRS TX when APRS Edit has no callsign) send this line as your call sign, so enter only your call sign: spaces are dropped, and "N0CALL JOHN" would go out as N0CALLJOHN.
 
 ### Message 2
 Second line of the power-on message (up to 16 characters), shown under **Message 1** when **POnMsg** includes messages.

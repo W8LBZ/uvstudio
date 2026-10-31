@@ -7,6 +7,11 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## Unreleased
+
+- Help for Message 1 in Radio settings: transmitting apps (Beacon, APRS Digi, KISS TNC, and
+  APRS TX without its own callsign) send this line as your call sign, so it should hold only that.
+
 ## 2026.10.6 (2026-10-30)
 
 Merged UV Studio upstream:
