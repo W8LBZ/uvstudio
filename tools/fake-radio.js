@@ -1,8 +1,8 @@
 // Fake UV-K5 (F4HWN v6.2.0) on a fake Web Serial port, speaking the real framed, obfuscated
-// protocol: handshake, EEPROM read/write, reboot. Covers Memories, Radio settings and calibration
-// read; not the Live Viewer, flashing, or apps. Used by tools/smoke.js. By hand: open UV Studio in
-// Chrome, paste this file into the DevTools console (or save it as a DevTools Snippet), then press
-// Connect.
+// protocol: handshake, EEPROM read/write, reboot. Covers Memories, Radio settings, their backups,
+// and calibration read/restore; not the Live Viewer, flashing, or apps. Used by tools/smoke.js.
+// By hand: open UV Studio in Chrome, paste this file into the DevTools console (or save it as a
+// DevTools Snippet), then press Connect.
 // window.fakeRadio is the EEPROM; set window.fakeAesKey = true to act as a locked radio.
 (() => {
   const M = window.UVSTUDIO_MEMORIES;

@@ -40,6 +40,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const send = (method, params = {}) => new Promise(r => { const n = ++id; pending.set(n, r); ws.send(JSON.stringify({ id: n, method, params })); });
   const evaluate = async expr => {
     const res = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true });
+    if (res.error) throw new Error(res.error.message);
     if (res.result.exceptionDetails) throw new Error(res.result.exceptionDetails.exception?.description);
     return res.result.result.value;
   };
@@ -291,6 +292,79 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   })()`);
   console.log('calibration', calib);
   if (!calib.match || !/^calibration-[0-9a-f]{8}-\d{4}-\d\d-\d\d\.dat$/.test(calib.name)) throw new Error('calibration read broken');
+
+  // Backups and restores: catch Save downloads, feed files to the hidden inputs.
+  await evaluate(`(() => {
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { if (this.download) window.lastDownload = this.href; return click.call(this); };
+    window.saved = async btn => { document.getElementById(btn).click(); return new Uint8Array(await (await fetch(lastDownload)).arrayBuffer()); };
+    window.openFile = async (input, bytes, name) => {
+      const dt = new DataTransfer(); dt.items.add(new File([bytes], name));
+      const el = document.getElementById(input); el.files = dt.files; el.dispatchEvent(new Event('change'));
+      await new Promise(r => setTimeout(r, 200));
+    };
+  })()`);
+  // Memories backup round trip: save, change the radio, open the backup, write, radio is back.
+  await evaluate("location.hash = 'memories'");
+  await sleep(500);
+  await evaluate("document.getElementById('memReadBtn').click()");
+  await waitIdle();
+  await evaluate(`(async () => {
+    window.memOrig = fakeRadio.slice(0, UVSTUDIO_MEMORIES.IMAGE_SIZE);
+    window.memSaved = await saved('memSaveBackupBtn');
+    fakeRadio.fill(0x55, 0x10, 0x20); fakeRadio.fill(0x41, 0x4010, 0x401A); fakeRadio.fill(0x00, 0x9000, 0x9010);
+  })()`);
+  await evaluate("document.getElementById('memReadBtn').click()");
+  await waitIdle();
+  await evaluate("openFile('memBinFile', memSaved, 'memories.bin').then(() => document.getElementById('memWriteBtn').click())");
+  await sleep(500);
+  await waitIdle();
+  const memBackup = await evaluate(`(async () => {
+    const restored = fakeRadio.subarray(0, memOrig.length).every((b, i) => b === memOrig[i]);
+    const savedMatch = memSaved.length === memOrig.length && memSaved.every((b, i) => b === memOrig[i]);
+    const pulseAfterWrite = document.getElementById('memWriteBtn').classList.contains('mem-write-reminder');
+    await openFile('memBinFile', memSaved.slice(0, 0x8800), 'old.bin');   // pre-list-names backup size
+    return { savedMatch, restored, pulseAfterWrite, legacyAccepted: document.getElementById('log').textContent.includes('old.bin') };
+  })()`);
+  console.log('memories backup', memBackup);
+  if (!memBackup.savedMatch || !memBackup.restored || memBackup.pulseAfterWrite || !memBackup.legacyAccepted) throw new Error('memories backup broken');
+  await evaluate("document.getElementById('memDiscardBtn').click()");
+  // Settings backup: opening a file never brings in an AES key or firmware stamp.
+  await evaluate("location.hash = 'settings'");
+  await sleep(500);
+  await evaluate("document.getElementById('setReadBtn').click()");
+  await waitIdle();
+  await evaluate(`(async () => {
+    window.setKeep = fakeRadio.slice(0xA138, 0xA170);
+    const file = await saved('setSaveBackupBtn');
+    file[0x001] = 2;                     // Sql, to prove the file was applied
+    file.fill(0xAA, 0x138, 0x148);       // AES key
+    file.fill(0x58, 0x160, 0x170);       // firmware version stamp
+    await openFile('setBinFile', file, 'settings.bin');
+    document.getElementById('setWriteBtn').click();
+  })()`);
+  await sleep(500);
+  await waitIdle();
+  const setBackup = await evaluate(`({ sql: fakeRadio[0xA001],
+    protectedKept: fakeRadio.subarray(0xA138, 0xA170).every((b, i) => b === setKeep[i]) })`);
+  console.log('settings backup', setBackup);
+  if (setBackup.sql !== 2 || !setBackup.protectedKept) throw new Error('settings backup restore broken');
+  // Calibration restore: writes exactly 0xB000-0xB1FF.
+  await evaluate("location.hash = 'calibration'");
+  await sleep(500);
+  await evaluate(`(async () => {
+    window.calFile = Uint8Array.from({ length: 512 }, (_, i) => (i * 13 + 1) & 0xFF);
+    window.radioBefore = fakeRadio.slice();
+    await openFile('calibFile', calFile, 'calibration.dat');
+    return document.getElementById('restoreBtn').disabled;
+  })()`);
+  await evaluate("document.getElementById('restoreBtn').click()");
+  await sleep(500);
+  await waitIdle();
+  const calRestore = await evaluate(`({ written: fakeRadio.subarray(0xB000, 0xB200).every((b, i) => b === calFile[i]),
+    restUntouched: fakeRadio.every((b, i) => (i >= 0xB000 && i < 0xB200) || b === radioBefore[i]) })`);
+  console.log('calibration restore', calRestore);
+  if (!calRestore.written || !calRestore.restUntouched) throw new Error('calibration restore broken');
   if (mobile) {
     await evaluate("location.hash = 'live'");
     await sleep(800);
