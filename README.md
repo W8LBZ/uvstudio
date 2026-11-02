@@ -124,6 +124,22 @@ starts on (the radio updates them itself as you change channels); the DTMF group
 timings the radio's menu doesn't show. Opening a
 settings backup never restores its AES key or firmware version bytes.
 
+## Claude skill
+
+This repo is also a Claude plugin marketplace with one plugin, `uvstudio-plus`: a skill that
+drives UV Studio+ through Claude in Chrome (navigate, configure memories and settings,
+hardware-test builds). In Claude Code:
+
+```
+/plugin marketplace add w8lbz/uvstudio
+/plugin install uvstudio-plus@w8lbz
+```
+
+Auto-update is off by default for this marketplace. To get new versions automatically, run
+`/plugin`, open Marketplaces, select `w8lbz` and choose Enable auto-update. On claude.ai,
+upload `plugins/uvstudio-plus/skills/uvstudio/SKILL.md` as a skill; it says at the end of a
+run when a newer version is out.
+
 ## Run locally
 
 UV Studio is a static HTML, CSS, and JavaScript application. Open index.html
@@ -156,7 +172,7 @@ Run the local test suite with `node --test tests/*.test.js`.
 
 ### Browser smoke test
 
-`tools/smoke.js` drives the Memories and Radio settings panels in headless
+`tools/smoke.js` drives the Memories, Radio settings and Calibration panels in headless
 Chrome against a fake radio that speaks the real serial protocol (handshake,
 EEPROM read/write, reboot, and a locked-radio case). No radio or npm packages
 are needed, only Node.js and a Chrome or Chromium binary:
@@ -169,6 +185,9 @@ It prints what was read, edited, and written to the fake radio, and saves
 `memories.png` and `settings.png` in the output folder. Without `CHROME` it
 looks for Playwright's headless shell in `~/.cache/ms-playwright`. It uses the
 DevTools port 9333 and is not part of `node --test`.
+
+The fake radio itself is `tools/fake-radio.js`. To try it by hand in desktop Chrome,
+paste that file into the DevTools console on the UV Studio page, then press Connect.
 
 ## Origin and attribution
 

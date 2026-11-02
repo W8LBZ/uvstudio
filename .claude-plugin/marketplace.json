@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "w8lbz",
+  "description": "Claude plugins from the Sandusky Radio Experimental League (W8LBZ)",
+  "owner": {
+    "name": "W8LBZ"
+  },
+  "plugins": [
+    {
+      "name": "uvstudio-plus",
+      "source": "./plugins/uvstudio-plus",
+      "description": "Drive UV Studio+ in Chrome for a Quansheng UV-K5 V3 / UV-K1 on F4HWN firmware: navigate, configure memories and settings, and hardware-test builds.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "keywords": ["ham-radio", "quansheng", "uv-k5", "f4hwn", "uv-studio"]
+    }
+  ]
+}

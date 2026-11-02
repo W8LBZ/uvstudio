@@ -15,17 +15,29 @@
 
 ### Import and export CSV
 These buttons are under **Import and export**. CSV files use the CHIRP format, so you can share channel lists with CHIRP users, spreadsheets, and sites like RepeaterBook.
-- **Export CSV** saves the channels as a CSV file.
+- **Export CSV** saves the channels as a CSV file. With **Include extra columns** ticked it also saves each channel's scan list, TX lock and busy lock, and your own columns (see Extra columns below), after the standard CHIRP columns. CHIRP shows a warning about columns it doesn't know but still opens the file. Untick it for a plain CHIRP file.
 - Importing takes three steps:
   1. **Choose CSV file**, or paste a web address (or pick a list from the suggestions) and press **Load from URL**. The line below shows which CSV is ready. Nothing changes yet.
-  2. Pick where the rows go in the menu, and tick **Skip duplicates** if you want.
+  2. Pick where the rows go in the menu, the scan list for new channels, and tick **Skip exact duplicates** if you want.
   3. Press **Import into table**. The channels appear in the table, and **Write changes to radio** pulses until you write them. The radio is not touched until you do.
 - Where the rows go:
   - **At CSV locations**: each row goes to the channel number in its Location column. Other channels stay as they are.
   - **Append**: rows go after your last used channel, in file order.
   - **Prepend**: rows go at the top (from channel 1), and your existing channels move down.
   - **Replace all**: every channel is cleared first, then rows go to their locations.
-- **Skip duplicates** leaves out rows with the same frequency, duplex, offset, mode and tones as a channel you already have. Names are ignored when comparing.
+- **Scan list for new channels** is where channels go when the file doesn't say. A file with a ScanList column (as **Include extra columns** writes) keeps its own lists. A list named in the file (such as `2 EST`) gets that name only if it has none yet.
+- **Skip exact duplicates** leaves out rows with the same frequency, duplex, offset, mode and tones as a channel you already have. Names are ignored when comparing. A row on the same frequency with different tones is still imported, and gets the orange duplicate outline.
+- Likely mistakes in a file get an orange outline (hover or tap for why) and a line in the import log. Check them before writing:
+  - **Offset:** + or − with an offset of 0 (it would transmit on the receive frequency), a 2 m repeater with 5 MHz, or a 70 cm one with 0.6 MHz.
+  - **Mode:** an airband channel (108–137 MHz) that isn't AM.
+- The radio shows names of up to 10 plain letters, digits and symbols. Longer names are cut, and accented letters or other scripts (such as Chinese) are left out; the import log shows the name as stored.
+
+### Extra columns
+Columns the radio can't store, such as **Comment** or a file's own columns (City, Net, Source, LastVerified…).
+- Importing a CSV keeps them, and they show in the table after PTT ID, with their names in italics. **+** in the table header adds a column, and **✕** next to a column's name removes it (on a phone these show as chips under **Select all shown**). **Remove empty columns** appears above the table when a column has nothing filled in. Removing a column with values asks first: they aren't in Undo.
+- **They are not stored on the radio.** They stay on this page and go into **Export CSV** (Comment always, the others with **Include extra columns** ticked). Keep the exported CSV, for example in git, to keep them.
+- They follow the channel by frequency and name, so they stay with it when you move, sort or re-read channels. Changing a channel's frequency or name in the table carries them along.
+- Leaving the page with extra column changes that haven't been exported asks first.
 
 ### Show empty channels
 Shows unused channel numbers too, so you can type a new channel into a specific slot.
@@ -35,6 +47,9 @@ Lists the channels by channel number, frequency or name. This only changes the o
 
 ### Duplicates
 A frequency or name used by more than one channel gets an orange outline. Hover over it to see which other channels use it. Duplicates are allowed (for example one repeater with two tones); the outline is only a reminder. Untick **Highlight duplicates** to hide it.
+
+### Close gaps
+Moves channels up into empty channel numbers, keeping their order, so channels 1, 2, 5 become 1, 2, 3. It pulses after you delete a channel and leave a gap. Undo puts the channels back.
 
 ### Editing several channels
 Tick the boxes on the left to select channels. A bar appears with:

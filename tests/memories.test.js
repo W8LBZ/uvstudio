@@ -313,3 +313,81 @@ test('csvNameFromUrl gives a short label for the loaded CSV', () => {
   assert.equal(mem.csvNameFromUrl('data:text/csv,Location%2CName%0A1%2CX'), 'data:text/csv');
   assert.equal(mem.csvNameFromUrl('data:text/csv;charset=utf-8,a'), 'data:text/csv');
 });
+
+test('extra columns: notes, scan list, TX lock and busy lock round-trip through CSV', () => {
+  const image = blank();
+  const notes = mem.createNotes();
+  const csv = [
+    'Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,LastVerified,City / County,ScanList,TxLock,Source',
+    '1,SIMP V,146.52,,0.6,,88.5,88.5,023,NN,023,Tone->Tone,FM,5,,50W,Calling,,11/1/2026,"Clarksfield,Huron",2 EST,N,example.com',
+    '2,BAD U,442.175,+,0.6,,88.5,88.5,023,NN,023,Tone->Tone,FM,5,,50W,,,,,,,',
+    '3,NOAA,162.55,,0,,88.5,88.5,023,NN,023,Tone->Tone,FM,5,,50W,,,,,None,Y,'
+  ].join('\n');
+  const result = mem.importChirpCsv(image, csv, { mode: 'location', scanlist: 4, notes });
+  assert.equal(result.imported, 3);
+  assert.deepEqual(result.warnings.map(w => w.line), [3]);   // 0.6 MHz offset on 70 cm
+  const [simp, bad, noaa] = [0, 1, 2].map(i => mem.decodeChannel(image, i));
+  assert.equal(simp.scanlist, 2);
+  assert.equal(mem.getListName(image, 2), 'EST');            // unnamed list takes the file's name
+  assert.equal(simp.txLock, false);
+  assert.equal(bad.scanlist, 4);                              // no ScanList value: the import default
+  assert.equal(bad.txLock, true);
+  assert.equal(noaa.scanlist, 0);
+  assert.deepEqual(mem.channelWarnings(bad), [{ field: 'offset', code: 'offset', usual: 5 }]);
+  assert.deepEqual(mem.channelWarnings(simp), []);
+  assert.deepEqual(notes.columns, ['Comment', 'LastVerified', 'City / County', 'Source']);
+  assert.deepEqual(notes.values.get(mem.noteKey(simp)),
+    { Comment: 'Calling', LastVerified: '11/1/2026', 'City / County': 'Clarksfield,Huron', Source: 'example.com' });
+
+  // Plain export: CHIRP columns only, Comment kept in its own column.
+  const plain = mem.parseCsv(mem.exportChirpCsv(image, { notes }));
+  assert.deepEqual(plain[0], mem.CHIRP_HEADER);
+  assert.equal(plain[1][16], 'Calling');
+
+  // Extended export reimports to the same channels and notes; a named list keeps the radio's name.
+  mem.setListName(image, 2, 'LOC');
+  const extended = mem.exportChirpCsv(image, { notes, extras: true });
+  const copy = blank();
+  const copyNotes = mem.createNotes();
+  mem.importChirpCsv(copy, extended, { mode: 'replace', notes: copyNotes });
+  for (let i = 0; i < 3; i++) assert.deepEqual(mem.decodeChannel(copy, i), mem.decodeChannel(image, i));
+  assert.equal(mem.getListName(copy, 2), 'LOC');
+  assert.deepEqual(copyNotes.values, notes.values);
+
+  // A plain CHIRP file with blank comments doesn't wipe notes kept on the page.
+  mem.importChirpCsv(image, mem.exportChirpCsv(image), { mode: 'location', notes });
+  assert.equal(notes.values.get(mem.noteKey(simp)).Comment, 'Calling');
+
+  assert.equal(mem.importChirpCsv(blank(), csv.replace(',N,example', ',maybe,example')).errors.length, 1);
+});
+
+test('flags likely mistakes and keys notes by the stored (cut) name', () => {
+  const warn = ch => mem.channelWarnings(channel(ch)).map(w => w.code);
+  assert.deepEqual(warn({ freq: 146940000, duplex: '-', offset: 0 }), ['zeroOffset']);
+  assert.deepEqual(warn({ freq: 146940000, duplex: '-', offset: 5000000 }), ['offset']);
+  assert.deepEqual(warn({ freq: 146940000, duplex: '-', offset: 600000 }), []);
+  assert.deepEqual(warn({ freq: 121500000, mode: 'FM' }), ['airband']);
+  assert.deepEqual(warn({ freq: 121500000, mode: 'AM' }), []);
+
+  const image = blank();
+  const notes = mem.createNotes();
+  const result = mem.importChirpCsv(image,
+    'Location,Name,Frequency,Duplex,Offset,Mode,Comment\n1,TOWER APPROACH,121.5,,0,FM,Tower\n2,中继台,146.52,,0,FM,\n3,CAFÉ,146.55,,0,FM,\n', { notes });
+  const ch = mem.decodeChannel(image, 0);
+  assert.equal(ch.name, 'TOWER APPR');
+  assert.deepEqual(result.warnings.map(w => w.message.split(' (')[0]),
+    ['name stored as "TOWER APPR"', 'airband', 'name left blank', 'name stored as "CAF"']);
+  assert.equal(notes.values.get(mem.noteKey(ch)).Comment, 'Tower');
+});
+
+test('closes gaps in channel order, keeping every byte', () => {
+  const image = blank();
+  [0, 3, 7].forEach((i, k) => mem.encodeChannel(image, i, channel({ name: `CH${k}` })));
+  assert.equal(mem.hasGaps(image), true);
+  const third = mem.copyChannel(image, 7);
+  assert.equal(mem.compactChannels(image), 2);
+  assert.deepEqual([0, 1, 2].map(i => mem.decodeChannel(image, i).name), ['CH0', 'CH1', 'CH2']);
+  assert.deepEqual(mem.copyChannel(image, 2), third);
+  assert.equal(mem.isEmpty(image, 3) && mem.isEmpty(image, 7), true);
+  assert.equal(mem.hasGaps(image), false);
+});

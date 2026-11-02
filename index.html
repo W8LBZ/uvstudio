@@ -4,13 +4,13 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>UV Studio+ by KO4CGQ</title>
-    <script src="js/studio-version.js?v=2026.10.6"></script>
+    <script src="js/studio-version.js?v=2026.11.0"></script>
 <link rel="icon" type="image/svg+xml" href="assets/uv-studio-radio.svg">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2563eb">
 <link href="css/core.css?v=6" rel="stylesheet">
 <link href="css/viewer.css?v=14" rel="stylesheet">
-<link href="css/tools.css?v=82" rel="stylesheet">
+<link href="css/tools.css?v=86" rel="stylesheet">
 <link href="css/studio.css?v=37" rel="stylesheet">
 </head>
 <body data-theme="light">
@@ -455,12 +455,16 @@
                                 <option value="prepend" data-i18n="memImportModePrepend">Prepend</option>
                                 <option value="replace" data-i18n="memImportModeReplace">Replace all</option>
                             </select>
-                            <label class="mem-show-empty"><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip duplicates</span></label>
+                            <label class="mem-show-empty"><span data-i18n="memImportScanList">Scan list for new channels</span>
+                                <select id="memImportScanList"></select>
+                            </label>
+                            <label class="mem-show-empty" data-i18n-title="memSkipDuplicatesHint" title="Leaves out rows with the same frequency, duplex, offset, mode and tones as a channel you have. Same frequency with other tones is still imported."><input type="checkbox" id="memSkipDuplicates"> <span data-i18n="memSkipDuplicates">Skip exact duplicates</span></label>
                             <button type="button" id="memImportApplyBtn" class="btn primary compact-toolbar-action" data-i18n="memImportApply" disabled>Import into table</button>
                         </div>
                         <p class="mem-import-status" data-i18n="memImportHint">Importing changes only this page. Press Write changes to radio to send the channels to the radio.</p>
                         <div class="mem-toolbar">
                             <button type="button" id="memExportBtn" class="btn compact-toolbar-action" data-i18n="memExportBtn" disabled>Export CSV</button>
+                            <label class="mem-show-empty" data-i18n-title="memExportExtrasHint" title="Adds scan list, TX lock, busy lock and your own columns after the CHIRP ones. CHIRP warns about them but still opens the file."><input type="checkbox" id="memExportExtras" checked> <span data-i18n="memExportExtras">Include extra columns</span></label>
                             <button type="button" id="memOpenBackupBtn" class="btn compact-toolbar-action" data-i18n="memOpenBackupBtn" disabled>Open backup (.bin)</button>
                         </div>
                     </details>
@@ -474,6 +478,8 @@
                         <div class="mem-toolbar">
                             <label class="mem-show-empty"><input type="checkbox" id="memShowEmpty"> <span data-i18n="memShowEmpty">Show empty channels</span></label>
                             <label class="mem-show-empty"><input type="checkbox" id="memShowDups" checked> <span data-i18n="memShowDups">Highlight duplicates</span></label>
+                            <button type="button" id="memCloseGapsBtn" class="btn compact-toolbar-action" data-i18n="memCloseGaps" data-i18n-title="memCloseGapsHint" title="Move channels up into empty channel numbers, keeping their order." disabled>Close gaps</button>
+                            <button type="button" id="memRemoveEmptyBtn" class="btn compact-toolbar-action" data-i18n="memRemoveEmptyColumns" hidden>Remove empty columns</button>
                             <label class="mem-show-empty"><span data-i18n="memSortBy">Sort by</span>
                                 <select id="memSort">
                                     <option value="channel" data-i18n="memSortChannel">Channel number</option>
@@ -528,7 +534,7 @@
                                         <th data-help="reverse" data-i18n="memColReverse">Reverse</th>
                                         <th data-help="compander" data-i18n="memColCompander">Compander</th>
                                         <th data-help="ptt-id" data-i18n="memColPttId">PTT ID</th>
-                                        <th><span class="sr-only" data-i18n="memDelete">Delete channel</span></th>
+                                        <th class="mem-col-add"><span class="sr-only" data-i18n="memDelete">Delete channel</span><button type="button" class="btn mem-col-btn" data-add-column title="Add column" aria-label="Add column" data-i18n-title="memAddColumn" data-i18n-aria-label="memAddColumn">+</button></th>
                                     </tr>
                                 </thead>
                                 <tbody id="memTableBody"></tbody>
@@ -1246,16 +1252,16 @@
 </div>
 
 <!-- ═══════════ Scripts (all local, file://-friendly) ═══════════ -->
-<script src="locales/en.js?v=85"></script>
-<script src="locales/fr.js?v=85"></script>
-<script src="locales/it.js?v=85"></script>
-<script src="locales/es.js?v=85"></script>
-<script src="locales/de.js?v=85"></script>
-<script src="locales/pt.js?v=85"></script>
-<script src="locales/ru.js?v=85"></script>
-<script src="locales/pl.js?v=85"></script>
-<script src="locales/zh.js?v=85"></script>
-<script src="locales/nl.js?v=85"></script>
+<script src="locales/en.js?v=90"></script>
+<script src="locales/fr.js?v=90"></script>
+<script src="locales/it.js?v=90"></script>
+<script src="locales/es.js?v=90"></script>
+<script src="locales/de.js?v=90"></script>
+<script src="locales/pt.js?v=90"></script>
+<script src="locales/ru.js?v=90"></script>
+<script src="locales/pl.js?v=90"></script>
+<script src="locales/zh.js?v=90"></script>
+<script src="locales/nl.js?v=90"></script>
 <script src="js/studio-preferences.js?v=3"></script>
 <script src="js/studio-i18n.js?v=5"></script>
 <script src="js/webusb-serial.js?v=4"></script>
@@ -1266,11 +1272,11 @@
 <script src="js/keypad-detach.js?v=1"></script>
 <script src="js/firmware-package.js?v=1"></script>
 <script src="js/flash.js?v=107"></script>
-<script src="js/memories.js?v=17"></script>
+<script src="js/memories.js?v=22"></script>
 <script src="js/settings.js?v=12"></script>
 <script src="js/flash-catalog.js?v=20"></script>
-<script src="js/app-screens.js?v=9"></script>
-<script src="js/app-catalog.js?v=28"></script>
+<script src="js/app-screens.js?v=10"></script>
+<script src="js/app-catalog.js?v=29"></script>
 <script src="js/app-submit.js?v=1"></script>
 <script src="js/studio.js?v=32"></script>
 <script src="js/studio-flash-counter.js?v=2"></script>

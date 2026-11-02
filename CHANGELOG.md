@@ -7,6 +7,36 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.11.0 (2026-11-01)
+
+- Memories: extra CSV columns. Comment and a file's own columns (City, Net, Source…) are kept on
+  import, shown in the table and saved by Export CSV. + in the table header adds one, ✕ removes
+  one, and Remove empty columns appears when one is empty. They are not stored on the radio, so
+  keep the exported CSV (in git, for example). Leaving the page with unexported changes to
+  them asks first.
+- Memories: Export CSV can add Scan list, TX lock and Busy lock columns (Include extra columns),
+  and import reads them back, including scan list names like `2 EST` for unnamed lists. CHIRP
+  warns about the extra columns but still opens the file.
+- Memories: choose the scan list for imported channels (the file's ScanList column wins).
+- Memories: "Skip duplicates" is now "Skip exact duplicates", with a tooltip: rows on the same
+  frequency with other tones are still imported.
+- Memories: likely mistakes are outlined in the table and mentioned on import: + or − with no
+  offset, a 5 MHz offset on 2 m or 0.6 MHz on 70 cm, and airband (108-137 MHz) channels not on
+  AM. Import also mentions names the radio can't show as given (over 10 characters, or
+  accents and other scripts, which it leaves out).
+- Memories: Close gaps moves channels up into empty channel numbers; it pulses after a delete
+  leaves a gap.
+- Memories: the VFOs table's PTT ID header lines up with its column.
+- Claude skill: this repository is now a Claude plugin marketplace with a skill that drives
+  UV Studio+ in Chrome (navigate, configure memories and settings, hardware-test builds). See
+  the README for installing it.
+- Help for Message 1 in Radio settings: transmitting apps (Beacon, APRS Digi, KISS TNC, and
+  APRS TX without its own callsign) send this line as your call sign, so it should hold only that.
+
+Merged UV Studio upstream:
+
+- Apps: CW QSO Auto sends and automatically repeats 16 customizable Morse messages for CW contacts.
+
 ## 2026.10.6 (2026-10-30)
 
 Merged UV Studio upstream:

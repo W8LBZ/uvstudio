@@ -2,7 +2,7 @@
 
 - **FM** : FM large. Le mode habituel des relais et du simplex radioamateur sur 2 m et 70 cm.
 - **NFM** : FM étroite. Utilisée par de nombreux relais et par les canaux PMR446. Une station en FM large l’entend plus faible et étouffée.
-- **AM** : utilisée par l’aviation (bande aéro, 118 à 137 MHz).
+- **AM** : utilisée par l’aviation (bande aéro, 118 à 137 MHz, plus les balises de navigation dès 108 MHz). La page entoure d’orange un canal entre 108 et 137 MHz qui n’est ni en AM ni en NAM.
 - **NAM** : AM étroite.
 - **USB** : bande latérale supérieure, un mode phonie pour les signaux faibles. Rare sur les bandes de cette radio.
 

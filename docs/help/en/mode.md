@@ -2,7 +2,7 @@
 
 - **FM**: wide FM. Standard for ham repeaters and simplex on 2 m and 70 cm.
 - **NFM**: narrow FM. Used by many repeaters outside the US, plus GMRS/FRS/PMR446-style channels. It sounds quieter and muffled if the other side is wide.
-- **AM**: used by aircraft (airband, 118–137 MHz).
+- **AM**: used by aircraft (airband, 118–137 MHz, plus navigation beacons from 108 MHz). The page outlines a channel from 108 to 137 MHz that isn't AM or NAM.
 - **NAM**: narrow AM.
 - **USB**: upper sideband, a voice mode used for weak-signal work. Rare on this radio's bands.
 

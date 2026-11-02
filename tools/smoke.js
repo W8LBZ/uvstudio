@@ -40,6 +40,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const send = (method, params = {}) => new Promise(r => { const n = ++id; pending.set(n, r); ws.send(JSON.stringify({ id: n, method, params })); });
   const evaluate = async expr => {
     const res = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true });
+    if (res.error) throw new Error(res.error.message);
     if (res.result.exceptionDetails) throw new Error(res.result.exceptionDetails.exception?.description);
     return res.result.result.value;
   };
@@ -54,77 +55,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(1500);
 
   // Fake radio on a fake Web Serial port speaking the real framed, obfuscated protocol.
-  await evaluate(`(() => {
-    const M = window.UVSTUDIO_MEMORIES;
-    const S = window.UVSTUDIO_SETTINGS;
-    const OB = [0x16,0x6C,0x14,0xE6,0x2E,0x91,0x0D,0x40,0x21,0x35,0xD5,0x40,0x13,0x03,0xE9,0x80];
-    const radio = new Uint8Array(0x10000).fill(0xFF);
-    radio.fill(0, 0xA000, 0xA178); radio[0xA001] = 3; radio[0xA002] = 11; radio[0xA0C3] = 0; radio[0xA15F] = 0x62;
-    radio.set(new TextEncoder().encode('W8LBZ'), 0xA0C8);
-    M.encodeChannel(radio, 0, Object.assign(M.defaultChannel(), { name: 'CALLING', freq: 145500000 }));
-    M.encodeChannel(radio, 1, Object.assign(M.defaultChannel(), { name: 'RPT', freq: 145600000, offset: 600000, duplex: '-', txTone: '88.5', mode: 'NFM' }));
-    M.encodeChannel(radio, 9, Object.assign(M.defaultChannel(), { name: 'PMR1', freq: 446006250, mode: 'NFM', power: 1 }));
-    M.encodeChannel(radio, M.CHANNEL_COUNT + 4, Object.assign(M.defaultChannel(), { name: '', freq: 146520000 }));   // VFO A 137
-    window.fakeRadio = radio;
-    window.radioLog = [];
-    window.fakeAesKey = false;
-    let ctrl, ts = 0, rx = [];
-    const reply = (type, data) => {
-      const msg = new Uint8Array(4 + data.length + 2);
-      new DataView(msg.buffer).setUint16(0, type, true);
-      new DataView(msg.buffer).setUint16(2, data.length, true);
-      msg.set(data, 4);
-      msg[msg.length - 2] = 0xFF; msg[msg.length - 1] = 0xFF;
-      for (let i = 0; i < msg.length; i++) msg[i] ^= OB[i % 16];
-      const len = msg.length - 2;
-      const pkt = new Uint8Array(4 + msg.length + 2);
-      pkt.set([0xAB, 0xCD, len & 0xFF, len >> 8]); pkt.set(msg, 4); pkt.set([0xDC, 0xBA], 4 + msg.length);
-      // split delivery to exercise partial-frame parsing
-      const cut = Math.floor(pkt.length / 2);
-      setTimeout(() => { ctrl.enqueue(pkt.slice(0, cut)); setTimeout(() => ctrl.enqueue(pkt.slice(cut)), 2); }, 3);
-    };
-    const handle = () => {
-      for (;;) {
-        const i = rx.findIndex((b, k) => b === 0xAB && rx[k + 1] === 0xCD);
-        if (i < 0 || rx.length < i + 4) return;
-        const len = rx[i + 2] | (rx[i + 3] << 8);
-        if (rx.length < i + 4 + len + 4) return;
-        const body = rx.slice(i + 4, i + 4 + len).map((b, k) => b ^ OB[k % 16]);
-        rx = rx.slice(i + 4 + len + 4);
-        const dv = new DataView(Uint8Array.from(body).buffer);
-        const type = dv.getUint16(0, true);
-        radioLog.push(type.toString(16));
-        if (type === 0x0514) {
-          ts = dv.getUint32(4, true);
-          const d = new Uint8Array(36); d.set(new TextEncoder().encode('F4HWN v6.2.0')); d[16] = fakeAesKey ? 1 : 0;
-          reply(0x0515, d);
-        } else if (type === 0x051B) {
-          const off = dv.getUint16(4, true), size = body[6];
-          if (dv.getUint32(8, true) !== ts) continue;
-          const d = new Uint8Array(4 + size); d[0] = off & 0xFF; d[1] = off >> 8; d[2] = size;
-          if (!fakeAesKey) d.set(radio.subarray(off, off + size), 4);
-          reply(0x051C, d);
-        } else if (type === 0x051D) {
-          const off = dv.getUint16(4, true), size = body[6];
-          if (dv.getUint32(8, true) !== ts) continue;
-          if (!fakeAesKey) for (let k = 0; k + 8 <= size; k += 8) radio.set(body.slice(12 + k, 20 + k), off + k);
-          reply(0x051E, new Uint8Array([off & 0xFF, off >> 8]));
-        }
-      }
-    };
-    const fakePort = {
-      readable: null, writable: null,
-      async open() {
-        this.readable = new ReadableStream({ start(c) { ctrl = c; } });
-        this.writable = new WritableStream({ write(chunk) { rx.push(...chunk); handle(); } });
-      },
-      async close() {}, getInfo() { return { usbVendorId: 0x1a86, usbProductId: 0x7523 }; }, async forget() {}
-    };
-    Object.defineProperty(navigator, 'serial', { configurable: true,
-      value: { requestPort: async () => (window.pickerCount = (window.pickerCount || 0) + 1, fakePort),
-        getPorts: async () => (window.pickerCount ? [fakePort] : []), addEventListener() {} } });
-    window.dispatchEvent(new CustomEvent('uvstudio:serialstatechange', { detail: {} }));
-  })()`);
+  await evaluate(fs.readFileSync(path.join(__dirname, 'fake-radio.js'), 'utf8'));
 
   const waitIdle = async () => { await sleep(300); for (let i = 0; i < 300; i++) { if (await evaluate("document.getElementById('studioSerialStatus').dataset.operation !== 'true'")) return; await sleep(100); } throw new Error('operation never finished'); };
   const state = () => evaluate(`({
@@ -198,7 +129,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const imp = await evaluate(`(async () => {
     const input = document.getElementById('memCsvFile');
     const dt = new DataTransfer();
-    dt.items.add(new File(['Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,Mode,TStep,Skip,Comment\\n1,SMOKE,145.500000,,0.000000,,88.5,88.5,023,NN,FM,5.00,,\\n'], 'smoke.csv'));
+    dt.items.add(new File(['Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,Mode,TStep,Skip,Comment,Net\\n1,SMOKE,145.500000,,0.000000,,88.5,88.5,023,NN,FM,5.00,,Smoke note,Tue 8pm\\n'], 'smoke.csv'));
     input.files = dt.files;
     input.dispatchEvent(new Event('change'));
     await new Promise(r => setTimeout(r, 100));
@@ -208,10 +139,24 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     document.getElementById('memImportMode').value = 'append';
     apply.click();
     return { staged, rows: document.querySelectorAll('#memTableBody tr').length, applyEnabled: !apply.disabled,
-      pulse: document.getElementById('memWriteBtn').classList.contains('mem-write-reminder') };
+      pulse: document.getElementById('memWriteBtn').classList.contains('mem-write-reminder'),
+      noteHeaders: [...document.querySelectorAll('#memChannelsBox th[data-note] [data-help]')].map(el => el.textContent).join(),
+      notes: [...document.querySelectorAll('#memTableBody [data-note]')].map(el => el.value).filter(Boolean).join(),
+      // The ✕ must sit clear of its column name (the table's button rule once pulled it over the text).
+      xGap: Math.min(...[...document.querySelectorAll('#memChannelsBox th[data-note]')].map(th =>
+        th.querySelector('button').getBoundingClientRect().left - th.querySelector('[data-help]').getBoundingClientRect().right)),
+      xHeight: document.querySelector('#memChannelsBox [data-remove-column]').getBoundingClientRect().height,
+      afterRemove: (() => {   // ✕ on the Net header: remove it (has a value, so it confirms)
+        const confirm = window.confirm;
+        window.confirm = () => true;
+        document.querySelector('#memChannelsBox [data-remove-column="Net"]').click();
+        window.confirm = confirm;
+        return [...document.querySelectorAll('#memChannelsBox th[data-note] [data-help]')].map(el => el.textContent).join();
+      })() };
   })()`);
   console.log('csv import', JSON.stringify(imp));
-  if (!imp.staged.applyEnabled || imp.rows !== imp.staged.rows + 1 || imp.applyEnabled || !imp.pulse) throw new Error('CSV import flow broken');
+  if (!imp.staged.applyEnabled || imp.rows !== imp.staged.rows + 1 || imp.applyEnabled || !imp.pulse ||
+    imp.noteHeaders !== 'Comment,Net' || imp.notes !== 'Smoke note,Tue 8pm' || imp.afterRemove !== 'Comment' || !(imp.xGap >= 4)) throw new Error('CSV import flow broken');
   const view = await evaluate(`(() => {
     const order = () => [...document.querySelectorAll('#memTableBody tr')].map(tr => tr.dataset.index).join(',');
     const sort = document.getElementById('memSort');
@@ -351,6 +296,89 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await evaluate("document.getElementById('memWriteBtn').click()");
   await waitIdle();
   console.log('table written', await evaluate(`JSON.stringify([0, 1, 2].map(i => { const c = UVSTUDIO_MEMORIES.decodeChannel(fakeRadio, i); return c && (c.name + '/' + c.power); }))`));
+  // Calibration read: the 512 bytes at 0xB000, saved under a hash-based name.
+  await evaluate("location.hash = 'calibration'; document.getElementById('dumpBtn').click()");
+  await waitIdle();
+  const calib = await evaluate(`(async () => {
+    const link = document.getElementById('dumpLink');
+    const got = new Uint8Array(await (await fetch(link.href)).arrayBuffer());
+    return { name: link.download, match: got.length === 512 && got.every((b, i) => b === fakeRadio[0xB000 + i]) };
+  })()`);
+  console.log('calibration', calib);
+  if (!calib.match || !/^calibration-[0-9a-f]{8}-\d{4}-\d\d-\d\d\.dat$/.test(calib.name)) throw new Error('calibration read broken');
+
+  // Backups and restores: catch Save downloads, feed files to the hidden inputs.
+  await evaluate(`(() => {
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { if (this.download) window.lastDownload = this.href; return click.call(this); };
+    window.saved = async btn => { document.getElementById(btn).click(); return new Uint8Array(await (await fetch(lastDownload)).arrayBuffer()); };
+    window.openFile = async (input, bytes, name) => {
+      const dt = new DataTransfer(); dt.items.add(new File([bytes], name));
+      const el = document.getElementById(input); el.files = dt.files; el.dispatchEvent(new Event('change'));
+      await new Promise(r => setTimeout(r, 200));
+    };
+  })()`);
+  // Memories backup round trip: save, change the radio, open the backup, write, radio is back.
+  await evaluate("location.hash = 'memories'");
+  await sleep(500);
+  await evaluate("document.getElementById('memReadBtn').click()");
+  await waitIdle();
+  await evaluate(`(async () => {
+    window.memOrig = fakeRadio.slice(0, UVSTUDIO_MEMORIES.IMAGE_SIZE);
+    window.memSaved = await saved('memSaveBackupBtn');
+    fakeRadio.fill(0x55, 0x10, 0x20); fakeRadio.fill(0x41, 0x4010, 0x401A); fakeRadio.fill(0x00, 0x9000, 0x9010);
+  })()`);
+  await evaluate("document.getElementById('memReadBtn').click()");
+  await waitIdle();
+  await evaluate("openFile('memBinFile', memSaved, 'memories.bin').then(() => document.getElementById('memWriteBtn').click())");
+  await sleep(500);
+  await waitIdle();
+  const memBackup = await evaluate(`(async () => {
+    const restored = fakeRadio.subarray(0, memOrig.length).every((b, i) => b === memOrig[i]);
+    const savedMatch = memSaved.length === memOrig.length && memSaved.every((b, i) => b === memOrig[i]);
+    const pulseAfterWrite = document.getElementById('memWriteBtn').classList.contains('mem-write-reminder');
+    await openFile('memBinFile', memSaved.slice(0, 0x8800), 'old.bin');   // pre-list-names backup size
+    return { savedMatch, restored, pulseAfterWrite, legacyAccepted: document.getElementById('log').textContent.includes('old.bin') };
+  })()`);
+  console.log('memories backup', memBackup);
+  if (!memBackup.savedMatch || !memBackup.restored || memBackup.pulseAfterWrite || !memBackup.legacyAccepted) throw new Error('memories backup broken');
+  await evaluate("document.getElementById('memDiscardBtn').click()");
+  // Settings backup: opening a file never brings in an AES key or firmware stamp.
+  await evaluate("location.hash = 'settings'");
+  await sleep(500);
+  await evaluate("document.getElementById('setReadBtn').click()");
+  await waitIdle();
+  await evaluate(`(async () => {
+    window.setKeep = fakeRadio.slice(0xA138, 0xA170);
+    const file = await saved('setSaveBackupBtn');
+    file[0x001] = 2;                     // Sql, to prove the file was applied
+    file.fill(0xAA, 0x138, 0x148);       // AES key
+    file.fill(0x58, 0x160, 0x170);       // firmware version stamp
+    await openFile('setBinFile', file, 'settings.bin');
+    document.getElementById('setWriteBtn').click();
+  })()`);
+  await sleep(500);
+  await waitIdle();
+  const setBackup = await evaluate(`({ sql: fakeRadio[0xA001],
+    protectedKept: fakeRadio.subarray(0xA138, 0xA170).every((b, i) => b === setKeep[i]) })`);
+  console.log('settings backup', setBackup);
+  if (setBackup.sql !== 2 || !setBackup.protectedKept) throw new Error('settings backup restore broken');
+  // Calibration restore: writes exactly 0xB000-0xB1FF.
+  await evaluate("location.hash = 'calibration'");
+  await sleep(500);
+  await evaluate(`(async () => {
+    window.calFile = Uint8Array.from({ length: 512 }, (_, i) => (i * 13 + 1) & 0xFF);
+    window.radioBefore = fakeRadio.slice();
+    await openFile('calibFile', calFile, 'calibration.dat');
+    return document.getElementById('restoreBtn').disabled;
+  })()`);
+  await evaluate("document.getElementById('restoreBtn').click()");
+  await sleep(500);
+  await waitIdle();
+  const calRestore = await evaluate(`({ written: fakeRadio.subarray(0xB000, 0xB200).every((b, i) => b === calFile[i]),
+    restUntouched: fakeRadio.every((b, i) => (i >= 0xB000 && i < 0xB200) || b === radioBefore[i]) })`);
+  console.log('calibration restore', calRestore);
+  if (!calRestore.written || !calRestore.restUntouched) throw new Error('calibration restore broken');
   if (mobile) {
     await evaluate("location.hash = 'live'");
     await sleep(800);

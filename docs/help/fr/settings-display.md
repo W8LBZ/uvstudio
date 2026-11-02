@@ -7,7 +7,7 @@ Affichage des canaux mémoire : fréquence, numéro de canal, nom, ou nom avec l
 Ce qui se passe à l’allumage : un son, vos messages, la tension de la batterie, le logo, tout (**ALL**) ou rien.
 
 ### Message 1
-Première ligne du message d’accueil (16 caractères maximum). Votre indicatif est un choix courant.
+Première ligne du message d’accueil (16 caractères maximum). Votre indicatif est un choix courant. Les applis qui émettent (Beacon, APRS Digi, KISS TNC, et APRS TX quand APRS Edit n’a pas d’indicatif) envoient cette ligne comme indicatif : n’y mettez que votre indicatif. Les espaces sont supprimés, et « N0CALL JOHN » partirait comme N0CALLJOHN.
 
 ### Message 2
 Deuxième ligne du message d’accueil (16 caractères maximum), affichée sous **Message 1** quand **POnMsg** inclut les messages.

@@ -66,6 +66,8 @@
   const CHIRP_HEADER = ['Location', 'Name', 'Frequency', 'Duplex', 'Offset', 'Tone',
     'rToneFreq', 'cToneFreq', 'DtcsCode', 'DtcsPolarity', 'RxDtcsCode', 'CrossMode',
     'Mode', 'TStep', 'Skip', 'Power', 'Comment', 'URCALL', 'RPT1CALL', 'RPT2CALL', 'DVCODE'];
+  // Radio fields CHIRP has no column for, written after the CHIRP ones when extra columns are on.
+  const RADIO_COLUMNS = ['ScanList', 'TxLock', 'BusyLock'];
 
   // ---------- Values ----------
   function formatMHz(hz) {
@@ -332,6 +334,50 @@
     return indices.map(i => i + delta);
   }
 
+  // An empty channel number before the last used one.
+  function hasGaps(image) {
+    let empty = false;
+    for (let i = 0; i < CHANNEL_COUNT; i++) {
+      if (isEmpty(image, i)) empty = true;
+      else if (empty) return true;
+    }
+    return false;
+  }
+
+  // Moves channels up into empty numbers, keeping their order; returns how many moved.
+  function compactChannels(image) {
+    let to = 0;
+    let moved = 0;
+    for (let i = 0; i < CHANNEL_COUNT; i++) {
+      if (isEmpty(image, i)) continue;
+      if (i !== to) {
+        pasteChannel(image, to, copyChannel(image, i));
+        encodeChannel(image, i, null);
+        moved++;
+      }
+      to++;
+    }
+    return moved;
+  }
+
+  // Likely mistakes in shared lists: [{ field, code, usual }]. Codes: zeroOffset (duplex
+  // without an offset), offset (the other band's repeater offset), airband (not AM).
+  function channelWarnings(ch) {
+    const out = [];
+    if (!ch) return out;
+    if (ch.duplex && ch.offset === 0) out.push({ field: 'offset', code: 'zeroOffset' });
+    else if (ch.duplex && ch.freq >= 144e6 && ch.freq <= 148e6 && ch.offset === 5e6) out.push({ field: 'offset', code: 'offset', usual: 0.6 });
+    else if (ch.duplex && ch.freq >= 420e6 && ch.freq <= 450e6 && ch.offset === 0.6e6) out.push({ field: 'offset', code: 'offset', usual: 5 });
+    if (ch.freq >= 108e6 && ch.freq < 137e6 && !['AM', 'NAM'].includes(ch.mode)) out.push({ field: 'mode', code: 'airband' });
+    return out;
+  }
+
+  const WARNING_TEXT = {
+    zeroOffset: () => 'duplex set but the offset is 0, so it transmits on the receive frequency',
+    offset: w => `offset is unusual here (repeaters usually use ${w.usual} MHz)`,
+    airband: () => 'airband (108-137 MHz) is AM'
+  };
+
   // Changed 8-byte blocks (the firmware's write granularity), merged into runs.
   function dirtyRuns(before, after, maxLength = 128) {
     const runs = [];
@@ -441,11 +487,55 @@
     }
   }
 
-  function exportChirpCsv(image) {
-    const lines = [CHIRP_HEADER.join(',')];
+  // Notes: values the radio can't store (Comment and the file's own columns), keyed by
+  // frequency + name so they follow a channel through moves, sorting, undo and re-reads.
+  function createNotes() {
+    return { columns: [], values: new Map() };
+  }
+
+  function noteKey(ch) {
+    return `${ch.freq}|${String(ch.name ?? '').trim().toUpperCase()}`;
+  }
+
+  const yesNo = text => {
+    const s = String(text ?? '').trim().toUpperCase();
+    if (['Y', 'YES', 'TRUE', '1'].includes(s)) return true;
+    if (['N', 'NO', 'FALSE', '0'].includes(s)) return false;
+    if (s) throw new Error(`expected Y or N, got "${text}"`);
+    return null;
+  };
+
+  // '' (not given), 'None', 'All', or a list number optionally followed by its name ('2 EST').
+  function parseScanList(text) {
+    const s = String(text ?? '').trim();
+    if (!s) return null;
+    if (/^(none|-|—|0)$/i.test(s)) return { list: 0 };
+    if (/^all$/i.test(s)) return { list: SCANLIST_ALL };
+    const m = /^(\d+)\s*(.*)$/.exec(s);
+    if (m && Number(m[1]) >= 1 && Number(m[1]) <= SCANLIST_COUNT) return { list: Number(m[1]), name: m[2].trim() };
+    throw new Error(`invalid scan list "${text}"`);
+  }
+
+  function scanListText(image, list) {
+    if (list === 0) return 'None';
+    if (list === SCANLIST_ALL) return 'All';
+    return `${list} ${getListName(image, list)}`.trim();
+  }
+
+  // extras: add the radio columns and the note columns after the CHIRP ones (CHIRP warns
+  // about unknown columns but loads the file). Comment always goes in CHIRP's own column.
+  function exportChirpCsv(image, { notes = null, extras = false } = {}) {
+    const own = extras && notes ? notes.columns.filter(c => c !== 'Comment') : [];
+    const lines = [CHIRP_HEADER.concat(extras ? RADIO_COLUMNS : [], own).join(',')];
     for (let i = 0; i < CHANNEL_COUNT; i++) {
       const ch = decodeChannel(image, i);
-      if (ch) lines.push(toChirpRow(i, ch).map(csvField).join(','));
+      if (!ch) continue;
+      const note = notes?.values.get(noteKey(ch)) || {};
+      const row = toChirpRow(i, ch);
+      row[CHIRP_HEADER.indexOf('Comment')] = note.Comment ?? '';
+      if (extras) row.push(scanListText(image, ch.scanlist), ch.txLock ? 'Y' : 'N', ch.busy ? 'Y' : 'N');
+      own.forEach(c => row.push(note[c] ?? ''));
+      lines.push(row.map(csvField).join(','));
     }
     return lines.join('\r\n') + '\r\n';
   }
@@ -466,8 +556,9 @@
     return best;
   }
 
-  // One CHIRP CSV record -> channel. `existing` supplies values CHIRP has no column for.
-  function fromChirpRecord(rec, existing) {
+  // One CHIRP CSV record -> channel. `existing` (or `defaults` for a new channel) supplies
+  // values the file leaves out.
+  function fromChirpRecord(rec, existing, defaults) {
     const freq = parseMHz(rec.Frequency);
     let offset = rec.Offset ? parseMHz(rec.Offset) : 0;
     let duplex = String(rec.Duplex ?? '').trim().toLowerCase();
@@ -507,7 +598,10 @@
     const mode = String(rec.Mode ?? 'FM').trim() || 'FM';
     if (!MODES.includes(mode)) throw new Error(`unsupported mode "${mode}"`);
     const stepIndex = STEPS.findIndex(step => Math.abs(step - Number(rec.TStep)) < 0.001);
-    const base = existing || defaultChannel();
+    const base = existing || Object.assign(defaultChannel(), defaults);
+    const scan = parseScanList(rec.ScanList);
+    const txLock = yesNo(rec.TxLock);
+    const busy = yesNo(rec.BusyLock);
 
     return {
       name: rec.Name ?? '',
@@ -519,10 +613,11 @@
       rxTone,
       power: parsePower(rec.Power) ?? base.power,
       step: stepIndex >= 0 ? stepIndex : base.step,
-      scanlist: base.scanlist,
+      scanlist: scan ? scan.list : base.scanlist,
+      listName: scan?.name || '',
       skip: String(rec.Skip ?? '').trim().toUpperCase() === 'S',
-      txLock: warning ? true : base.txLock,
-      busy: base.busy,
+      txLock: warning ? true : txLock ?? base.txLock,
+      busy: busy ?? base.busy,
       reverse: base.reverse,
       compander: base.compander,
       pttId: base.pttId,
@@ -542,7 +637,9 @@
   //   'append'   rows in file order after the last used channel (Location ignored)
   //   'prepend'  rows in file order from channel 1, existing channels shift down
   // dedupe skips rows whose RF setup matches a channel already present or an earlier row.
-  function importChirpCsv(image, text, { mode = 'location', dedupe = false } = {}) {
+  // scanlist: the list for new channels when the file has no ScanList value.
+  // notes (createNotes()): receives Comment and the file's own columns.
+  function importChirpCsv(image, text, { mode = 'location', dedupe = false, scanlist = SCANLIST_ALL, notes = null } = {}) {
     const rows = parseCsv(text);
     const header = (rows[0] || []).map(h => h.trim());
     if (!header.includes('Frequency') || (!header.includes('Location') && (mode === 'location' || mode === 'replace'))) {
@@ -565,9 +662,9 @@
           }
           index = location - 1;
         }
-        const ch = fromChirpRecord(rec, byLocation && mode !== 'replace' ? decodeChannel(image, index) : null);
+        const ch = fromChirpRecord(rec, byLocation && mode !== 'replace' ? decodeChannel(image, index) : null, { scanlist });
         encodeChannel(scratch, 0, ch);   // validate before touching the image
-        parsed.push({ line: i + 2, index, ch });
+        parsed.push({ line: i + 2, index, ch, rec });
       } catch (error) {
         errors.push({ line: i + 2, message: error.message });
       }
@@ -575,6 +672,13 @@
 
     if (mode === 'replace' && !parsed.length) throw new Error('no valid rows: channels left unchanged');
     if (mode === 'replace') for (let i = 0; i < CHANNEL_COUNT; i++) encodeChannel(image, i, null);
+    // Columns the radio can't store; Comment only when it has something in it.
+    const noteColumns = header.filter(h => h && !CHIRP_HEADER.includes(h) && !RADIO_COLUMNS.includes(h));
+    if (parsed.some(p => String(p.rec.Comment ?? '').trim())) noteColumns.unshift('Comment');
+    if (notes && mode === 'replace') {
+      notes.columns.length = 0;
+      notes.values.clear();
+    }
 
     let duplicates = 0;
     let accepted = parsed;
@@ -613,9 +717,27 @@
       }
       encodeChannel(image, p.index, p.ch);
       if (p.ch.warning) warnings.push({ line: p.line, message: p.ch.warning });
+      const stored = decodeChannel(image, p.index);   // name as the radio keeps it
+      // Too long, or characters the radio's font lacks (it shows ASCII only): stripped by encodeChannel.
+      if (String(p.ch.name ?? '').trim() !== stored.name) {
+        warnings.push({ line: p.line, message: `name ${stored.name ? `stored as "${stored.name}"` : 'left blank'} (the radio shows up to ${NAME_LENGTH} plain letters, digits and symbols)` });
+      }
+      channelWarnings(stored).forEach(w => warnings.push({ line: p.line, message: WARNING_TEXT[w.code](w) }));
+      // '2 EST' names an unnamed list; a name already on the radio wins.
+      if (p.ch.listName && p.ch.scanlist <= SCANLIST_COUNT && !getListName(image, p.ch.scanlist)) {
+        try { setListName(image, p.ch.scanlist, p.ch.listName.slice(0, LIST_NAME_LENGTH)); } catch { /* not ASCII: leave unnamed */ }
+      }
+      if (notes) {
+        // Only filled-in values, so a plain CHIRP file doesn't wipe notes kept here.
+        const key = noteKey(stored);
+        const note = notes.values.get(key) || {};
+        noteColumns.forEach(c => { if (String(p.rec[c] ?? '').trim()) note[c] = p.rec[c].trim(); });
+        if (Object.keys(note).length) notes.values.set(key, note);
+      }
       imported++;
     });
     errors.sort((a, b) => a.line - b.line);
+    if (notes && imported) noteColumns.forEach(c => { if (!notes.columns.includes(c)) notes.columns.push(c); });
     return { imported, errors, warnings, duplicates };
   }
 
@@ -686,8 +808,15 @@
     insertChannel,
     removeChannel,
     moveChannels,
+    hasGaps,
+    compactChannels,
+    channelWarnings,
     dirtyRuns,
     parseCsv,
+    createNotes,
+    noteKey,
+    RADIO_COLUMNS,
+    CHIRP_HEADER,
     exportChirpCsv,
     csvNameFromUrl,
     importChirpCsv,
@@ -719,6 +848,10 @@
   const csvInput = $('memCsvFile');
   const importMode = $('memImportMode');
   const skipDuplicates = $('memSkipDuplicates');
+  const importScanList = $('memImportScanList');
+  const exportExtras = $('memExportExtras');
+  const closeGapsBtn = $('memCloseGapsBtn');
+  const removeEmptyBtn = $('memRemoveEmptyBtn');
   const sourceUrl = $('memSourceUrl');
   const loadUrlBtn = $('memLoadUrlBtn');
   const importApplyBtn = $('memImportApplyBtn');
@@ -729,6 +862,7 @@
   const showDups = $('memShowDups');
   const prefs = window.UVStudioPreferences;
   showDups.checked = prefs.get('uvstudio.memShowDups', 'true') === 'true';
+  exportExtras.checked = prefs.get('uvstudio.memExportExtras', 'true') === 'true';
   const summary = $('memSummary');
   const toneList = $('memToneList');
   const listNames = $('memListNames');
@@ -754,6 +888,10 @@
   let pendingCsv = null;   // { name, text } chosen but not imported yet
   let writeReminder = false;   // pulse Write after an import or backup until the changes are written
   let discardedReminder = false;   // the pulse Discard turned off, back on Undo
+  let gapReminder = false;   // pulse Close gaps once a delete leaves an empty channel number
+  let closedReminder = false;   // the pulse Close gaps turned off, back on Undo
+  const notes = M.createNotes();   // Comment and the CSV's own columns (not on the radio)
+  let notesUnsaved = false;   // notes changed since the last CSV export
 
   toneList.innerHTML = M.CTCSS.map((_, i) => `<option value="${M.toneText(1, i)}">`).join('') +
     M.DCS.map((_, i) => `<option value="${M.toneText(2, i)}"><option value="${M.toneText(3, i)}">`).join('');
@@ -845,10 +983,21 @@
     const label = field => `${t(FIELD_LABELS[field])} ${i + 1}`;
     if (!ch) {
       return `${head}<td></td><td data-label="${escapeHtml(t(FIELD_LABELS.freq))}">${cellHtml('freq', { freq: 0 }, label('freq')).replace(/ value="[^"]*"/, '')}</td>` +
-        `<td colspan="${CELL_FIELDS.length - 1}"></td></tr>`;
+        `<td colspan="${CELL_FIELDS.length - 1 + notes.columns.length}"></td></tr>`;
     }
-    return head + summaryCell(i, ch) + CELL_FIELDS.map(field => `<td data-label="${escapeHtml(t(FIELD_LABELS[field]))}">${cellHtml(field, ch, label(field))}</td>`).join('') +
+    const note = notes.values.get(M.noteKey(ch)) || {};
+    const warn = M.channelWarnings(ch);
+    return head + summaryCell(i, ch) + CELL_FIELDS.map(field => `<td data-label="${escapeHtml(t(FIELD_LABELS[field]))}"${warningAttrs(warn, field)}>${cellHtml(field, ch, label(field))}</td>`).join('') +
+      notes.columns.map(c => `<td data-label="${escapeHtml(c)}"><input data-note="${escapeHtml(c)}" value="${escapeHtml(note[c] ?? '')}" aria-label="${escapeHtml(`${c} ${i + 1}`)}"></td>`).join('') +
       `<td><button type="button" class="btn compact-toolbar-action" data-action="delete" title="${escapeHtml(t('memDelete'))}" aria-label="${escapeHtml(`${t('memDelete')} ${i + 1}`)}">✕</button></td></tr>`;
+  }
+
+  const WARNING_KEYS = { zeroOffset: 'memWarnZeroOffset', offset: 'memOffsetUnusual', airband: 'memWarnAirband' };
+  const warningTitle = w => t(WARNING_KEYS[w.code], w.usual);
+
+  function warningAttrs(warnings, field) {
+    const w = warnings.find(x => x.field === field);
+    return w ? ` class="mem-warn" title="${escapeHtml(warningTitle(w))}"` : '';
   }
 
   function counts() {
@@ -907,6 +1056,10 @@
     importApplyBtn.disabled = busy || !image || !pendingCsv;
     importStatus.textContent = pendingCsv ? t('memImportReady', pendingCsv.name) : t('memImportNone');
     exportBtn.disabled = saveBtn.disabled = !image;
+    const gaps = Boolean(image && M.hasGaps(image));
+    if (!gaps) gapReminder = false;
+    closeGapsBtn.disabled = busy || !gaps;
+    closeGapsBtn.classList.toggle('mem-write-reminder', gapReminder);
   }
 
   function renderListNames() {
@@ -918,10 +1071,38 @@
         `aria-label="${escapeHtml(t('memListName', list))}"></label>`;
     }).join('') : '';
     listNamesBox.hidden = !image;
+    if (image) importScanList.innerHTML = options(scanPairs(), importScanList.value || M.SCANLIST_ALL);
+  }
+
+  // Filled-in values per extra column, counting only channels in the table.
+  function columnUse() {
+    const use = Object.fromEntries(notes.columns.map(c => [c, 0]));
+    for (let i = 0; i < M.CHANNEL_COUNT; i++) {
+      const ch = M.decodeChannel(image, i);
+      const note = ch && notes.values.get(M.noteKey(ch));
+      if (note) notes.columns.forEach(c => { if (note[c]) use[c]++; });
+    }
+    return use;
+  }
+
+  function updateRemoveEmpty() {
+    removeEmptyBtn.hidden = !image || !Object.values(columnUse()).some(n => n === 0);
+  }
+
+  // Note columns go between PTT ID and the delete column.
+  // Each has a ✕; the + sits in the delete column's header. On phones these show as chips.
+  function renderNoteHeaders() {
+    updateRemoveEmpty();
+    const row = channelsBox.querySelector('thead tr');
+    row.querySelectorAll('th[data-note]').forEach(th => th.remove());
+    row.lastElementChild.insertAdjacentHTML('beforebegin', notes.columns.map(c =>
+      `<th data-note><span data-help="memories-guide#extra-columns" tabindex="0" role="button" title="${escapeHtml(t('memExtraColumnHint'))}">${escapeHtml(c)}</span>` +
+      `<button type="button" class="btn mem-col-btn" data-remove-column="${escapeHtml(c)}" title="${escapeHtml(t('memRemoveColumn', c))}" aria-label="${escapeHtml(t('memRemoveColumn', c))}">✕</button></th>`).join(''));
   }
 
   function render() {
     renderListNames();
+    renderNoteHeaders();
     const rows = [];
     if (image) {
       const shown = [];
@@ -980,6 +1161,15 @@
     const input = event.target;
     const field = input.dataset.field;
     const tr = input.closest('tr');
+    if (input.dataset.note && tr) {
+      const key = M.noteKey(M.decodeChannel(image, Number(tr.dataset.index)));
+      const note = notes.values.get(key) || {};
+      note[input.dataset.note] = input.value.trim();
+      notes.values.set(key, note);
+      notesUnsaved = true;
+      updateRemoveEmpty();
+      return;
+    }
     if (!field || !tr) return;
     const i = Number(tr.dataset.index);
     const wasEmpty = !M.decodeChannel(image, i);
@@ -987,15 +1177,23 @@
       input.removeAttribute('aria-invalid');
       if (!wasEmpty) {
         M.encodeChannel(image, i, null);
+        gapReminder = true;
         replaceRow(tr, 'freq');
       }
       return;
     }
     try {
       const ch = M.decodeChannel(image, i) || M.defaultChannel();
+      const oldKey = M.noteKey(ch);
       ch[field] = fieldValue(input);
       M.encodeChannel(image, i, ch);
       input.removeAttribute('aria-invalid');
+      // Notes follow a renamed or retuned channel (unless the new key already has some).
+      const newKey = M.noteKey(M.decodeChannel(image, i));
+      if (newKey !== oldKey && notes.values.has(oldKey) && !notes.values.has(newKey)) {
+        notes.values.set(newKey, notes.values.get(oldKey));
+        notes.values.delete(oldKey);
+      }
     } catch (error) {
       log(t('memInvalidValue', `${tr.querySelector('.slot-idx').textContent}: ${error.message}`), 'error');
       input.setAttribute('aria-invalid', 'true');
@@ -1011,6 +1209,16 @@
     tr.querySelectorAll('[data-field="freq"], [data-field="offset"]').forEach(el => { el.value = M.formatMHz(ch[el.dataset.field]); });
     if (field === 'name' || field === 'txTone' || field === 'rxTone') input.value = ch[field];
     tr.classList.toggle('mem-dirty', Boolean(radioImage && M.channelDirty(radioImage, image, i)));
+    if (i < M.CHANNEL_COUNT) {
+      const warnings = M.channelWarnings(ch);
+      for (const f of ['offset', 'mode']) {
+        const cell = tr.querySelector(`[data-field="${f}"]`)?.closest('td');
+        const w = warnings.find(x => x.field === f);
+        cell?.classList.toggle('mem-warn', Boolean(w));
+        if (w) cell.title = warningTitle(w);
+        else cell?.removeAttribute('title');
+      }
+    }
     updateState();
   }
   body.addEventListener('change', onCellChange);
@@ -1030,7 +1238,7 @@
     input.value = M.getListName(image, list);
     input.closest('label').classList.toggle('mem-dirty', M.getListName(radioImage, list) !== M.getListName(image, list));
     // Refresh the scan list labels in the table without moving focus.
-    body.querySelectorAll('select[data-field="scanlist"]').forEach(select => {
+    [...body.querySelectorAll('select[data-field="scanlist"]'), importScanList].forEach(select => {
       select.options[list].textContent = `${list} ${M.getListName(image, list)}`.trim();
     });
     updateState();
@@ -1211,7 +1419,59 @@
     if (!button) return;
     const tr = button.closest('tr');
     M.encodeChannel(image, Number(tr.dataset.index), null);
+    gapReminder = true;
     replaceRow(tr, 'freq');
+  });
+
+  // Undoable, so no confirmation.
+  closeGapsBtn.addEventListener('click', () => {
+    closedReminder = gapReminder;
+    const moved = M.compactChannels(image);
+    selected.clear();
+    openCards.clear();
+    render();
+    log(t('memGapsClosed', moved), 'success');
+  });
+
+  function addColumn() {
+    const name = window.prompt(t('memAddColumnPrompt'))?.trim();
+    if (!name) return;
+    const column = /^comment$/i.test(name) ? 'Comment' : name;   // Comment is CHIRP's own column
+    const same = c => c.toLowerCase() === name.toLowerCase();
+    if (column !== 'Comment' && [...M.CHIRP_HEADER, ...M.RADIO_COLUMNS].some(same)) {
+      log(t('memColumnReserved', name), 'error');
+      return;
+    }
+    if (notes.columns.some(same)) {
+      log(t('memColumnTaken', name), 'error');
+      return;
+    }
+    notes.columns.push(column);
+    notesUnsaved = true;
+    render();
+  }
+
+  function removeColumns(columns) {
+    notes.columns = notes.columns.filter(c => !columns.includes(c));
+    for (const note of notes.values.values()) columns.forEach(c => delete note[c]);
+    notesUnsaved = true;
+    render();
+  }
+
+  channelsBox.querySelector('thead').addEventListener('click', event => {
+    const button = event.target.closest('[data-add-column], [data-remove-column]');
+    if (!button) return;
+    if (button.dataset.addColumn !== undefined) return addColumn();
+    const column = button.dataset.removeColumn;
+    const used = columnUse()[column];
+    // Notes aren't in Undo and not on the radio: confirm before losing values.
+    if (used && !window.confirm(t('memRemoveColumnConfirm', column, used))) return;
+    removeColumns([column]);
+  });
+
+  removeEmptyBtn.addEventListener('click', () => {
+    const use = columnUse();
+    removeColumns(notes.columns.filter(c => use[c] === 0));
   });
 
   showEmpty.addEventListener('change', render);
@@ -1236,6 +1496,7 @@
       image = data.slice();
       history.reset();
       discardedReminder = false;
+      gapReminder = closedReminder = false;
       selected.clear();
       openCards.clear();
       render();
@@ -1246,6 +1507,7 @@
   undoBtn.addEventListener('click', () => {
     image = history.undo() || image;
     if (discardedReminder) writeReminder = true;   // cleared again below if nothing is unwritten
+    if (closedReminder) gapReminder = true;   // likewise when the undo leaves no gap
     render();
   });
 
@@ -1304,8 +1566,9 @@
     pendingCsv = null;   // importing the same file twice would duplicate it
     try {
       const { imported, errors, warnings, duplicates } = M.importChirpCsv(image, text, {
-        mode: importMode.value, dedupe: skipDuplicates.checked
+        mode: importMode.value, dedupe: skipDuplicates.checked, scanlist: Number(importScanList.value), notes
       });
+      if (imported && notes.columns.length) notesUnsaved = true;
       errors.forEach(e => log(t('memImportRowError', e.line, e.message), 'error'));
       warnings.forEach(w => log(t('memImportRowWarning', w.line, w.message), 'info'));
       if (duplicates) log(t('memImportDuplicates', duplicates), 'info');
@@ -1340,8 +1603,10 @@
   });
 
   exportBtn.addEventListener('click', () => {
-    download(M.exportChirpCsv(image), 'memories.csv', 'text/csv');
+    download(M.exportChirpCsv(image, { notes, extras: exportExtras.checked }), 'memories.csv', 'text/csv');
+    notesUnsaved = false;
   });
+  exportExtras.addEventListener('change', () => prefs.set('uvstudio.memExportExtras', exportExtras.checked));
 
   saveBtn.addEventListener('click', () => {
     download(image, 'memories.bin', 'application/octet-stream');
@@ -1373,7 +1638,7 @@
   });
   window.addEventListener('uvstudio:languagechange', render);
   window.addEventListener('beforeunload', event => {
-    if (radioImage && image && M.dirtyRuns(radioImage, image).length) event.preventDefault();
+    if ((radioImage && image && M.dirtyRuns(radioImage, image).length) || notesUnsaved) event.preventDefault();
   });
   updateState();
 })();

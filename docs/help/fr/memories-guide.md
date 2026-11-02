@@ -15,17 +15,29 @@
 
 ### Importer et exporter en CSV
 Ces boutons sont sous **Importer et exporter**. Les fichiers CSV suivent le format CHIRP : vous pouvez échanger des listes de canaux avec CHIRP, un tableur ou des sites comme RepeaterBook.
-- **Exporter en CSV** enregistre les canaux dans un fichier CSV.
+- **Exporter en CSV** enregistre les canaux dans un fichier CSV. Avec **Inclure les colonnes supplémentaires** cochée, il enregistre aussi la liste de scan, le verrouillage TX et le verrouillage occupé de chaque canal, ainsi que vos propres colonnes (voir Colonnes supplémentaires ci-dessous), après les colonnes CHIRP standard. CHIRP signale les colonnes qu’il ne connaît pas mais ouvre quand même le fichier. Décochez-la pour un fichier CHIRP simple.
 - L’import se fait en trois étapes :
   1. **Choisir un fichier CSV**, ou collez une adresse web (ou choisissez une liste proposée) et appuyez sur **Charger depuis l'URL**. La ligne en dessous indique quel CSV est prêt. Rien ne change encore.
-  2. Choisissez dans le menu où vont les lignes, et cochez **Ignorer les doublons** si besoin.
+  2. Choisissez dans le menu où vont les lignes, la liste de scan des nouveaux canaux, et cochez **Ignorer les doublons exacts** si besoin.
   3. Appuyez sur **Importer dans le tableau**. Les canaux apparaissent dans le tableau, et **Écrire les changements** pulse jusqu’à ce que vous les écriviez. La radio n’est pas touchée avant.
 - Où vont les lignes :
   - **Aux emplacements du CSV** : chaque ligne va au numéro de canal de sa colonne Location. Les autres canaux ne bougent pas.
   - **Ajouter à la fin** : les lignes vont après votre dernier canal utilisé, dans l’ordre du fichier.
   - **Ajouter au début** : les lignes vont en tête (à partir du canal 1) et vos canaux existants descendent.
   - **Tout remplacer** : tous les canaux sont effacés, puis les lignes vont à leurs emplacements.
-- **Ignorer les doublons** écarte les lignes ayant la même fréquence, le même duplex, décalage, mode et les mêmes tonalités qu’un canal existant. Les noms ne sont pas comparés.
+- **Liste de scan des nouveaux canaux** : la liste des canaux quand le fichier ne l’indique pas. Un fichier avec une colonne ScanList (comme l’écrit **Inclure les colonnes supplémentaires**) garde ses propres listes. Une liste nommée dans le fichier (par exemple `2 EST`) prend ce nom seulement si elle n’en a pas encore.
+- **Ignorer les doublons exacts** écarte les lignes ayant la même fréquence, le même duplex, décalage, mode et les mêmes tonalités qu’un canal existant. Les noms ne sont pas comparés. Une ligne sur la même fréquence avec d’autres tonalités est quand même importée, et reçoit le contour orange des doublons.
+- Les erreurs probables d’un fichier sont entourées d’orange (survolez ou touchez pour savoir pourquoi) et signalées dans le journal d’import. Vérifiez-les avant d’écrire :
+  - **Décalage :** + ou − avec un décalage de 0 (le canal émettrait sur sa fréquence de réception), un relais 2 m avec 5 MHz, ou un relais 70 cm avec 0,6 MHz.
+  - **Mode :** un canal de la bande aviation (108–137 MHz) qui n’est pas en AM.
+- La radio affiche des noms de 10 lettres, chiffres et symboles simples au maximum. Les noms plus longs sont coupés, et les lettres accentuées ou les autres écritures (comme le chinois) sont omises ; le journal d’import montre le nom tel qu’enregistré.
+
+### Colonnes supplémentaires
+Des colonnes que la radio ne peut pas enregistrer, comme **Comment** ou les colonnes propres à un fichier (ville, réseau, source, date de vérification…).
+- L’import d’un CSV les garde, et elles s’affichent dans le tableau après PTT ID, avec leur nom en italique. **+** dans l’en-tête du tableau ajoute une colonne, et **✕** à côté du nom d’une colonne la supprime (sur un téléphone, ils s’affichent en pastilles sous **Tout sélectionner (affichés)**). **Supprimer les colonnes vides** apparaît au-dessus du tableau quand une colonne n’a aucune valeur. Supprimer une colonne qui a des valeurs demande d’abord confirmation : elles ne sont pas dans Annuler.
+- **Elles ne sont pas enregistrées dans la radio.** Elles restent sur cette page et partent dans **Exporter en CSV** (Comment toujours, les autres avec **Inclure les colonnes supplémentaires** cochée). Gardez le CSV exporté, par exemple dans git, pour les conserver.
+- Elles suivent le canal par sa fréquence et son nom : elles restent avec lui quand vous déplacez, triez ou relisez les canaux. Changer la fréquence ou le nom d’un canal dans le tableau les emporte aussi.
+- Quitter la page avec des changements de colonnes supplémentaires non exportés demande d’abord confirmation.
 
 ### Trier par
 Affiche les canaux par numéro, fréquence ou nom. Seul l’ordre de cette page change : les numéros de canaux dans la radio restent les mêmes. Monter, Descendre et Insérer un vide au-dessus agissent sur les numéros de canaux, ils sont donc désactivés pendant un autre tri.
@@ -35,6 +47,9 @@ Une fréquence ou un nom utilisé par plusieurs canaux est entouré d’orange. 
 
 ### Afficher les canaux vides
 Affiche aussi les numéros de canal inutilisés, pour saisir un nouveau canal à un emplacement précis.
+
+### Combler les trous
+Remonte les canaux dans les numéros de canal vides, dans le même ordre : les canaux 1, 2, 5 deviennent 1, 2, 3. Le bouton pulse après la suppression d’un canal qui laisse un trou. Annuler remet les canaux en place.
 
 ### Modifier plusieurs canaux
 Cochez les cases à gauche pour sélectionner des canaux. Une barre apparaît avec :

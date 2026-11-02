@@ -1,0 +1,11 @@
+{
+  "name": "uvstudio-plus",
+  "description": "Drive UV Studio+ in Chrome for a Quansheng UV-K5 V3 / UV-K1 on F4HWN firmware: navigate, configure memories and settings, and hardware-test builds.",
+  "version": "1.0.0",
+  "author": {
+    "name": "W8LBZ"
+  },
+  "homepage": "https://w8lbz.github.io/uvstudio/",
+  "repository": "https://github.com/w8lbz/uvstudio",
+  "keywords": ["ham-radio", "quansheng", "uv-k5", "f4hwn", "uv-studio"]
+}

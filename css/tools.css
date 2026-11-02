@@ -873,7 +873,8 @@ display: none !important;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
-#pane-tools .slots-table thead th:last-child { text-align: right; }
+/* Not the Memories tables: there the last column is PTT ID (VFOs) or a header-less Delete. */
+#pane-tools .slots-table:not(.mem-table) thead th:last-child { text-align: right; }
 #pane-tools .slots-table tbody tr + tr td {
   border-top: 1px solid var(--border);
 }
@@ -1948,6 +1949,25 @@ display: none !important;
   border-color: #f59e0b;
   box-shadow: 0 0 0 1px #f59e0b;
 }
+/* Likely mistake (M.channelWarnings: zero or other-band offset, airband not AM); tooltip says which. */
+#pane-tools .mem-table td.mem-warn :is(input, select) {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+/* Note columns (not stored on the radio): set apart from the radio fields. */
+#pane-tools .mem-table th[data-note] { font-style: italic; }
+/* ✕ on each extra column, + to add one (in the delete column's header). */
+#pane-tools .slots-table button.mem-col-btn {   /* beats the table's button.btn rule */
+  height: 22px;
+  min-width: 22px;
+  margin-left: 8px;
+  padding: 0 5px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-style: normal;
+  vertical-align: middle;
+}
+#pane-tools #memRemoveEmptyBtn[hidden] { display: none; }   /* .btn's display would win */
 #pane-tools tr.mem-dup-freq .mem-card-detail,
 #pane-tools tr.mem-dup-name .mem-card-name { color: #d97706; }
 #pane-tools .mem-import-status {
@@ -2060,6 +2080,15 @@ display: none !important;
   #pane-tools .mem-table thead { display: block; }
   #pane-tools .mem-table thead th { position: static; border: 0; padding: 0 0 8px; background: none; }
   #pane-tools .mem-table thead th:not(:first-child) { display: none; }
+  /* Extra columns and + show as chips after Select all. */
+  #pane-tools .mem-table thead tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #pane-tools .mem-table thead th[data-note],
+  #pane-tools .mem-table thead th.mem-col-add { display: inline-flex; align-items: center; }
+  #pane-tools .mem-table thead th[data-note] {
+    padding: 2px 4px 2px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
   #pane-tools .mem-select-all { display: flex; align-items: center; gap: 8px; }
   #pane-tools .mem-select-all span { display: inline; }
   #pane-tools .mem-select-all input { width: 22px; height: 22px; margin: 0; }

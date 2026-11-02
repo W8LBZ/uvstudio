@@ -1,0 +1,4 @@
+# Kept out of `git archive`, so the Pages build (and the sw.js offline file list) skips them.
+/.claude export-ignore
+/.claude-plugin export-ignore
+/plugins export-ignore
