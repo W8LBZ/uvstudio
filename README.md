@@ -135,8 +135,10 @@ hardware-test builds). In Claude Code:
 /plugin install uvstudio-plus@w8lbz
 ```
 
-Auto-update is off by default for this marketplace. To get new versions automatically, run
-`/plugin`, open Marketplaces, select `w8lbz` and choose Enable auto-update. On claude.ai,
+In Claude Code, auto-update is off by default for this marketplace. To get new versions
+automatically, run `/plugin`, open Marketplaces, select `w8lbz` and choose Enable auto-update.
+In Claude Desktop, add it under Settings > Plugins > Add with the URL `w8lbz/uvstudio`; leave
+Sync automatically on to get new versions. On claude.ai,
 upload `plugins/uvstudio-plus/skills/uvstudio/SKILL.md` as a skill; it says at the end of a
 run when a newer version is out.
 
