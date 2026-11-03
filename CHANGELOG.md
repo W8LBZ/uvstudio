@@ -7,6 +7,18 @@ From 2026.10.0 on, UV Studio+ uses calendar versions (year.month.release), and A
 shows which UV Studio release it is based on. Earlier releases were numbered
 `<UV Studio version>-w8lbz.<N>`. Builds on the test site show `+test.<commit>`.
 
+## 2026.11.1 (2026-11-02)
+
+Based on UV Studio 2.4.0.
+
+Merged UV Studio 2.4.0:
+
+- Apps: each app links to its manual (firmware Wiki page or the author's README) instead of
+  its source, and official authors link to their GitHub profile.
+- Firmware Slots: a v7.0+ firmware (one with assets) is no longer written into a slot while the
+  radio runs older firmware (it would boot to a blank screen); a dialog asks to update the main
+  firmware first, with a Flash Firmware button.
+
 ## 2026.11.0 (2026-11-01)
 
 - Memories: extra CSV columns. Comment and a file's own columns (City, Net, Source…) are kept on
